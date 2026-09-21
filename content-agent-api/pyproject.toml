@@ -1,0 +1,49 @@
+[project]
+name = "canarias-cerca-editor-agent"
+version = "0.3.0"
+description = "Canarias Cerca Editor Agent — FastAPI + LangGraph + Human-in-the-Loop"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+  "fastapi>=0.115.0,<1.0",
+  "uvicorn[standard]>=0.34.0,<1.0",
+  "langchain>=1.0.3,<2.0",
+  "langchain-core>=1.0.2,<2.0",
+  "langchain-community>=0.4.1,<1.0",
+  "langchain-openai>=1.0.1,<2.0",
+  "langchain-anthropic>=1.0.1,<2.0",
+  "langchain-tavily>=0.2.17,<1.0",
+  "langgraph>=1.0.2,<2.0",
+  "langgraph-checkpoint-mongodb>=0.3.1,<1.0",
+  "pymongo>=4.12.1,<5.0",
+  "motor>=3.7.0,<4.0",
+  "beanie>=1.29.0,<2.0",
+  "pydantic>=2.12.3,<3.0",
+  "pydantic-settings>=2.7.0,<3.0",
+  "google-api-python-client>=2.149.0,<3.0",
+  "google-auth>=2.35.0,<3.0",
+]
+
+[dependency-groups]
+dev = [
+  "mypy>=1.11.1,<2.0",
+  "pytest>=8.3.3,<9.0",
+  "pytest-asyncio>=1.2.0,<2.0",
+  "pytest-cov>=7.0.0,<8.0",
+  "httpx>=0.28.0,<1.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.mypy]
+python_version = "3.13"
+plugins = ["pydantic.mypy"]
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+filterwarnings = ["ignore::DeprecationWarning"]

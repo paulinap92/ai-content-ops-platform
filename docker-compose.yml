@@ -1,0 +1,44 @@
+services:
+  mongodb:
+    image: mongo:8.2
+    container_name: canarias_cerca_editor_mongodb
+    restart: unless-stopped
+    ports:
+      - "${MONGODB_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_DATABASE: canarias_cerca_editor
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  editor-agent-api:
+    build:
+      context: ./content-agent-api
+      dockerfile: Dockerfile
+      target: runtime
+    container_name: canarias_cerca_editor_api
+    restart: on-failure:5
+    ports:
+      - "${CONTENT_AGENT_API_PORT:-8000}:8000"
+    env_file:
+      - ./content-agent-api/.env
+    volumes:
+      - ./output:/app/output
+      - ./photo_inbox:/app/photo_inbox
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  mongo-data:
