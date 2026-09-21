@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Canarias Cerca · Content Studio</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">CANARIAS CERCA</p>
+      <h1>Content Studio</h1>
+    </div>
+    <div class="topbar-actions">
+      <span id="api-status" class="status-dot status-neutral">API</span>
+      <a class="ghost-link" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <nav class="tabs" aria-label="Widoki aplikacji">
+      <button class="tab active" data-view="editor">Text Editor</button>
+      <button class="tab" data-view="photos">Photos</button>
+      <button class="tab" data-view="graph">Graph</button>
+    </nav>
+
+    <section id="view-editor" class="view active">
+      <div class="editor-grid">
+        <aside class="panel draft-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">DRAFTY</p><h2>Treści</h2></div>
+            <button id="refresh-list" class="icon-button" title="Odśwież">↻</button>
+          </div>
+          <div id="draft-list" class="draft-list"><p class="muted">Brak draftów.</p></div>
+        </aside>
+
+        <section class="panel composer-panel">
+          <div class="panel-heading"><div><p class="eyebrow">NOWY DRAFT</p><h2>Źródło i temat</h2></div></div>
+          <form id="create-form" class="form-grid">
+            <label class="field field-wide"><span>Temat *</span><input id="topic" required minlength="3" maxlength="500" placeholder="Np. Piscinas naturales de Tenerife" /></label>
+            <label class="field"><span>Wyspa</span><select id="island_hint"><option value="">Automatycznie</option><option>Tenerife</option><option>Gran Canaria</option><option>Lanzarote</option><option>Fuerteventura</option><option>La Palma</option><option>La Gomera</option><option>El Hierro</option><option>La Graciosa</option></select></label>
+            <label class="field"><span>Typ treści</span><select id="content_type_hint"><option value="">Automatycznie</option><option value="place">Place</option><option value="route">Route</option><option value="event">Event</option><option value="news">News</option><option value="guide">Guide</option></select></label>
+            <label class="field field-wide"><span>URL źródła</span><input id="source_url" type="url" placeholder="https://..." /></label>
+            <label class="field field-wide"><span>Tekst źródłowy</span><textarea id="source_text" rows="9" maxlength="50000" placeholder="Wklej materiał źródłowy. Jeśli zostawisz puste, agent użyje Tavily."></textarea></label>
+            <div class="field-wide form-actions"><button id="create-button" class="primary-button" type="submit">Uruchom graf</button></div>
+          </form>
+        </section>
+
+        <section class="panel review-panel">
+          <div class="panel-heading"><div><p class="eyebrow">HUMAN IN THE LOOP</p><h2>Review</h2></div><span id="current-status" class="status-pill status-neutral">Brak draftu</span></div>
+          <div id="empty-review" class="empty-state"><div class="empty-icon">✦</div><p>Utwórz draft albo wybierz istniejący.</p></div>
+          <div id="review-content" class="review-content hidden">
+            <div class="meta-row"><span>Thread ID</span><code id="thread-id">—</code></div>
+            <div class="meta-row"><span>Temat</span><strong id="review-topic">—</strong></div>
+            <div class="meta-row"><span>Rewizja</span><strong id="revision-count">0</strong></div>
+            <div class="section-block"><div class="section-title">Propozycja / outline</div><pre id="outline" class="content-preview">Agent jeszcze pracuje…</pre></div>
+            <div id="decision-box" class="decision-box hidden">
+              <label class="field"><span>Feedback do poprawy</span><textarea id="feedback" rows="4" placeholder="Np. mniej marketingowo, dopisz dojazd i ograniczenia..."></textarea></label>
+              <label class="field"><span>Dodatkowe wyszukiwanie (opcjonalnie)</span><input id="search_query" placeholder="Np. acceso piscina natural Bajamar horarios" /></label>
+              <div class="decision-actions"><button id="revise-button" class="secondary-button" type="button">Revise</button><button id="approve-button" class="primary-button" type="button">Approve</button></div>
+            </div>
+            <div id="result-box" class="section-block hidden"><div class="section-title result-title-row"><span>Finalny JSON</span><a id="download-link" class="ghost-link" href="#">Pobierz JSON</a></div><pre id="json-output" class="content-preview json-preview"></pre></div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="view-photos" class="view">
+      <div class="photos-toolbar panel">
+        <div>
+          <p class="eyebrow">PHOTO MANAGER · V0.3</p>
+          <h2>Drive / folder photo queue</h2>
+          <p class="muted toolbar-copy">Skanujemy foldery, bierzemy wyspę i gminę ze ścieżki, a Ty zatwierdzasz metadata i nazwę.</p>
+        </div>
+        <div class="toolbar-actions">
+          <select id="photo-status-filter" aria-label="Filtr statusu">
+            <option value="">Wszystkie</option>
+            <option value="new" selected>New</option>
+            <option value="review">Review</option>
+            <option value="approved">Approved</option>
+            <option value="skipped">Skipped</option>
+          </select>
+          <button id="scan-photos" class="primary-button" type="button">Scan folders</button>
+        </div>
+      </div>
+
+      <div class="photos-grid">
+        <aside class="panel photo-queue-panel">
+          <div class="panel-heading"><div><p class="eyebrow">KOLEJKA</p><h2>Zdjęcia</h2></div><span id="photo-count" class="status-pill status-neutral">0</span></div>
+          <div id="photo-list" class="photo-list"><p class="muted">Kliknij Scan folders.</p></div>
+        </aside>
+
+        <section class="panel photo-preview-panel">
+          <div class="panel-heading"><div><p class="eyebrow">PODGLĄD</p><h2 id="photo-preview-title">Wybierz zdjęcie</h2></div><span id="photo-status" class="status-pill status-neutral">—</span></div>
+          <div id="photo-preview-empty" class="empty-state"><div class="empty-icon">▧</div><p>Wybierz zdjęcie z kolejki.</p></div>
+          <div id="photo-preview-content" class="photo-preview-content hidden">
+            <div class="image-stage"><img id="photo-image" alt="Podgląd zdjęcia" /></div>
+            <div class="photo-source-meta">
+              <div class="meta-row"><span>Folder</span><code id="photo-folder">—</code></div>
+              <div class="meta-row"><span>Plik</span><strong id="photo-current-name">—</strong></div>
+              <div class="meta-row"><span>Źródło</span><strong id="photo-source">—</strong></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel photo-editor-panel">
+          <div class="panel-heading"><div><p class="eyebrow">METADATA</p><h2>Review & rename</h2></div></div>
+          <div id="photo-editor-empty" class="empty-state"><p>Metadata pojawią się po wybraniu zdjęcia.</p></div>
+          <form id="photo-form" class="photo-form hidden">
+            <label class="field"><span>Wyspa</span><input id="photo-island" /></label>
+            <label class="field"><span>Gmina / obszar</span><input id="photo-municipality" /></label>
+            <label class="field"><span>Konkretne miejsce</span><input id="photo-place" placeholder="Np. Puertito de Güímar" /></label>
+            <label class="field"><span>Kategoria</span><input id="photo-category" placeholder="Np. coast, trail, viewpoint" /></label>
+            <label class="field"><span>Alt ES</span><textarea id="photo-alt" rows="4" placeholder="Na razie ręcznie; Gemini dołożymy w kolejnym kroku."></textarea></label>
+            <label class="field"><span>Tagi (po przecinku)</span><input id="photo-tags" placeholder="costa, puertito, paseo" /></label>
+            <label class="field"><span>Proponowana nazwa</span><input id="photo-filename" /></label>
+            <div class="photo-actions">
+              <button id="photo-save" class="secondary-button" type="submit">Save metadata</button>
+              <button id="photo-skip" class="secondary-button danger-outline" type="button">Skip</button>
+              <button id="photo-approve" class="primary-button" type="button">Approve + rename</button>
+            </div>
+          </form>
+        </section>
+      </div>
+    </section>
+
+    <section id="view-graph" class="view">
+      <section class="panel graph-panel">
+        <div class="panel-heading graph-heading"><div><p class="eyebrow">LANGGRAPH</p><h2>Text content workflow</h2></div><div class="graph-legend"><span><i class="legend-dot active-dot"></i> aktualny node</span><span><i class="legend-dot"></i> pozostałe</span></div></div>
+        <div class="graph-canvas" aria-label="Graf przepływu agenta">
+          <div class="graph-start">START</div><div class="arrow-down">↓</div>
+          <article class="graph-node" data-node="research"><span class="node-index">01</span><div><h3>research</h3><p>Źródło tekstowe lub Tavily → factual brief.</p></div></article><div class="arrow-down">↓</div>
+          <article class="graph-node" data-node="curate"><span class="node-index">02</span><div><h3>curate</h3><p>Układa propozycję treści Canarias Cerca do review.</p></div></article><div class="arrow-down">↓</div>
+          <article class="graph-node human-node" data-node="human_review"><span class="node-index">03</span><div><h3>human_review</h3><p>Graf zatrzymuje się. Ty wybierasz approve albo revise.</p></div></article>
+          <div class="branch-row"><div class="branch revise-branch"><span>revise</span><div class="branch-arrow">↖ wraca do curate</div></div><div class="branch approve-branch"><span>approve</span><div class="branch-arrow">↓</div></div></div>
+          <article class="graph-node" data-node="write"><span class="node-index">04</span><div><h3>write</h3><p>Generuje finalny pakiet ES / EN / PL.</p></div></article><div class="arrow-down">↓</div>
+          <article class="graph-node" data-node="publish"><span class="node-index">05</span><div><h3>publish</h3><p>Waliduje i zapisuje JSON.</p></div></article><div class="arrow-down">↓</div><div class="graph-end">END · ready</div>
+        </div>
+      </section>
+
+      <section class="panel graph-panel secondary-graph-panel">
+        <div class="panel-heading"><div><p class="eyebrow">PHOTO AUTOMATION</p><h2>Photo workflow · v0.3</h2></div><span class="status-pill status-working">bez Gemini na razie</span></div>
+        <div class="photo-flow">
+          <div class="mini-node"><strong>scan_source</strong><span>Drive / folder</span></div><div class="mini-arrow">→</div>
+          <div class="mini-node"><strong>infer_folders</strong><span>Tenerife / Güímar</span></div><div class="mini-arrow">→</div>
+          <div class="mini-node emphasis"><strong>human_review</strong><span>metadata + filename</span></div><div class="mini-arrow">→</div>
+          <div class="mini-node"><strong>rename</strong><span>approve</span></div>
+        </div>
+        <aside class="graph-note"><strong>Następny node:</strong><p>Gemini Vision wejdzie między <code>infer_folders</code> i <code>human_review</code>, żeby proponować miejsce, kategorię, alt i sensowną nazwę.</p></aside>
+      </section>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
