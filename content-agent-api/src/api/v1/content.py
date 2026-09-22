@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Path, status
 from fastapi.responses import FileResponse
 
-from src.api.dependencies import AgentServiceDep
+from src.api.dependencies import AgentServiceDep, CanariasPublisherDep
 from src.domain.schemas import (
     ContentCreateRequest,
     ContentCreatedResponse,
@@ -12,6 +12,8 @@ from src.domain.schemas import (
     ContentDecisionResponse,
     ContentListItemResponse,
     ContentStatusResponse,
+    CanariasPublishRequest,
+    CanariasPublishResponse,
 )
 from src.services.exceptions import AgentException
 
@@ -106,6 +108,25 @@ async def download_content(
         media_type="application/json",
         filename=os.path.basename(file_path),
     )
+
+
+@router.post(
+    "/{thread_id}/publish-to-canarias",
+    response_model=CanariasPublishResponse,
+    summary="Wyślij gotowy draft do editora Canarias Cerca",
+    description=(
+        "Wysyła finalny pakiet przez istniejące /api/editor/content. "
+        "Canarias Cerca zapisuje go jako edytowalny draft w swoim obecnym storage."
+    ),
+)
+async def publish_to_canarias(
+    thread_id: ThreadIdPath,
+    payload: CanariasPublishRequest,
+    service: AgentServiceDep,
+    publisher: CanariasPublisherDep,
+) -> CanariasPublishResponse:
+    file_path = await service.get_file_path(thread_id=thread_id)
+    return await publisher.publish_file(file_path=file_path, request=payload)
 
 
 @router.delete(

@@ -5,70 +5,32 @@ import hashlib
 import logging
 import re
 import unicodedata
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
 from beanie import PydanticObjectId, SortDirection
 
 from src.domain.documents import PhotoDocument
+from src.domain.photo_structure import parse_photo_folder
 from src.domain.schemas import (
     PhotoDecisionResponse,
     PhotoDetailResponse,
+    PhotoFolderItemResponse,
     PhotoListItemResponse,
     PhotoScanResponse,
     PhotoUpdateRequest,
 )
 from src.services.exceptions import BusinessRuleException, NotFoundException
-from src.services.photo_source import PhotoSource, SourcePhoto
+from src.services.photo_source import PhotoSource
 
 logger = logging.getLogger(__name__)
-
-ISLANDS = {
-    "tenerife": "Tenerife",
-    "gran canaria": "Gran Canaria",
-    "lanzarote": "Lanzarote",
-    "fuerteventura": "Fuerteventura",
-    "la palma": "La Palma",
-    "la gomera": "La Gomera",
-    "el hierro": "El Hierro",
-    "la graciosa": "La Graciosa",
-}
 
 
 def _slug(value: str) -> str:
     ascii_value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
     cleaned = re.sub(r"[^a-zA-Z0-9]+", "-", ascii_value).strip("-").lower()
     return cleaned or "photo"
-
-
-def _humanize_folder(value: str) -> str:
-    return value.replace("_", " ").replace("-", " ").strip().title()
-
-
-def _infer_from_folder(folder_path: str) -> tuple[str, str]:
-    parts = [part.strip() for part in folder_path.replace("\\", "/").split("/") if part.strip()]
-    if not parts:
-        return "", ""
-
-    island = ""
-    island_index: int | None = None
-    for index, part in enumerate(parts):
-        normalized = part.replace("_", " ").replace("-", " ").strip().lower()
-        if normalized in ISLANDS:
-            island = ISLANDS[normalized]
-            island_index = index
-            break
-
-    municipality = ""
-    if island_index is not None and island_index + 1 < len(parts):
-        municipality = _humanize_folder(parts[island_index + 1])
-    elif len(parts) >= 2:
-        island = _humanize_folder(parts[0])
-        municipality = _humanize_folder(parts[1])
-    elif len(parts) == 1:
-        island = _humanize_folder(parts[0])
-
-    return island, municipality
 
 
 class PhotoService:
@@ -88,7 +50,9 @@ class PhotoService:
 
             for item in photos:
                 source_key = self._source_key(item.source_file_id)
+                metadata = parse_photo_folder(item.folder_path)
                 doc = await PhotoDocument.find_one(PhotoDocument.source_key == source_key)
+
                 if doc:
                     doc.folder_path = item.folder_path
                     doc.current_name = item.name
@@ -96,16 +60,31 @@ class PhotoService:
                     doc.size = item.size
                     doc.web_view_link = item.web_view_link
                     doc.last_scanned_at = now
+
+                    # Folder structure is deterministic. Fill only missing editorial fields so a
+                    # later manual correction in the editor is never destroyed by another scan.
+                    if not doc.island:
+                        doc.island = metadata.island
+                    if not doc.site_area:
+                        doc.site_area = metadata.site_area
+                    if not doc.site_section:
+                        doc.site_section = metadata.site_section
+                    if not doc.municipality:
+                        doc.municipality = metadata.municipality
+                    if not doc.place:
+                        doc.place = metadata.place
+                    if not doc.category and metadata.site_section:
+                        doc.category = metadata.site_section
+
                     await doc.save_changes()
                     existing += 1
                     continue
 
-                island, municipality = _infer_from_folder(item.folder_path)
                 suggested = self._suggest_filename(
                     original_name=item.name,
-                    island=island,
-                    municipality=municipality,
-                    place="",
+                    island=metadata.island,
+                    municipality=metadata.municipality,
+                    place=metadata.place,
                     unique_token=hashlib.sha1(item.source_file_id.encode("utf-8")).hexdigest()[:6],
                 )
                 doc = PhotoDocument(
@@ -117,8 +96,12 @@ class PhotoService:
                     mime_type=item.mime_type,
                     size=item.size,
                     folder_path=item.folder_path,
-                    island=island,
-                    municipality=municipality,
+                    island=metadata.island,
+                    site_area=metadata.site_area,
+                    site_section=metadata.site_section,
+                    municipality=metadata.municipality,
+                    place=metadata.place,
+                    category=metadata.site_section,
                     suggested_filename=suggested,
                     web_view_link=item.web_view_link,
                     status="new",
@@ -134,10 +117,62 @@ class PhotoService:
                 existing=existing,
             )
 
-    async def list_photos(self, status: str | None = None) -> list[PhotoListItemResponse]:
-        query = PhotoDocument.find(PhotoDocument.status == status) if status else PhotoDocument.find()
-        docs = await query.sort([("created_at", SortDirection.DESCENDING)]).limit(500).to_list()
+    async def list_photos(
+        self,
+        status: str | None = None,
+        folder: str | None = None,
+    ) -> list[PhotoListItemResponse]:
+        query_filter: dict[str, object] = {}
+        if status:
+            query_filter["status"] = status
+        if folder:
+            normalized = folder.strip("/\\")
+            query_filter["folder_path"] = {
+                "$regex": rf"^{re.escape(normalized)}(?:/|$)",
+                "$options": "i",
+            }
+
+        query = PhotoDocument.find(query_filter) if query_filter else PhotoDocument.find()
+        docs = await query.sort([("folder_path", SortDirection.ASCENDING), ("current_name", SortDirection.ASCENDING)]).limit(1000).to_list()
         return [self._list_response(doc) for doc in docs]
+
+    async def list_folders(self, status: str | None = None) -> list[PhotoFolderItemResponse]:
+        query = PhotoDocument.find(PhotoDocument.status == status) if status else PhotoDocument.find()
+        docs = await query.limit(5000).to_list()
+
+        direct_counts: Counter[str] = Counter()
+        total_counts: Counter[str] = Counter()
+
+        for doc in docs:
+            path = (doc.folder_path or "").strip("/\\")
+            direct_counts[path] += 1
+            if not path:
+                continue
+            parts = [part for part in path.replace("\\", "/").split("/") if part]
+            for index in range(1, len(parts) + 1):
+                total_counts["/".join(parts[:index])] += 1
+
+        # Root represents the whole library. Folder nodes include intermediate directories even
+        # when images only exist deeper in the tree.
+        result = [
+            PhotoFolderItemResponse(
+                path="",
+                direct_count=direct_counts.get("", 0),
+                total_count=len(docs),
+            )
+        ]
+        all_paths = sorted(set(direct_counts) | set(total_counts), key=lambda value: (value.count("/"), value.casefold()))
+        for path in all_paths:
+            if not path:
+                continue
+            result.append(
+                PhotoFolderItemResponse(
+                    path=path,
+                    direct_count=direct_counts.get(path, 0),
+                    total_count=total_counts.get(path, direct_counts.get(path, 0)),
+                )
+            )
+        return result
 
     async def get_photo(self, photo_id: str) -> PhotoDetailResponse:
         doc = await self._get_doc(photo_id)
@@ -176,7 +211,12 @@ class PhotoService:
             doc.status = "skipped"
             doc.updated_at = datetime.now(timezone.utc)
             await doc.save_changes()
-            return PhotoDecisionResponse(photo_id=str(doc.id), action=action, status=doc.status, filename=doc.current_name)
+            return PhotoDecisionResponse(
+                photo_id=str(doc.id),
+                action=action,
+                status=doc.status,
+                filename=doc.current_name,
+            )
 
         if action != "approve":
             raise BusinessRuleException("Unsupported action. Use approve or skip.")
@@ -262,6 +302,8 @@ class PhotoService:
             current_name=doc.current_name,
             folder_path=doc.folder_path,
             island=doc.island,
+            site_area=doc.site_area,
+            site_section=doc.site_section,
             municipality=doc.municipality,
             place=doc.place,
             category=doc.category,
@@ -280,10 +322,12 @@ class PhotoService:
             mime_type=doc.mime_type,
             size=doc.size,
             island=doc.island,
+            site_area=doc.site_area,
+            site_section=doc.site_section,
             municipality=doc.municipality,
             place=doc.place,
             category=doc.category,
-            alt_es=doc.alt_es,
+            alt_texts=doc.alt_texts,
             tags=doc.tags,
             suggested_filename=doc.suggested_filename,
             web_view_link=doc.web_view_link,

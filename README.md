@@ -1,235 +1,216 @@
-# Canarias Cerca Content Studio — v0.3
+# AI Content Operations Platform
 
-Jeden projekt dla dwóch rzeczy:
+Human-in-the-loop content operations platform built with **FastAPI**, **LangGraph**, **MongoDB** and LLM providers. **Canarias Cerca** is the first real-world use case.
 
-1. **Text Editor** — LangGraph + Human-in-the-loop do przygotowywania treści Canarias Cerca.
-2. **Photo Manager** — skan folderów/Google Drive, kolejka zdjęć, metadata, approve/skip i automatyczny rename.
+## v0.4
 
-## Co doszło w v0.3
-
-- nowa zakładka **Photos** w tym samym UI,
-- nowa kolekcja MongoDB `photos`,
-- endpointy `/api/v1/photos/...`,
-- dwa źródła zdjęć:
-  - `PHOTO_SOURCE=local` — zwykły folder lokalny, idealny do pierwszych testów,
-  - `PHOTO_SOURCE=drive` — prawdziwy Google Drive przez Drive API,
-- skan rekurencyjny folderów,
-- wyspa i gmina są wyciągane z hierarchii folderów,
-- podgląd zdjęcia,
-- ręczna korekta: miejsce, kategoria, alt, tagi i nazwa,
-- `Approve + rename` naprawdę zmienia nazwę pliku w źródle,
-- `Skip` odkłada zdjęcie bez ruszania pliku,
-- w zakładce **Graph** doszedł osobny schemat Photo workflow.
-
-> W tej wersji **Gemini Vision jeszcze nie analizuje zdjęcia**. To będzie kolejny krok. Najpierw mamy działający scanner + review + rename.
-
----
-
-## Przykładowa struktura folderów
+The text workflow is now CMS-ready instead of only producing a loose multilingual JSON file:
 
 ```text
-photo_inbox/
-├── Tenerife/
-│   ├── Guimar/
-│   │   ├── IMG_3847.jpg
-│   │   └── IMG_3848.jpg
-│   └── La Laguna/
-└── Gran Canaria/
-    └── Agaete/
+research
+  ↓
+curate
+  ↓
+human_review ── revise ──→ curate
+  ↓ approve
+write
+  ↓
+publish package
+  ↓ optional
+Canarias Cerca editor API
 ```
 
-Dla:
+### What changed
+
+- output languages are configurable with `CONTENT_LANGUAGES` instead of being hard-coded to ES/EN/PL,
+- `EDITOR_LANGUAGE` controls the working/review language,
+- final public copy is separated from editorial notes,
+- article bodies are explicit Markdown inside structured JSON (`body_markdown`),
+- categories are stable `snake_case` slugs,
+- content gets a stable `kebab-case` slug,
+- multiple research sources are stored in `sources[]`,
+- final packages are validated with Pydantic before they are saved,
+- a ready draft can be sent to the existing Canarias Cerca `/api/editor/content` endpoint,
+- the adapter preserves all translations even though the current Canarias UI primarily edits one language,
+- photo alt text is language-keyed (`alt_texts`) rather than `alt_es`,
+- missing `src/core` and `src/tools` modules are included so the public repo is runnable.
+
+## Final content package
+
+```json
+{
+  "type": "guide",
+  "island": "tenerife",
+  "category": "natural_pools",
+  "slug": "piscinas-naturales-tenerife",
+  "tags": ["charcos", "costa"],
+  "sources": [
+    {"title": "Official source", "url": "https://example.com"}
+  ],
+  "public_content": {
+    "es": {
+      "title": "...",
+      "summary": "...",
+      "body_markdown": "## ..."
+    },
+    "en": {
+      "title": "...",
+      "summary": "...",
+      "body_markdown": "## ..."
+    }
+  },
+  "editor_notes": ["..."]
+}
+```
+
+JSON is the transport format. The article body itself stays Markdown. This lets the same package move cleanly into a JSON-file CMS today and PostgreSQL translation tables later.
+
+## Project structure
 
 ```text
-Tenerife/Guimar/IMG_3847.jpg
+ai-content-ops-platform/
+├── .gitignore
+├── docker-compose.yml
+├── README.md
+└── content-agent-api/
+    ├── .env.example
+    ├── app.py
+    ├── pyproject.toml
+    ├── uv.lock
+    ├── src/
+    │   ├── agent/
+    │   ├── api/
+    │   ├── core/
+    │   ├── domain/
+    │   ├── services/
+    │   └── tools/
+    ├── static/
+    └── tests/
 ```
 
-program wie od razu:
+## Run locally
 
-```text
-island = Tenerife
-municipality = Guimar
-```
-
-i proponuje unikalną nazwę w stylu:
-
-```text
-tenerife-guimar-a41c9f.jpg
-```
-
-Po dodaniu Gemini nazwa będzie bardziej semantyczna, np.:
-
-```text
-puertito-de-guimar-paseo-maritimo-a41c9f.jpg
-```
-
----
-
-# Najprostsze uruchomienie lokalne — uv
-
-## 1. Wejdź do projektu
-
-```powershell
-cd canarias-cerca-editor-project-v0.3
-```
-
-## 2. Uruchom MongoDB
+Start MongoDB from the repository root:
 
 ```powershell
 docker compose up -d mongodb
 ```
 
-## 3. Wejdź do backendu
+Then:
 
 ```powershell
 cd content-agent-api
-```
-
-## 4. Python 3.13 przez uv
-
-```powershell
-uv python install 3.13
-```
-
-## 5. Utwórz `.env`
-
-PowerShell:
-
-```powershell
 Copy-Item .env.example .env
+uv sync
+uv run python -m uvicorn app:app --host 127.0.0.1 --port 8000
 ```
 
-W `.env` ustaw co najmniej:
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+## Configuration
 
 ```env
-MODEL_PROVIDER=openai
-OPENAI_API_KEY=twoj_klucz
-OPENAI_MODEL_NAME=gpt-5.6
+EDITOR_LANGUAGE=pl
+CONTENT_LANGUAGES=es,en,pl
 
+MODEL_PROVIDER=openai
+OPENAI_API_KEY=...
+OPENAI_MODEL_NAME=...
+
+TAVILY_API_KEY=...
 MONGODB_URI=mongodb://127.0.0.1:27017
 MONGODB_DB_NAME=canarias_cerca_editor
-
-PHOTO_SOURCE=local
-PHOTO_LOCAL_ROOT=./photo_inbox
 ```
 
-## 6. Zainstaluj dependencies
+Tavily is only required when `source_text` is empty.
 
-```powershell
-uv sync
-```
+### Optional Canarias Cerca publishing
 
-## 7. Wrzuć kilka zdjęć
-
-Przykład:
-
-```text
-content-agent-api/
-└── photo_inbox/
-    └── Tenerife/
-        └── Guimar/
-            ├── IMG_001.jpg
-            └── IMG_002.jpg
-```
-
-## 8. Start
-
-```powershell
-uv run uvicorn app:app --reload --host 127.0.0.1 --port 8000
-```
-
-## 9. Otwórz
-
-- UI: `http://127.0.0.1:8000/`
-- Swagger: `http://127.0.0.1:8000/docs`
-
-W UI:
-
-```text
-Photos
-→ Scan folders
-→ wybierz zdjęcie
-→ popraw metadata jeśli chcesz
-→ Approve + rename
-```
-
----
-
-# Jak przełączyć się później na prawdziwy Google Drive
-
-W Google Cloud potrzebujemy Drive API oraz service account.
-Folder `Canarias Cerca` na Drive udostępniasz temu service accountowi jak zwykłemu użytkownikowi.
-
-`.env`:
+Run the Canarias backend on a different local port, for example `8001`, and enable its editor. Then configure Content Studio:
 
 ```env
-PHOTO_SOURCE=drive
-GOOGLE_DRIVE_ROOT_FOLDER_ID=ID_FOLDERU_CANARIAS_CERCA
-GOOGLE_SERVICE_ACCOUNT_FILE=C:/sekrety/canarias-drive-service-account.json
+CANARIAS_API_URL=http://127.0.0.1:8001
+CANARIAS_EDITOR_TOKEN=...
 ```
 
-Potem ten sam przycisk:
+After a draft reaches `ready`, the UI exposes **Send to Canarias Cerca**. The call goes through the Canarias editor API; Content Studio never writes directly to the Canarias database/storage.
+
+Current path:
 
 ```text
-Scan folders
+Content Studio → Canarias editor API → JSON content files
 ```
 
-nie skanuje dysku, tylko Google Drive.
-
-**Nie zmienia się UI ani PhotoService.** Zmienia się tylko provider danych.
-
-Na Cloud Run zamiast pliku z kluczem będziemy mogli użyć service account środowiska i udostępnić mu folder Drive.
-
----
-
-# API Photos
+Future path after the Canarias persistence migration:
 
 ```text
-POST   /api/v1/photos/scan
-GET    /api/v1/photos
-GET    /api/v1/photos/{photo_id}
-PATCH  /api/v1/photos/{photo_id}
-GET    /api/v1/photos/{photo_id}/preview
-POST   /api/v1/photos/{photo_id}/decision
-DELETE /api/v1/photos/{photo_id}
+Content Studio → same Canarias editor API → PostgreSQL
 ```
 
-Decision:
+The Content Studio integration does not need to change when the storage implementation changes.
 
-```json
-{"action": "approve"}
+## Tests
+
+```powershell
+uv run pytest -q
 ```
 
-lub:
+The tests cover final package validation and the adapter that converts the multilingual package into the current Canarias editor item format.
 
-```json
-{"action": "skip"}
-```
+## v0.6 — Photo Library + Drive as site structure
 
----
-
-# Co jest następne
-
-Następny krok jest już AI:
+The Photos tab is now a browser rather than only a review queue:
 
 ```text
-scan_source
-↓
-infer_folders
-↓
-Gemini Vision
-  - co jest na zdjęciu
-  - place
-  - category
-  - alt_es
-  - tags
-  - semantyczna nazwa
-↓
-human_review
-↓
-approve + rename
-↓
-R2 / publikacja później
+folders on Drive / local disk
+        ↓ scan
+folder tree in Content Studio
+        ↓
+thumbnail gallery
+        ↓
+preview + metadata
 ```
 
-Nie dokładamy jeszcze R2. Najpierw chcemy, żeby Drive → review → rename działało dobrze.
+The preferred folder hierarchy mirrors Canarias Cerca itself. It is intentionally a convention, not a hard requirement:
+
+```text
+Canarias Cerca/
+├── Tenerife/
+│   ├── Explore/
+│   │   ├── places/
+│   │   ├── beaches/
+│   │   ├── natural-pools/
+│   │   │   └── Guimar/
+│   │   │       └── Puertito de Guimar/
+│   │   ├── marinas/
+│   │   ├── volcanoes/
+│   │   ├── summits/
+│   │   ├── museums-visits/
+│   │   ├── markets/
+│   │   ├── routes/
+│   │   ├── fauna/
+│   │   └── flora/
+│   └── Guide/
+│       ├── food/
+│       ├── culture/
+│       ├── history/
+│       ├── geology/
+│       ├── nature/
+│       └── experiences/
+└── Gran Canaria/
+    └── ...
+```
+
+For a path such as:
+
+```text
+Tenerife/Explore/natural-pools/Guimar/Puertito de Guimar
+```
+
+Content Studio can infer `island=tenerife`, `site_area=explore`, `site_section=natural-pools`, municipality and place without any LLM call. Older folders such as `Tenerife/Guimar` still work.
+
+The browser works with `PHOTO_SOURCE=local` and `PHOTO_SOURCE=drive`. With Drive, the photo detail view also exposes the original Google Drive link when available. Empty Drive folders are not shown yet because v0.6 builds the tree from scanned images; folder creation/synchronization can be added later if needed.

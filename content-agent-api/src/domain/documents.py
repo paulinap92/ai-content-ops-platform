@@ -37,10 +37,12 @@ class PhotoDocument(Document):
 
     # Metadata wyciągane z folderu, później uzupełniane przez człowieka / Gemini.
     island: str = ""
+    site_area: str = ""
+    site_section: str = ""
     municipality: str = ""
     place: str = ""
     category: str = ""
-    alt_es: str = ""
+    alt_texts: dict[str, str] = Field(default_factory=dict)
     tags: list[str] = Field(default_factory=list)
     suggested_filename: str = ""
 

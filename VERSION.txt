@@ -1,0 +1,2 @@
+Canarias Cerca Content Studio v0.6.0
+Photo library browser + Drive folder hierarchy mapped to site structure.

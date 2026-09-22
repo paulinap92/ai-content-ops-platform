@@ -7,6 +7,7 @@ from src.domain.schemas import (
     PhotoDecisionRequest,
     PhotoDecisionResponse,
     PhotoDetailResponse,
+    PhotoFolderItemResponse,
     PhotoListItemResponse,
     PhotoScanResponse,
     PhotoUpdateRequest,
@@ -34,8 +35,17 @@ async def scan_photos(service: PhotoServiceDep) -> PhotoScanResponse:
 async def list_photos(
     service: PhotoServiceDep,
     photo_status: str | None = Query(default=None, alias="status"),
+    folder: str | None = Query(default=None, description="Folder path; includes all descendants"),
 ) -> list[PhotoListItemResponse]:
-    return await service.list_photos(status=photo_status)
+    return await service.list_photos(status=photo_status, folder=folder)
+
+
+@router.get("/folders", response_model=list[PhotoFolderItemResponse], summary="Drzewo folderów zdjęć")
+async def list_photo_folders(
+    service: PhotoServiceDep,
+    photo_status: str | None = Query(default=None, alias="status"),
+) -> list[PhotoFolderItemResponse]:
+    return await service.list_folders(status=photo_status)
 
 
 @router.get("/{photo_id}", response_model=PhotoDetailResponse, summary="Szczegóły zdjęcia")

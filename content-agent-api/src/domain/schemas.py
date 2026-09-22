@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -100,6 +100,31 @@ class ContentDecisionResponse(BaseModel):
     )
 
 
+class CanariasPublishRequest(BaseModel):
+    section: str = Field(
+        min_length=1,
+        max_length=100,
+        description="Docelowa sekcja Guide w Canarias Cerca, np. nature lub experiences",
+    )
+    language: str = Field(
+        default="es",
+        min_length=2,
+        max_length=20,
+        description="Język używany jako główna wersja dla obecnego editor/API Canarias Cerca",
+    )
+    featured: bool = False
+    order: int | None = Field(default=None, ge=0)
+
+
+class CanariasPublishResponse(BaseModel):
+    status: str
+    island: str
+    section: str
+    slug: str
+    language: str
+    backend_response: dict[str, Any]
+
+
 class ApiError(BaseModel):
     error: str
     details: list[str] | None = None
@@ -114,10 +139,12 @@ class PhotoScanResponse(BaseModel):
 
 class PhotoUpdateRequest(BaseModel):
     island: str | None = Field(default=None, max_length=100)
+    site_area: str | None = Field(default=None, max_length=50)
+    site_section: str | None = Field(default=None, max_length=100)
     municipality: str | None = Field(default=None, max_length=150)
     place: str | None = Field(default=None, max_length=200)
     category: str | None = Field(default=None, max_length=100)
-    alt_es: str | None = Field(default=None, max_length=500)
+    alt_texts: dict[str, str] | None = None
     tags: list[str] | None = None
     suggested_filename: str | None = Field(default=None, max_length=255)
 
@@ -132,10 +159,18 @@ class PhotoListItemResponse(BaseModel):
     current_name: str
     folder_path: str
     island: str
+    site_area: str
+    site_section: str
     municipality: str
     place: str
     category: str
     created_at: datetime | None = None
+
+
+class PhotoFolderItemResponse(BaseModel):
+    path: str
+    direct_count: int
+    total_count: int
 
 
 class PhotoDetailResponse(PhotoListItemResponse):
@@ -143,7 +178,7 @@ class PhotoDetailResponse(PhotoListItemResponse):
     original_name: str
     mime_type: str
     size: int | None = None
-    alt_es: str
+    alt_texts: dict[str, str]
     tags: list[str]
     suggested_filename: str
     web_view_link: str | None = None

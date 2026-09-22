@@ -49,3 +49,13 @@ rename
 To jeszcze nie jest LangGraph, bo na tym etapie nie ma powodu robić z prostego skanu plików agenta. Gdy dodamy Gemini Vision i ewentualne poprawki/ponowne analizy, możemy świadomie zdecydować, czy photo workflow też warto przenieść do osobnego grafu.
 
 Najważniejsza zasada: **LLM nie robi rzeczy deterministycznych**, takich jak skan folderu czy rename. AI dostanie tylko analizę treści zdjęcia.
+
+## v0.6 — Photo library browser
+
+- replaced the flat photo queue UI with folder tree + thumbnail gallery + detail panel,
+- added `/api/v1/photos/folders`,
+- added recursive `folder` filtering to `/api/v1/photos`,
+- added deterministic `site_area` and `site_section` inference from Drive/local paths,
+- documented a Drive hierarchy that mirrors Canarias Cerca (island → area → section → municipality → place),
+- kept old `Island/Municipality` folders backward compatible,
+- intentionally did not add Gemini Vision yet.

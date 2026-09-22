@@ -18,6 +18,7 @@ from src.agent.prompts import (
     WRITE_SYSTEM_PROMPT,
 )
 from src.agent.state import AgentState
+from src.domain.content_package import validate_content_package
 from src.core.config import settings
 from src.core.model import create_model
 from src.tools.search import search_web
@@ -47,7 +48,7 @@ def research(state: AgentState) -> dict:
 
     model = create_model(settings.model_temperature_analytical)
     response = model.invoke([
-        SystemMessage(content=RESEARCH_SYSTEM_PROMPT),
+        SystemMessage(content=RESEARCH_SYSTEM_PROMPT.format(editor_language=settings.editor_language)),
         HumanMessage(content=RESEARCH_HUMAN_PROMPT.format(
             topic=topic,
             island_hint=island_hint or "brak",
@@ -77,7 +78,7 @@ def curate(state: AgentState) -> dict:
 
     model = create_model(settings.model_temperature_analytical)
     response = model.invoke([
-        SystemMessage(content=CURATE_SYSTEM_PROMPT),
+        SystemMessage(content=CURATE_SYSTEM_PROMPT.format(editor_language=settings.editor_language)),
         HumanMessage(content=CURATE_HUMAN_PROMPT.format(
             topic=state.get("topic", ""),
             source_url=state.get("source_url", "") or "brak",
@@ -124,7 +125,7 @@ def human_review(state: AgentState) -> Command:
         results = search_web(search_query)
         model = create_model(settings.model_temperature_analytical)
         response = model.invoke([
-            SystemMessage(content=RESEARCH_SYSTEM_PROMPT),
+            SystemMessage(content=RESEARCH_SYSTEM_PROMPT.format(editor_language=settings.editor_language)),
             HumanMessage(content=RESEARCH_FEEDBACK_PROMPT.format(
                 feedback=feedback,
                 search_results=results,
@@ -164,11 +165,38 @@ def human_review(state: AgentState) -> Command:
 
 
 def write(state: AgentState) -> dict:
-    """Generuje finalny, trójjęzyczny pakiet JSON dla Canarias Cerca."""
+    """Generuje finalny pakiet JSON z Markdownem dla skonfigurowanych języków."""
+
+    language_template = {
+        language: {
+            "title": "...",
+            "summary": "2-4 zdania",
+            "body_markdown": "## Sekcja\n\nFinalna treść publiczna w Markdown",
+        }
+        for language in settings.content_language_codes
+    }
+    output_schema = json.dumps(
+        {
+            "type": "place|event|news|route|guide|other",
+            "island": "tenerife",
+            "category": "natural_pools",
+            "slug": "piscinas-naturales-tenerife",
+            "tags": ["tag1", "tag2"],
+            "sources": [
+                {"title": "Nazwa źródła", "url": "https://example.com/source"}
+            ],
+            "public_content": language_template,
+            "editor_notes": ["tylko rzeczy wymagające ręcznej weryfikacji"],
+        },
+        ensure_ascii=False,
+        indent=2,
+    )
 
     model = create_model(settings.model_temperature_creative)
     response = model.invoke([
-        SystemMessage(content=WRITE_SYSTEM_PROMPT),
+        SystemMessage(content=WRITE_SYSTEM_PROMPT.format(
+            content_languages=", ".join(settings.content_language_codes),
+        )),
         HumanMessage(content=WRITE_HUMAN_PROMPT.format(
             topic=state.get("topic", ""),
             source_url=state.get("source_url", ""),
@@ -176,6 +204,7 @@ def write(state: AgentState) -> dict:
             content_type_hint=state.get("content_type_hint", "") or "brak",
             outline=state.get("outline", ""),
             research_data=state.get("research_data", ""),
+            output_schema=output_schema,
         )),
     ])
 
@@ -195,10 +224,10 @@ def _clean_json_text(raw: str) -> str:
 
 def publish(state: AgentState) -> dict:
     """
-    Eksportuje finalny draft do JSON.
+    Eksportuje finalny draft do walidowanego JSON transportowego.
 
     Nazwa node'a zostaje `publish`, żeby graf był prawie 1:1 jak w kursie.
-    WAŻNE: ten krok NIE publikuje niczego do produkcyjnej bazy Canarias Cerca.
+    WAŻNE: ten krok tylko przygotowuje pakiet. Publikacja do Canarias Cerca wymaga osobnego kliknięcia.
     """
 
     raw_draft = state.get("draft", "")
@@ -213,13 +242,29 @@ def publish(state: AgentState) -> dict:
     if not isinstance(payload, dict):
         raise ValueError("Finalny JSON musi być obiektem.")
 
-    languages = payload.get("languages")
-    if not isinstance(languages, dict) or not all(lang in languages for lang in ("es", "en", "pl")):
-        raise ValueError("Finalny JSON musi zawierać languages.es, languages.en i languages.pl.")
+    manual_source_url = state.get("source_url", "").strip()
+    sources = payload.get("sources")
+    if not isinstance(sources, list):
+        sources = []
+        payload["sources"] = sources
+    if manual_source_url and not any(
+        isinstance(source, dict) and source.get("url") == manual_source_url
+        for source in sources
+    ):
+        sources.insert(0, {"title": "Źródło podane przez redaktora", "url": manual_source_url})
 
-    payload["source_url"] = payload.get("source_url") or state.get("source_url", "")
     payload["status"] = "ready_for_editor"
     payload["generated_at"] = datetime.now(timezone.utc).isoformat()
+
+    try:
+        package = validate_content_package(
+            payload,
+            expected_languages=settings.content_language_codes,
+        )
+    except ValueError as exc:
+        raise ValueError(f"Finalny JSON ma niepoprawny schemat: {exc}") from exc
+
+    payload = package.model_dump(mode="json")
 
     topic = state.get("topic", "content")
     slug = re.sub(r"[^a-z0-9]+", "-", topic.lower().strip())[:60].strip("-") or "content"
