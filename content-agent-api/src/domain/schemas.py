@@ -190,3 +190,109 @@ class PhotoDecisionResponse(BaseModel):
     action: str
     status: str
     filename: str
+
+
+
+class EventSourceCreateRequest(BaseModel):
+    name: str = Field(min_length=2, max_length=180)
+    island: str = Field(min_length=2, max_length=100)
+    url: str = Field(min_length=8, max_length=2000)
+    provider: str = Field(default="", max_length=180)
+    crawl_strategy: Literal["http", "tavily"] = "http"
+    priority: Literal["high", "medium", "low"] = "medium"
+
+
+class EventSourceConfigUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=180)
+    island: str | None = Field(default=None, min_length=2, max_length=100)
+    url: str | None = Field(default=None, min_length=8, max_length=2000)
+    provider: str | None = Field(default=None, max_length=180)
+    crawl_strategy: Literal["http", "tavily"] | None = None
+    priority: Literal["high", "medium", "low"] | None = None
+
+
+class EventSourceReviewRequest(BaseModel):
+    analysis_status: Literal[
+        "todo",
+        "investigating",
+        "ready",
+        "tavily_candidate",
+        "blocked",
+        "ignore",
+    ] | None = None
+    acquisition_method: Literal[
+        "unknown",
+        "api",
+        "json",
+        "ics",
+        "rss",
+        "html",
+        "tavily",
+        "hybrid",
+    ] | None = None
+    priority: Literal["high", "medium", "low"] | None = None
+    future_horizon: str | None = Field(default=None, max_length=100)
+    external_id_notes: str | None = Field(default=None, max_length=1000)
+    pagination_notes: str | None = Field(default=None, max_length=1500)
+    notes: str | None = Field(default=None, max_length=5000)
+
+
+class EventSourceResponse(BaseModel):
+    source_id: str
+    name: str
+    island: str
+    provider: str
+    url: str
+    scope: str
+    discovery_hint: str
+    crawl_strategy: str
+    source_origin: str
+    analysis_status: str
+    acquisition_method: str
+    priority: str
+    future_horizon: str
+    external_id_notes: str
+    pagination_notes: str
+    notes: str
+    last_checked_at: datetime | None = None
+
+
+
+class EventPreviewRequest(BaseModel):
+    limit: int = Field(default=10, ge=1, le=30)
+
+
+class EventPreviewItem(BaseModel):
+    source_id: str
+    source_name: str
+    island: str
+    title: str
+    start_at: str | None = None
+    end_at: str | None = None
+    venue: str | None = None
+    municipality: str | None = None
+    locality: str | None = None
+    organizer: str | None = None
+    category: str | None = None
+    description: str | None = None
+    image_url: str | None = None
+    price: str | None = None
+    source_url: str
+    extraction_method: str
+    validation_status: str
+    validation_notes: list[str] = Field(default_factory=list)
+    raw_excerpt: str = ""
+
+
+class EventPreviewResponse(BaseModel):
+    run_id: str
+    source_id: str
+    source_name: str
+    island: str
+    source_url: str
+    count: int
+    status: str
+    active_node: str
+    stats: dict[str, Any] = Field(default_factory=dict)
+    events: list[EventPreviewItem]
+    note: str

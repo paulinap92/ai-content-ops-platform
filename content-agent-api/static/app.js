@@ -1,11 +1,16 @@
 const CONTENT_API = "/api/v1/content";
 const PHOTO_API = "/api/v1/photos";
+const EVENT_API = "/api/v1/events";
+const CANARY_ISLAND_ORDER = ["Tenerife", "Gran Canaria", "Lanzarote", "Fuerteventura", "La Palma", "La Gomera", "El Hierro", "La Graciosa"];
 
 const state = {
   currentThreadId: null,
   pollTimer: null,
   currentPhotoId: null,
   currentPhotoFolder: "",
+  currentEventSourceId: null,
+  eventSources: [],
+  currentEventPreview: [],
   contentLanguages: ["es", "en", "pl"],
   canariasPublishEnabled: false,
   currentPackage: null,
@@ -44,8 +49,10 @@ function setStatus(el, label) {
 }
 
 function setActiveGraphNode(status) {
-  document.querySelectorAll(".graph-node").forEach((node) => node.classList.remove("active"));
-  const graphEnd = document.querySelector(".graph-end");
+  const graph = $("content-graph-canvas");
+  if (!graph) return;
+  graph.querySelectorAll(".graph-node").forEach((node) => node.classList.remove("active"));
+  const graphEnd = graph.querySelector(".graph-end");
   if (graphEnd) graphEnd.classList.remove("active");
   if (status === "ready") {
     if (graphEnd) graphEnd.classList.add("active");
@@ -53,7 +60,22 @@ function setActiveGraphNode(status) {
   }
   const nodeName = statusToNode[status];
   if (!nodeName) return;
-  const node = document.querySelector(`[data-node="${nodeName}"]`);
+  const node = graph.querySelector(`[data-node="${nodeName}"]`);
+  if (node) node.classList.add("active");
+}
+
+function setActiveEventGraphNode(nodeName) {
+  const graph = $("event-graph-canvas");
+  if (!graph) return;
+  graph.querySelectorAll(".graph-node").forEach((node) => node.classList.remove("active"));
+  const graphEnd = graph.querySelector(".graph-end");
+  if (graphEnd) graphEnd.classList.remove("active");
+  if (!nodeName) return;
+  if (nodeName === "end") {
+    if (graphEnd) graphEnd.classList.add("active");
+    return;
+  }
+  const node = graph.querySelector(`[data-event-node="${nodeName}"]`);
   if (node) node.classList.add("active");
 }
 
@@ -723,6 +745,386 @@ function clearPhotoSelection() {
   if (driveLink) driveLink.classList.add("hidden");
 }
 
+// -------------------------------------------------------------------------------------------------
+// EVENT SOURCE LAB
+// -------------------------------------------------------------------------------------------------
+
+function eventStatusClass(status) {
+  if (status === "ready") return "status-ready";
+  if (["investigating", "tavily_candidate"].includes(status)) return "status-working";
+  if (status === "blocked") return "status-error";
+  return "status-neutral";
+}
+
+function setEventStatus(el, label) {
+  el.className = `status-pill ${eventStatusClass(label)}`;
+  el.textContent = label || "—";
+}
+
+function formatEventSourceStatus(value) {
+  const labels = {
+    todo: "to analyze",
+    investigating: "investigating",
+    ready: "ready",
+    tavily_candidate: "tavily candidate",
+    blocked: "blocked",
+    ignore: "ignore",
+  };
+  return labels[value] || value || "todo";
+}
+
+function renderEventIslandFilter() {
+  const select = $("event-island-filter");
+  if (!select) return;
+  const current = select.value;
+  const islands = [...new Set(state.eventSources.map((source) => source.island).filter(Boolean))].sort((a, b) => {
+    const ai = CANARY_ISLAND_ORDER.indexOf(a);
+    const bi = CANARY_ISLAND_ORDER.indexOf(b);
+    if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    return a.localeCompare(b);
+  });
+  select.innerHTML = '<option value="">Wszystkie wyspy</option>';
+  islands.forEach((island) => select.add(new Option(island, island)));
+  if (islands.includes(current)) select.value = current;
+}
+
+function filteredEventSources() {
+  const island = $("event-island-filter")?.value || "";
+  const status = $("event-status-filter")?.value || "";
+  return state.eventSources.filter((source) => {
+    if (island && source.island !== island) return false;
+    if (status && source.analysis_status !== status) return false;
+    return true;
+  });
+}
+
+function renderEventSourceList() {
+  const root = $("event-source-list");
+  if (!root) return;
+  const sources = filteredEventSources();
+  $("event-source-count").textContent = sources.length;
+  root.innerHTML = "";
+
+  if (!sources.length) {
+    root.innerHTML = '<p class="muted event-list-empty">Brak źródeł dla tego filtra. Kliknij „+ Add source”.</p>';
+    return;
+  }
+
+  const byIsland = new Map();
+  sources.forEach((source) => {
+    const island = source.island || "Other";
+    if (!byIsland.has(island)) byIsland.set(island, []);
+    byIsland.get(island).push(source);
+  });
+
+  [...byIsland.entries()].sort(([a], [b]) => {
+    const ai = CANARY_ISLAND_ORDER.indexOf(a);
+    const bi = CANARY_ISLAND_ORDER.indexOf(b);
+    if (ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    return a.localeCompare(b);
+  }).forEach(([island, islandSources]) => {
+    const group = document.createElement("section");
+    group.className = "event-island-group";
+    group.innerHTML = `<div class="event-island-heading"><strong>${escapeHtml(island)}</strong><span>${islandSources.length}</span></div>`;
+
+    islandSources.sort((a, b) => a.name.localeCompare(b.name)).forEach((source) => {
+      const card = document.createElement("article");
+      card.className = `event-source-card ${source.source_id === state.currentEventSourceId ? "active" : ""}`;
+      card.innerHTML = `
+        <button class="event-source-select" type="button">
+          <div class="event-source-card-top">
+            <span class="event-priority event-priority-${escapeHtml(source.priority)}">${escapeHtml(source.priority)}</span>
+            <small>${escapeHtml(formatEventSourceStatus(source.analysis_status))}</small>
+          </div>
+          <strong>${escapeHtml(source.name)}</strong>
+          <span>${escapeHtml(source.provider || "")}</span>
+        </button>
+        <a class="event-source-card-url" href="${escapeHtml(source.url)}" target="_blank" rel="noreferrer" title="Open official events page">${escapeHtml(source.url)}</a>`;
+      card.querySelector(".event-source-select").addEventListener("click", () => selectEventSource(source.source_id));
+      group.appendChild(card);
+    });
+    root.appendChild(group);
+  });
+}
+
+async function loadEventSources() {
+  const root = $("event-source-list");
+  if (!root) return;
+  try {
+    const sources = await apiFetch(`${EVENT_API}/sources`);
+    state.eventSources = Array.isArray(sources) ? sources : [];
+    renderEventIslandFilter();
+    renderEventSourceList();
+
+    if (state.currentEventSourceId) {
+      const stillExists = state.eventSources.some((source) => source.source_id === state.currentEventSourceId);
+      if (stillExists) renderCurrentEventSource();
+      else clearEventSourceSelection();
+    }
+  } catch (error) {
+    root.innerHTML = '<p class="muted event-list-empty">Nie udało się pobrać źródeł.</p>';
+    toast(error.message, true);
+  }
+}
+
+function selectEventSource(sourceId) {
+  state.currentEventSourceId = sourceId;
+  renderEventSourceList();
+  renderCurrentEventSource();
+}
+
+function currentEventSource() {
+  return state.eventSources.find((source) => source.source_id === state.currentEventSourceId) || null;
+}
+
+function renderCurrentEventSource() {
+  const source = currentEventSource();
+  if (!source) {
+    clearEventSourceSelection();
+    return;
+  }
+
+  $("event-source-empty").classList.add("hidden");
+  $("event-source-config-form").classList.remove("hidden");
+  $("event-source-form").classList.remove("hidden");
+  const previewButton = $("preview-event-source");
+  if (previewButton) previewButton.disabled = false;
+  $("event-source-title").textContent = source.name;
+  setEventStatus($("event-source-status"), formatEventSourceStatus(source.analysis_status));
+  $("event-config-island").value = source.island || "";
+  $("event-config-name").value = source.name || "";
+  $("event-config-url").value = source.url || "";
+  $("event-config-provider").value = source.provider || "";
+  $("event-config-strategy").value = source.crawl_strategy || "http";
+  $("event-open-source").href = source.url;
+  $("event-source-hint").textContent = source.discovery_hint || "Generic event-source link.";
+
+  $("event-analysis-status").value = source.analysis_status || "todo";
+  $("event-acquisition-method").value = source.acquisition_method || "unknown";
+  $("event-priority").value = source.priority || "medium";
+  $("event-future-horizon").value = source.future_horizon || "";
+  $("event-external-id-notes").value = source.external_id_notes || "";
+  $("event-pagination-notes").value = source.pagination_notes || "";
+  $("event-source-notes").value = source.notes || "";
+  $("event-last-checked").textContent = source.last_checked_at
+    ? `Last checked: ${new Date(source.last_checked_at).toLocaleString()}`
+    : "Not analyzed yet.";
+}
+
+function clearEventSourceSelection() {
+  state.currentEventSourceId = null;
+  const empty = $("event-source-empty");
+  const form = $("event-source-form");
+  const configForm = $("event-source-config-form");
+  if (empty) empty.classList.remove("hidden");
+  if (form) form.classList.add("hidden");
+  if (configForm) configForm.classList.add("hidden");
+  const previewButton = $("preview-event-source");
+  if (previewButton) previewButton.disabled = true;
+  if ($("event-source-title")) $("event-source-title").textContent = "Wybierz źródło";
+  if ($("event-source-status")) setEventStatus($("event-source-status"), "—");
+  renderEventSourceList();
+}
+
+function setAddEventSourceVisible(visible) {
+  const panel = $("event-source-add-panel");
+  if (!panel) return;
+  panel.classList.toggle("hidden", !visible);
+  if (visible) $("new-event-island")?.focus();
+}
+
+async function addEventSource(event) {
+  event.preventDefault();
+  const payload = {
+    island: $("new-event-island").value.trim(),
+    name: $("new-event-name").value.trim(),
+    url: $("new-event-url").value.trim(),
+    provider: $("new-event-provider").value.trim(),
+    crawl_strategy: $("new-event-strategy").value,
+    priority: $("new-event-priority").value,
+  };
+  try {
+    const created = await apiFetch(`${EVENT_API}/sources`, { method: "POST", body: JSON.stringify(payload) });
+    $("event-source-add-form").reset();
+    $("new-event-strategy").value = "http";
+    $("new-event-priority").value = "medium";
+    setAddEventSourceVisible(false);
+    await loadEventSources();
+    selectEventSource(created.source_id);
+    toast("Source link added.");
+  } catch (error) {
+    toast(error.message, true);
+  }
+}
+
+async function saveEventSourceConfig(event) {
+  event.preventDefault();
+  const source = currentEventSource();
+  if (!source) return;
+  const button = $("save-event-config");
+  button.disabled = true;
+  try {
+    const payload = {
+      island: $("event-config-island").value.trim(),
+      name: $("event-config-name").value.trim(),
+      url: $("event-config-url").value.trim(),
+      provider: $("event-config-provider").value.trim(),
+      crawl_strategy: $("event-config-strategy").value,
+    };
+    const updated = await apiFetch(`${EVENT_API}/sources/${encodeURIComponent(source.source_id)}/config`, {
+      method: "PATCH", body: JSON.stringify(payload),
+    });
+    state.eventSources = state.eventSources.map((item) => item.source_id === updated.source_id ? updated : item);
+    renderEventIslandFilter();
+    renderEventSourceList();
+    renderCurrentEventSource();
+    toast("Source link saved.");
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function deleteCurrentEventSource() {
+  const source = currentEventSource();
+  if (!source) return;
+  if (!window.confirm(`Delete source link “${source.name}”? This removes it from the local Event Importer catalog.`)) return;
+  const button = $("delete-event-source");
+  button.disabled = true;
+  try {
+    await apiFetch(`${EVENT_API}/sources/${encodeURIComponent(source.source_id)}`, { method: "DELETE" });
+    state.currentEventSourceId = null;
+    state.currentEventPreview = [];
+    await loadEventSources();
+    clearEventSourceSelection();
+    $("event-preview-list").innerHTML = '<div class="empty-state"><div class="empty-icon">◌</div><p>Wybierz inne źródło, aby pobrać eventy.</p></div>';
+    $("event-preview-count").textContent = "0";
+    toast("Source link deleted.");
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+async function saveEventSourceReview(event) {
+  event.preventDefault();
+  const source = currentEventSource();
+  if (!source) return;
+
+  const button = $("save-event-source");
+  button.disabled = true;
+  button.textContent = "Saving…";
+  const payload = {
+    analysis_status: $("event-analysis-status").value,
+    acquisition_method: $("event-acquisition-method").value,
+    priority: $("event-priority").value,
+    future_horizon: $("event-future-horizon").value.trim(),
+    external_id_notes: $("event-external-id-notes").value.trim(),
+    pagination_notes: $("event-pagination-notes").value.trim(),
+    notes: $("event-source-notes").value.trim(),
+  };
+
+  try {
+    const updated = await apiFetch(`${EVENT_API}/sources/${encodeURIComponent(source.source_id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+    state.eventSources = state.eventSources.map((item) => item.source_id === updated.source_id ? updated : item);
+    renderEventSourceList();
+    renderCurrentEventSource();
+    toast("Analiza źródła zapisana.");
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Save analysis";
+  }
+}
+
+
+async function previewSelectedEventSource() {
+  const source = currentEventSource();
+  if (!source) return;
+  const button = $("preview-event-source");
+  const list = $("event-preview-list");
+  const meta = $("event-preview-meta");
+  const count = $("event-preview-count");
+  const title = $("event-preview-title");
+  const rawLimit = Number($("event-preview-limit")?.value || 10);
+  const limit = Math.max(1, Math.min(30, Number.isFinite(rawLimit) ? rawLimit : 10));
+
+  button.disabled = true;
+  button.textContent = "Importuję…";
+  title.textContent = source.name;
+  meta.textContent = "EventImportGraph: crawl → clean + HTML fields → extract/enrich → validate. Zatrzyma się przed publikacją.";
+  list.innerHTML = '<p class="muted event-preview-loading">Crawler pracuje lokalnie. Potem czyścimy HTML, czytamy jawne daty/miejsce i dopiero brakujące pola uzupełnia extractor…</p>';
+  setActiveEventGraphNode("crawl");
+
+  try {
+    const result = await apiFetch(`${EVENT_API}/sources/${encodeURIComponent(source.source_id)}/preview`, {
+      method: "POST",
+      body: JSON.stringify({ limit }),
+    });
+    state.currentEventPreview = result.events || [];
+    count.textContent = result.count ?? state.currentEventPreview.length;
+    const st = result.stats || {};
+    const tavily = st.tavily_credits !== null && st.tavily_credits !== undefined ? ` · Tavily credits ${st.tavily_credits}` : "";
+    meta.textContent = `Visited ${st.visited || 0} · URLs ${st.candidate_urls || 0} · old filtered ${st.past_filtered || 0} · cleaned ${st.cleaned || 0} · extracted ${st.extracted || 0} · ready ${st.ready || 0} · review ${st.needs_review || 0}${tavily}. Nic nie zapisano do produkcji.`;
+    setActiveEventGraphNode(result.active_node || "human_review");
+    renderEventPreview();
+  } catch (error) {
+    state.currentEventPreview = [];
+    count.textContent = "0";
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">!</div><p>${escapeHtml(error.message)}</p></div>`;
+    meta.textContent = "Import preview nie powiódł się.";
+    setActiveEventGraphNode(null);
+    toast(error.message, true);
+  } finally {
+    button.disabled = false;
+    button.textContent = "Run import preview";
+  }
+}
+
+function renderEventPreview() {
+  const list = $("event-preview-list");
+  const events = state.currentEventPreview || [];
+  if (!events.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">◌</div><p>Crawler nie znalazł poprawnych eventów. Sprawdź source config albo discovery URL-i.</p></div>';
+    return;
+  }
+  list.innerHTML = "";
+  events.forEach((item) => {
+    const card = document.createElement("article");
+    const validation = item.validation_status || "needs_review";
+    const start = item.start_at || "date unknown";
+    const end = item.end_at ? ` → ${item.end_at}` : "";
+    const notes = Array.isArray(item.validation_notes) && item.validation_notes.length
+      ? `<div class="event-review-notes">${item.validation_notes.map((note) => `<span>${escapeHtml(note)}</span>`).join("")}</div>`
+      : "";
+    const place = [item.venue, item.locality || item.municipality].filter(Boolean).join(" · ");
+    const price = item.price ? `<span><strong>Price</strong>${escapeHtml(item.price)}</span>` : "";
+    card.className = `event-preview-card event-validation-${escapeHtml(validation)}`;
+    card.innerHTML = `
+      <div class="event-preview-card-top">
+        <span class="event-source-island">${escapeHtml(item.island || "")}</span>
+        <span class="event-validation-badge">${escapeHtml(validation)}</span>
+      </div>
+      <h3>${escapeHtml(item.title || "Untitled event")}</h3>
+      <div class="event-structured-meta">
+        <span><strong>Date</strong>${escapeHtml(start + end)}</span>
+        <span><strong>Place</strong>${escapeHtml(place || "unknown")}</span>
+        <span><strong>Extractor</strong>${escapeHtml(item.extraction_method || "unknown")}</span>
+        ${price}
+      </div>
+      <p>${escapeHtml(item.description || item.raw_excerpt || "")}</p>
+      ${notes}
+      <a class="secondary-button event-preview-open" href="${escapeHtml(item.source_url)}" target="_blank" rel="noreferrer">Open official event ↗</a>`;
+    list.appendChild(card);
+  });
+}
+
 // APP
 // -------------------------------------------------------------------------------------------------
 
@@ -734,6 +1136,7 @@ function initTabs() {
       tab.classList.add("active");
       $(`view-${tab.dataset.view}`).classList.add("active");
       if (tab.dataset.view === "photos") await loadPhotoLibrary();
+      if (tab.dataset.view === "events") await loadEventSources();
     });
   });
 }
@@ -752,6 +1155,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("photo-form").addEventListener("submit", savePhotoMetadata);
   $("photo-approve").addEventListener("click", () => decidePhoto("approve"));
   $("photo-skip").addEventListener("click", () => decidePhoto("skip"));
+
+  $("add-event-source").addEventListener("click", () => setAddEventSourceVisible(true));
+  $("cancel-add-event-source").addEventListener("click", () => setAddEventSourceVisible(false));
+  $("event-source-add-form").addEventListener("submit", addEventSource);
+  $("event-source-config-form").addEventListener("submit", saveEventSourceConfig);
+  $("delete-event-source").addEventListener("click", deleteCurrentEventSource);
+  $("refresh-event-sources").addEventListener("click", loadEventSources);
+  $("event-island-filter").addEventListener("change", renderEventSourceList);
+  $("event-status-filter").addEventListener("change", renderEventSourceList);
+  $("event-source-form").addEventListener("submit", saveEventSourceReview);
+  $("preview-event-source").addEventListener("click", previewSelectedEventSource);
 
   await checkHealth();
   await loadDrafts();

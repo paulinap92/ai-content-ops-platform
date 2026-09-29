@@ -1,6 +1,6 @@
 [project]
 name = "canarias-cerca-editor-agent"
-version = "0.6.0"
+version = "0.9.0"
 description = "Canarias Cerca Editor Agent — FastAPI + LangGraph + Human-in-the-Loop"
 requires-python = ">=3.13,<3.14"
 dependencies = [
@@ -20,6 +20,8 @@ dependencies = [
   "pydantic>=2.12.3,<3.0",
   "pydantic-settings>=2.7.0,<3.0",
   "httpx>=0.28.0,<1.0",
+  "beautifulsoup4>=4.12.3,<5.0",
+  "trafilatura>=2.0.0,<3.0",
   "google-api-python-client>=2.149.0,<3.0",
   "google-auth>=2.35.0,<3.0",
 ]

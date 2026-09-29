@@ -13,7 +13,7 @@
       <h1>Content Studio</h1>
     </div>
     <div class="topbar-actions">
-      <span class="status-dot status-neutral">v0.6.0</span>
+      <span class="status-dot status-neutral">v0.9.0</span>
       <span id="language-status" class="status-dot status-neutral">Content · ES · EN · PL</span>
       <span id="api-status" class="status-dot status-neutral">API</span>
       <a class="ghost-link" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
@@ -24,6 +24,7 @@
     <nav class="tabs" aria-label="Widoki aplikacji">
       <button class="tab active" data-view="editor">Text Editor</button>
       <button class="tab" data-view="photos">Photos</button>
+      <button class="tab" data-view="events">Events</button>
       <button class="tab" data-view="graph">Graph</button>
     </nav>
 
@@ -105,6 +106,176 @@
           </div>
         </section>
       </div>
+    </section>
+
+    <section id="view-events" class="view">
+      <div class="events-toolbar panel">
+        <div>
+          <p class="eyebrow">EVENT IMPORTER · LOCAL LANGGRAPH</p>
+          <h2>Event Importer</h2>
+          <p class="muted toolbar-copy">Źródła eventów są zarządzane tutaj lokalnie i pogrupowane według wyspy. Możesz otwierać, dodawać, edytować i usuwać linki do oficjalnych agend, a potem uruchomić ten sam EventImportGraph.</p>
+        </div>
+        <div class="toolbar-actions">
+          <select id="event-island-filter" aria-label="Filtr wyspy">
+            <option value="">Wszystkie wyspy</option>
+          </select>
+          <select id="event-status-filter" aria-label="Filtr statusu analizy">
+            <option value="">Wszystkie statusy</option>
+            <option value="todo">To analyze</option>
+            <option value="investigating">Investigating</option>
+            <option value="ready">Ready</option>
+            <option value="tavily_candidate">Tavily candidate</option>
+            <option value="blocked">Blocked</option>
+            <option value="ignore">Ignore</option>
+          </select>
+          <button id="add-event-source" class="secondary-button" type="button">+ Add source</button>
+          <button id="refresh-event-sources" class="secondary-button" type="button">Refresh</button>
+          <button id="preview-event-source" class="primary-button" type="button" disabled>Run import preview</button>
+        </div>
+      </div>
+
+      <section id="event-source-add-panel" class="panel event-source-add-panel hidden">
+        <div class="panel-heading">
+          <div><p class="eyebrow">ADD OFFICIAL EVENTS PAGE</p><h2>New source link</h2></div>
+          <button id="cancel-add-event-source" class="secondary-button" type="button">Cancel</button>
+        </div>
+        <form id="event-source-add-form" class="event-source-add-form">
+          <label class="field"><span>Island</span><input id="new-event-island" list="canary-islands" placeholder="Tenerife" required /></label>
+          <label class="field"><span>Name</span><input id="new-event-name" placeholder="Ayuntamiento · Agenda" required /></label>
+          <label class="field field-wide"><span>Events page URL</span><input id="new-event-url" type="url" placeholder="https://.../agenda" required /></label>
+          <label class="field"><span>Provider</span><input id="new-event-provider" placeholder="Ayuntamiento / Cabildo / venue" /></label>
+          <label class="field"><span>Discovery</span><select id="new-event-strategy"><option value="http">Agenda page / HTTP crawler</option><option value="tavily">Tavily URL discovery</option></select></label>
+          <label class="field"><span>Priority</span><select id="new-event-priority"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></label>
+          <div class="event-source-add-actions"><button class="primary-button" type="submit">Add source link</button></div>
+        </form>
+        <datalist id="canary-islands"><option value="Tenerife"></option><option value="Gran Canaria"></option><option value="Lanzarote"></option><option value="Fuerteventura"></option><option value="La Palma"></option><option value="La Gomera"></option><option value="El Hierro"></option><option value="La Graciosa"></option></datalist>
+      </section>
+
+      <div class="event-sources-grid">
+        <aside class="panel event-source-list-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">OFFICIAL EVENT LINKS</p><h2>Sources by island</h2></div>
+            <span id="event-source-count" class="status-pill status-neutral">0</span>
+          </div>
+          <div id="event-source-list" class="event-source-list"><p class="muted">Ładowanie źródeł…</p></div>
+        </aside>
+
+        <section class="panel event-source-detail-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">SOURCE ANALYSIS</p><h2 id="event-source-title">Wybierz źródło</h2></div>
+            <span id="event-source-status" class="status-pill status-neutral">—</span>
+          </div>
+          <div id="event-source-empty" class="empty-state">
+            <div class="empty-icon">◎</div>
+            <p>Źródła są pogrupowane według wyspy. Kliknij link, żeby obejrzeć oficjalną agendę, albo dodaj własny.</p>
+          </div>
+
+          <form id="event-source-config-form" class="event-source-config-form hidden">
+            <div class="event-config-grid">
+              <label class="field"><span>Island</span><input id="event-config-island" list="canary-islands" /></label>
+              <label class="field"><span>Name</span><input id="event-config-name" /></label>
+              <label class="field field-wide"><span>Events page URL</span><input id="event-config-url" type="url" /></label>
+              <label class="field"><span>Provider</span><input id="event-config-provider" /></label>
+              <label class="field"><span>Discovery</span><select id="event-config-strategy"><option value="http">Agenda page / HTTP crawler</option><option value="tavily">Tavily URL discovery</option></select></label>
+            </div>
+            <div class="event-config-actions">
+              <a id="event-open-source" class="secondary-button event-open-link" target="_blank" rel="noreferrer">Open events page ↗</a>
+              <div class="event-config-actions-right">
+                <button id="delete-event-source" class="secondary-button danger-outline" type="button">Delete source</button>
+                <button id="save-event-config" class="primary-button" type="submit">Save source link</button>
+              </div>
+            </div>
+          </form>
+
+          <form id="event-source-form" class="event-source-form hidden">
+            <aside class="event-discovery-hint">
+              <strong>Initial technical hint</strong>
+              <p id="event-source-hint">—</p>
+            </aside>
+
+            <div class="event-analysis-grid">
+              <label class="field">
+                <span>Analysis status</span>
+                <select id="event-analysis-status">
+                  <option value="todo">To analyze</option>
+                  <option value="investigating">Investigating</option>
+                  <option value="ready">Ready for adapter</option>
+                  <option value="tavily_candidate">Tavily candidate</option>
+                  <option value="blocked">Blocked</option>
+                  <option value="ignore">Ignore</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Acquisition method</span>
+                <select id="event-acquisition-method">
+                  <option value="unknown">Unknown</option>
+                  <option value="api">API</option>
+                  <option value="json">JSON endpoint</option>
+                  <option value="ics">ICS</option>
+                  <option value="rss">RSS</option>
+                  <option value="html">HTML crawler</option>
+                  <option value="tavily">Tavily</option>
+                  <option value="hybrid">Hybrid</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Priority</span>
+                <select id="event-priority">
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Currently published until</span>
+                <input id="event-future-horizon" placeholder="Np. 2027-03 / unknown" />
+              </label>
+              <label class="field field-wide">
+                <span>External ID / canonical URL notes</span>
+                <textarea id="event-external-id-notes" rows="3" placeholder="Czy event ma stabilny ID? Jak wygląda URL? Czy ID jest w HTML/JSON?"></textarea>
+              </label>
+              <label class="field field-wide">
+                <span>Pagination / discovery notes</span>
+                <textarea id="event-pagination-notes" rows="4" placeholder="Load more, page=2, cursor, endpoint w Network, data range..."></textarea>
+              </label>
+              <label class="field field-wide">
+                <span>Notes</span>
+                <textarea id="event-source-notes" rows="6" placeholder="Co działa, czego nie działa, co sprawdzić później, pomysł na parser..."></textarea>
+              </label>
+            </div>
+
+            <div class="event-source-actions">
+              <span class="muted">Technical review notes for this source</span>
+              <button id="save-event-source" class="primary-button" type="submit">Save analysis</button>
+            </div>
+            <p id="event-last-checked" class="muted event-last-checked"></p>
+          </form>
+        </section>
+      </div>
+
+      <section class="panel event-preview-panel">
+        <div class="panel-heading">
+          <div><p class="eyebrow">STRUCTURED EVENT REVIEW</p><h2 id="event-preview-title">Eventy</h2></div>
+          <span id="event-preview-count" class="status-pill status-neutral">0</span>
+        </div>
+        <div class="event-preview-controls">
+          <label class="field compact-field"><span>Max events</span><input id="event-preview-limit" type="number" min="1" max="30" value="10" /></label>
+          <p id="event-preview-meta" class="muted">Wybierz źródło i kliknij „Run import preview”.</p>
+        </div>
+        <div id="event-preview-list" class="event-preview-list">
+          <div class="empty-state"><div class="empty-icon">◌</div><p>Tu pojawią się już ustrukturyzowane eventy po przejściu przez crawler, cleaning, extraction i validation.</p></div>
+        </div>
+      </section>
+
+      <section class="panel event-roadmap-panel">
+        <div class="panel-heading"><div><p class="eyebrow">NEXT</p><h2>Importer roadmap</h2></div></div>
+        <div class="event-roadmap">
+          <div><strong>1 · Generic crawler</strong><span>same-domain discovery with fixed per-source URL rules</span></div>
+          <div><strong>2 · Deterministic fields + cleaning</strong><span>JSON-LD first; then explicit Inicio / Finalización / Lugar / Precio from HTML; Trafilatura cleans the description</span></div>
+          <div><strong>3 · LLM enrichment + validation</strong><span>past events are dropped before LLM; the model fills only missing semantic fields and never overrides explicit source dates</span></div>
+          <div><strong>4 · Later</strong><span>dedupe, ML classification and explicit PostgreSQL publish after review</span></div>
+        </div>
+      </section>
     </section>
 
     <section id="view-photos" class="view">
@@ -193,7 +364,7 @@
     <section id="view-graph" class="view">
       <section class="panel graph-panel">
         <div class="panel-heading graph-heading"><div><p class="eyebrow">LANGGRAPH</p><h2>Text content workflow</h2></div><div class="graph-legend"><span><i class="legend-dot active-dot"></i> aktualny node</span><span><i class="legend-dot"></i> pozostałe</span></div></div>
-        <div class="graph-canvas" aria-label="Graf przepływu agenta">
+        <div id="content-graph-canvas" class="graph-canvas" aria-label="Graf przepływu agenta">
           <div class="graph-start">START</div><div class="arrow-down">↓</div>
           <article class="graph-node" data-node="research"><span class="node-index">01</span><div><h3>research</h3><p>Źródło tekstowe lub Tavily → factual brief.</p></div></article><div class="arrow-down">↓</div>
           <article class="graph-node" data-node="curate"><span class="node-index">02</span><div><h3>curate</h3><p>Układa propozycję treści Canarias Cerca do review.</p></div></article><div class="arrow-down">↓</div>
@@ -202,6 +373,21 @@
           <article class="graph-node" data-node="write"><span class="node-index">04</span><div><h3>write</h3><p>Generuje finalny pakiet dla języków ustawionych w CONTENT_LANGUAGES.</p></div></article><div class="arrow-down">↓</div>
           <article class="graph-node" data-node="publish"><span class="node-index">05</span><div><h3>publish</h3><p>Waliduje i zapisuje JSON.</p></div></article><div class="arrow-down">↓</div><div class="graph-end">END · ready</div>
         </div>
+      </section>
+
+      <section class="panel graph-panel secondary-graph-panel">
+        <div class="panel-heading graph-heading"><div><p class="eyebrow">LANGGRAPH · EVENTS</p><h2>Event import workflow · v0.9.0</h2></div><span class="status-pill status-review">local preview</span></div>
+        <div id="event-graph-canvas" class="graph-canvas compact-graph" aria-label="Graf importu eventów">
+          <div class="graph-start">START</div><div class="arrow-down">↓</div>
+          <article class="graph-node" data-event-node="crawl"><span class="node-index">01</span><div><h3>crawl</h3><p>Wybrany link z katalogu wyspy jest punktem startowym. Generic crawler odkrywa URL-e eventów; Tavily może być użyte tylko do discovery, gdy agenda tego wymaga.</p></div></article><div class="arrow-down">↓</div>
+          <article class="graph-node" data-event-node="clean"><span class="node-index">02</span><div><h3>clean</h3><p>Czyści treść, zachowuje JSON-LD i deterministycznie czyta jawne pola HTML: Inicio, Finalización, Lugar i Precio. Stare daty odpadają przed LLM.</p></div></article><div class="arrow-down">↓</div>
+          <article class="graph-node" data-event-node="extract"><span class="node-index">03</span><div><h3>extract</h3><p>Priorytet: JSON-LD → jawne pola HTML → LLM. LLM tylko uzupełnia braki i nie nadpisuje dat/miejsca znalezionych w źródle.</p></div></article><div class="arrow-down">↓</div>
+          <article class="graph-node" data-event-node="validate"><span class="node-index">04</span><div><h3>validate</h3><p>Sprawdza tytuł, datę i venue. Braki trafiają do needs_review zamiast być zgadywane.</p></div></article><div class="arrow-down">↓</div>
+          <article class="graph-node human-node" data-event-node="human_review"><span class="node-index">05</span><div><h3>human_review</h3><p>Graf zatrzymuje się tutaj. Panel Events pokazuje ustrukturyzowane eventy do kontroli.</p></div></article><div class="arrow-down muted-arrow">↓ approve later</div>
+          <article class="graph-node" data-event-node="publish"><span class="node-index">06</span><div><h3>publish</h3><p>Na razie wyłącznie lokalny JSON export. Produkcyjne PostgreSQL pozostaje osobnym późniejszym krokiem.</p></div></article><div class="arrow-down">↓</div>
+          <div class="graph-end">END</div>
+        </div>
+        <aside class="graph-note"><strong>Wspólna infrastruktura:</strong><p>Text workflow i Event Importer korzystają z tego samego LangGraph checkpointera/MongoDB, ale mają osobne state i nody. Dzięki temu eventy nie mieszają się z generowaniem artykułów.</p></aside>
       </section>
 
       <section class="panel graph-panel secondary-graph-panel">
