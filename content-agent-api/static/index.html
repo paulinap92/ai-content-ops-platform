@@ -26,6 +26,8 @@
       <button class="tab" data-view="photos">Photos</button>
       <button class="tab" data-view="events">Events</button>
       <button class="tab" data-view="graph">Graph</button>
+      <button class="tab" data-view="database">Database</button>
+      <button class="tab" data-view="social">Social Media</button>
     </nav>
 
     <section id="view-editor" class="view active">
@@ -401,9 +403,38 @@
         <aside class="graph-note"><strong>Teraz:</strong><p>Bez Vision. Najpierw budujemy czytelną bibliotekę zdjęć i strukturę Drive zgodną ze strukturą strony. AI możemy dołożyć później tylko na żądanie.</p></aside>
       </section>
     </section>
+    <section id="view-database" class="view">
+      <div class="panel" style="padding:24px">
+        <div class="panel-heading"><div><p class="eyebrow">LOCAL DATA · READ ONLY</p><h2>Database Explorer</h2></div><button type="button" id="studio-db-toggle" class="secondary-button">Hide</button></div>
+        <div id="studio-db-body">
+          <p class="muted">MongoDB Content Studio. PostgreSQL Canarias Cerca nie jest podłączony. Brak edycji i zapytań SQL.</p>
+          <div class="toolbar-actions"><select id="studio-collection" aria-label="Collection"><option value="">Choose collection</option></select><button type="button" id="studio-db-refresh" class="secondary-button">Refresh</button></div>
+          <p id="studio-db-status" class="muted"></p>
+          <div style="overflow:auto"><table id="studio-db-table" style="width:100%;text-align:left"></table></div>
+          <div class="toolbar-actions"><button type="button" id="studio-db-prev" class="secondary-button">Previous</button><button type="button" id="studio-db-next" class="secondary-button">Next</button></div>
+        </div>
+      </div>
+    </section>
+    <section id="view-social" class="view">
+      <div class="panel" style="padding:24px">
+        <div class="panel-heading"><div><p class="eyebrow">FACEBOOK · INSTAGRAM</p><h2>Social Media Queue</h2></div><span class="status-pill status-neutral">Drafts only · not connected</span></div>
+        <p class="muted">Przygotuj treści do zatwierdzenia. Żadne materiały nie są publikowane bez integracji i autoryzacji kont.</p>
+        <form id="studio-social-form" class="form-grid">
+          <label class="field field-wide"><span>Post title</span><input id="studio-social-title" required maxlength="180"></label>
+          <label class="field field-wide"><span>Caption / hashtags</span><textarea id="studio-social-caption" required maxlength="4000" rows="5"></textarea></label>
+          <label class="field field-wide"><span>Image URL (optional)</span><input type="url" id="studio-social-image" placeholder="https://..."></label>
+          <label class="field"><span><input id="studio-social-instagram" type="checkbox" checked> Instagram</span></label>
+          <label class="field"><span><input id="studio-social-facebook" type="checkbox" checked> Facebook</span></label>
+          <div class="field-wide"><button type="submit" class="primary-button">Save draft</button></div>
+        </form>
+        <p id="studio-social-status" class="muted"></p>
+        <h3>Draft queue</h3><div id="studio-social-list" class="draft-list"></div>
+      </div>
+    </section>
   </main>
 
   <div id="toast" class="toast hidden" role="status"></div>
   <script src="/static/app.js" defer></script>
+  <script src="/static/studio-extras.js" defer></script>
 </body>
 </html>
