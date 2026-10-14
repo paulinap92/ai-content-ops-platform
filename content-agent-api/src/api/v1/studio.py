@@ -3,17 +3,23 @@
 No SQL executor, no database writes from the browser view, and no direct
 publication to Meta. Publishing must use a separately authorized integration.
 """
-import os
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field
 
 from src.core.config import settings
 
-router = APIRouter(prefix="/api/studio", tags=["Studio"])
+async def require_local(request: Request) -> None:
+    # Local operator tool, not a public administration endpoint.
+    host = request.client.host if request.client else ""
+    if host not in {"127.0.0.1", "::1"}:
+        raise HTTPException(status_code=403, detail="Studio admin API is localhost-only")
+
+
+router = APIRouter(prefix="/api/studio", tags=["Studio"], dependencies=[Depends(require_local)])
 REDACT = ("password", "secret", "token", "api_key", "credential", "authorization")
 ALLOWED_PLATFORMS = {"instagram", "facebook"}
 
