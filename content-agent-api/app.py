@@ -15,6 +15,7 @@ from src.api.error_handlers import register_error_handlers
 from src.api.v1.content import router as content_router
 from src.api.v1.events import router as events_router
 from src.api.v1.photos import router as photos_router
+from src.api.v1.studio import router as studio_router
 from src.core.config import settings
 from src.core.persistence import create_mongodb_checkpointer
 from src.domain.documents import (
@@ -116,6 +117,7 @@ def create_app() -> FastAPI:
     app.include_router(content_router)
     app.include_router(events_router)
     app.include_router(photos_router)
+    app.include_router(studio_router)
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
     @app.get("/", include_in_schema=False)
