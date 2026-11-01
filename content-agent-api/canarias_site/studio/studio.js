@@ -88,8 +88,7 @@ async function api(path, options = {}) {
   const data = await r.json().catch(() => ({}));
   if (!r.ok) {
     if (r.status === 401) {
-      $("login").hidden = false;
-      $("workspace").hidden = true;
+      window.top.location.assign("/login");
     }
     throw new Error(
       typeof data.detail === "string"
@@ -620,7 +619,6 @@ function view(name) {
 }
 async function init() {
   state.options = await api("/options");
-  $("login").hidden = true;
   $("workspace").hidden = false;
   $("logout").hidden = false;
   $("island").replaceChildren(
@@ -649,25 +647,6 @@ async function init() {
     $("resource").value = requested.get("resource");
   await loadRecords();
 }
-$("login-form").onsubmit = (e) => {
-  e.preventDefault();
-  task(async () => {
-    try {
-      await api("/login", {
-        method: "POST",
-        body: JSON.stringify({ token: $("token").value }),
-      });
-    } finally {
-      $("token").value = "";
-    }
-    await init();
-  });
-};
-$("logout").onclick = () =>
-  task(async () => {
-    await api("/logout", { method: "POST" });
-    location.reload();
-  });
 for (const key of ["island", "kind", "resource", "month"]) {
   $(key).onchange = () =>
     task(async () => {
@@ -818,9 +797,7 @@ window.addEventListener("beforeunload", (e) => {
     e.returnValue = "";
   }
 });
-task(init).then(() => {
-  if (!state.options) $("login").hidden = false;
-});
+task(init);
 
 $("rebase").onclick=()=>task(async()=>{if(!state.record?.id)throw new Error("Najpierw zapisz wersję roboczą.");if(state.dirty)throw new Error("Najpierw zapisz własne poprawki.");state.record=await api(`/documents/${state.record.id}/rebase`,{method:"POST",body:JSON.stringify({expected_version:state.record.version})});renderRecord();preview("record");message("Wczytano bieżącą wersję strony do porównania. Twój draft pozostał zachowany; sprawdź różnice przed publikacją.");});
 
