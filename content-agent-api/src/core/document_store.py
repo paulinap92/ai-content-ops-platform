@@ -21,7 +21,10 @@ TABLE = sql.Identifier("cc_editor_private", "documents")
 
 
 def connection_string(url):
-    return make_url(url).set(drivername="postgresql").render_as_string(hide_password=False)
+    parsed = make_url(url).set(drivername="postgresql")
+    if parsed.host and parsed.host.endswith(".neon.tech"):
+        parsed = parsed.set(host=parsed.host.replace("-pooler.", "."))
+    return parsed.render_as_string(hide_password=False)
 
 
 async def initialize(url):

@@ -155,3 +155,32 @@ async def test_failure_before_history_commit_rolls_back_canonical_publication(se
     assert await session.scalar(select(ContentItem.id).where(ContentItem.slug==slug)) is None
     saved=await session.get(StudioDocument,UUID(draft["id"]))
     assert saved.status=="draft" and saved.version==1
+
+
+@pytest.mark.asyncio
+async def test_ai_improves_bound_article_as_private_draft_and_preserves_identity(session,tmp_path,monkeypatch):
+    import json
+    from contextlib import asynccontextmanager
+    from types import SimpleNamespace
+    from src.services import canarias_publisher as publisher
+    from src.domain.schemas import CanariasPublishRequest
+    slug='bound-'+uuid4().hex
+    identity={'kind':'guide','island':'tenerife','resource':'food','record_key':'new:'+slug}
+    original={'name':'Original','slug':slug,'description':'Original body','image_url':'https://example.com/photo.jpg'}
+    initial=await studio.save_draft(session,identity,original,0,studio.fingerprint(None))
+    published=await studio.publish(session,initial['id'],initial['version'])
+    package={'type':'guide','island':'tenerife','category':'food','slug':'different-ai-slug','sources':[], 'public_content':{'es':{'title':'AI suggestion','summary':'Summary','body_markdown':'New body'}}}
+    path=tmp_path/'package.json';path.write_text(json.dumps(package))
+    @asynccontextmanager
+    async def scope():yield session
+    monkeypatch.setattr(publisher,'session_scope',scope)
+    monkeypatch.setattr(publisher,'settings',SimpleNamespace(canarias_publish_enabled=True,content_language_codes=('es',)))
+    target={'identity':published['identity'],'payload':published['draft'],'version':published['version'],'base_fingerprint':published['base_fingerprint']}
+    result=await publisher.CanariasPublisherService().publish_file(file_path=str(path),request=CanariasPublishRequest(section='food'),site_target=target)
+    assert result.slug==slug
+    saved=result.backend_response
+    assert saved['identity']==published['identity']
+    assert saved['draft']['description']=='New body' and saved['draft']['image_url']==original['image_url']
+    assert saved['published']['description']=='Original body'
+    row=await session.scalar(select(ContentItem).where(ContentItem.slug==slug))
+    assert row.title=='Original' and row.body=='Original body'

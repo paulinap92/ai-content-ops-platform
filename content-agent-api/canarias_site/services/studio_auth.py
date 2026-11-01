@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from canarias_site.db.base import Base
 from canarias_site.models.studio import StudioDocument, StudioRevision
 from src.core.auth import require_editor
+from src.core.document_store import connection_string
 
 _lock = asyncio.Lock()
 _initialized = set()
@@ -27,7 +28,7 @@ def database_url():
 
 @lru_cache(maxsize=2)
 def writer_engine(url):
-    engine = create_async_engine(make_url(url).set(drivername="postgresql+psycopg"), pool_pre_ping=True, pool_size=2, max_overflow=0, connect_args={"options": "-c statement_timeout=30000 -c lock_timeout=2000"})
+    engine = create_async_engine(make_url(connection_string(url)).set(drivername="postgresql+psycopg"), pool_pre_ping=True, pool_size=2, max_overflow=0, connect_args={"options": "-c statement_timeout=30000 -c lock_timeout=2000"})
     _engines.add(engine)
     return engine
 
