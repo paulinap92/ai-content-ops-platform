@@ -1,32 +1,33 @@
-from types import SimpleNamespace
-
-import httpx
-import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+from canarias_site.api.studio import router
+from canarias_site.services.studio_auth import studio_session
+from src.core.auth import authentication, router as auth_router, COOKIE, valid_cookie, cookie_value
 
-from src.api.v1 import site_editor
+TOKEN="isolated-editor-test-credential-1234567890"
 
+def test_one_session_protects_the_entire_editor_and_cookie_is_not_shared_with_site():
+ app=FastAPI();app.middleware("http")(authentication);app.include_router(auth_router);app.include_router(router)
+ app.dependency_overrides[studio_session]=lambda:None
+ with TestClient(app,base_url="https://editor.example") as client:
+  for path in ["/site/api/options","/api/v1/content","/api/studio/database/collections","/static/app.js","/docs"]:
+   assert client.get(path).status_code==401
+  assert client.post("/auth/login",json={"token":TOKEN},headers={"Origin":"https://other.example"}).status_code==403
+  result=client.post("/auth/login",json={"token":TOKEN},headers={"Origin":"https://editor.example"})
+  assert result.status_code==200
+  cookie=result.headers["set-cookie"]
+  assert "HttpOnly" in cookie and "Secure" in cookie and "SameSite=strict" in cookie and "Path=/" in cookie
+  assert client.get("/site/api/options").status_code==200
+  assert client.get("/site/api/sql").status_code==404
+  assert client.post("/auth/logout").status_code==200
+  assert client.get("/site/api/options").status_code==401
 
-def test_local_bridge_forwards_only_editor_paths_and_keeps_token_server_side(monkeypatch):
-    monkeypatch.setattr(site_editor,"settings",SimpleNamespace(canarias_api_url="https://backend.example",canarias_editor_token=SimpleNamespace(get_secret_value=lambda:"private-studio-key")))
-    requests=[]
-    original=httpx.AsyncClient
-    def handler(request):
-        requests.append(request)
-        return httpx.Response(200,json={"islands":["tenerife"]})
-    monkeypatch.setattr(site_editor.httpx,"AsyncClient",lambda **kwargs:original(transport=httpx.MockTransport(handler)))
-    app=FastAPI();app.include_router(site_editor.router)
-    with TestClient(app,client=("127.0.0.1",50000)) as client:
-        response=client.get("/site/api/options")
-        assert response.status_code==200 and response.json()=={"islands":["tenerife"]}
-        assert "private-studio-key" not in response.text
-        assert requests[0].headers["authorization"]=="Bearer private-studio-key"
-        assert client.get("/site/api/admin/sql").status_code==404
-        assert len(requests)==1
-
-
-def test_remote_client_cannot_use_local_editor_bridge():
-    app=FastAPI();app.include_router(site_editor.router)
-    with TestClient(app,client=("203.0.113.10",50000)) as client:
-        assert client.get("/site/api/options").status_code==403
+def test_local_installation_also_requires_login_and_rejects_tampered_cookie():
+ app=FastAPI();app.middleware("http")(authentication);app.include_router(auth_router);app.include_router(router)
+ app.dependency_overrides[studio_session]=lambda:None
+ with TestClient(app,base_url="http://localhost:8002") as client:
+  assert client.get("/site/api/options").status_code==401
+  result=client.post("/auth/login",json={"token":TOKEN})
+  assert result.status_code==200 and "Secure;" not in result.headers["set-cookie"]
+ assert valid_cookie(cookie_value(TOKEN),TOKEN)
+ assert not valid_cookie(cookie_value(TOKEN)+"bad",TOKEN)

@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && apt-get install -y --no-install-recommends curl build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=ghcr.io/astral-sh/uv:0.10.0 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.4 /uv /uvx /bin/
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
@@ -25,8 +25,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 
 COPY --from=deps /app/.venv /app/.venv
 COPY . .
-RUN mkdir -p /app/output /app/photo_inbox
+RUN groupadd --gid 10001 editor && useradd --uid 10001 --gid editor --no-create-home editor \
+    && mkdir -p /app/output /app/photo_inbox \
+    && chown -R editor:editor /app/output /app/photo_inbox
+
+USER 10001:10001
 
 EXPOSE 8000
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--loop", "uvloop", "--workers", "1", "--no-access-log"]
+CMD ["python", "-m", "src.core.run"]
 

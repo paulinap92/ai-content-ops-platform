@@ -40,3 +40,4 @@ def test_rejects_human_category_label() -> None:
 
     with pytest.raises(ValueError, match="snake_case"):
         validate_content_package(payload, ("es", "en", "pl"))
+

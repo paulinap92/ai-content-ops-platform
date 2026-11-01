@@ -16,9 +16,11 @@ from src.api.v1.content import router as content_router
 from src.api.v1.events import router as events_router
 from src.api.v1.photos import router as photos_router
 from src.api.v1.studio import router as studio_router
-from src.api.v1.site_editor import router as site_editor_router
+from canarias_site.api.studio import router as site_editor_router
+from src.core.auth import router as auth_router, authentication
 from src.core.config import settings
-from src.core.persistence import create_mongodb_checkpointer
+from src.core.persistence import create_editor_checkpointer
+from src.core import document_store
 from src.domain.documents import (
     ContentDocument,
     EventSourceCatalogStateDocument,
@@ -43,24 +45,25 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     logger.info("Starting canarias-cerca-editor-agent ...")
-    motor_client: AsyncIOMotorClient = AsyncIOMotorClient(
-        settings.mongodb_uri,
-        serverSelectionTimeoutMS=5000,
-    )
+    app.state.storage_ready = False
+    app.state.storage_backend = settings.editor_storage
+    motor_client = None
+    if settings.editor_storage == "postgres" and not (settings.editor_database_url or settings.site_database_url):
+        logger.warning("Editor requires private database configuration; public site is unaffected")
+        yield
+        return
 
     try:
-        await init_beanie(
-            database=motor_client[settings.mongodb_db_name],
-            document_models=[
-                ContentDocument,
-                PhotoDocument,
-                EventSourceDocument,
-                EventSourceCatalogStateDocument,
-                EventSourceReviewDocument,
-            ],
-        )
+        if settings.editor_storage == "postgres":
+            value = settings.editor_database_url or settings.site_database_url
+            await document_store.initialize(value.get_secret_value())
+        elif settings.editor_storage == "mongodb":
+            motor_client = AsyncIOMotorClient(settings.mongodb_uri, serverSelectionTimeoutMS=5000)
+            await init_beanie(database=motor_client[settings.mongodb_db_name], document_models=[ContentDocument, PhotoDocument, EventSourceDocument, EventSourceCatalogStateDocument, EventSourceReviewDocument])
+        else:
+            raise ValueError("EDITOR_STORAGE must be mongodb or postgres")
 
-        with create_mongodb_checkpointer() as checkpointer:
+        with create_editor_checkpointer() as checkpointer:
             graph = build_content_agent(checkpointer=checkpointer)
             event_graph = build_event_import_graph(checkpointer=checkpointer)
             agent_service = AgentService(
@@ -86,6 +89,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 max_workers=min(settings.max_concurrent_agents, 2),
             )
             app.state.event_import_service = event_import_service
+            app.state.storage_ready = True
 
             logger.info(
                 "Canarias Cerca editor agent ready (photo_source=%s)",
@@ -96,25 +100,32 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             await agent_service.shutdown()
             await event_import_service.shutdown()
     finally:
-        motor_client.close()
+        if motor_client:
+            motor_client.close()
+        if settings.editor_storage == "postgres":
+            await document_store.shutdown()
+        from canarias_site.services.studio_auth import shutdown_engines
+        await shutdown_engines()
         logger.info("Canarias Cerca editor agent stopped")
 
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Canarias Cerca Editor Agent API",
+        title="Canarias Cerca Content Editor",
         description=(
             "Human-in-the-loop agent pomagający przygotowywać i tłumaczyć treści "
             "dla Canarias Cerca. Finalny wynik to JSON gotowy do review/importu; "
             "finalny pakiet może być wysłany jako draft do editora Canarias Cerca. Photo Manager skanuje foldery/Drive i prowadzi kolejkę review zdjęć. Event Importer ma osobny lokalny LangGraph: crawl → clean → extract → validate → human_review."
         ),
-        version="0.10.0",
+        version="0.11.0",
         lifespan=lifespan,
         docs_url="/docs",
         redoc_url="/redoc",
     )
 
     register_error_handlers(app)
+    app.middleware("http")(authentication)
+    app.include_router(auth_router)
     app.include_router(content_router)
     app.include_router(events_router)
     app.include_router(photos_router)
@@ -125,6 +136,10 @@ def create_app() -> FastAPI:
     @app.get("/", include_in_schema=False)
     async def editor_ui() -> FileResponse:
         return FileResponse("static/index.html")
+
+    @app.get("/health/live", include_in_schema=False)
+    async def live():
+        return {"status": "ok", "service": "content-editor"}
 
     return app
 
@@ -143,5 +158,8 @@ async def health() -> dict[str, object]:
         "editor_language": settings.editor_language,
         "content_languages": list(settings.content_language_codes),
         "canarias_publish_enabled": settings.canarias_publish_enabled,
+        "ai_configured": settings.ai_configured,
+        "storage_backend": settings.editor_storage,
+        "storage_ready": getattr(app.state, "storage_ready", False),
     }
 

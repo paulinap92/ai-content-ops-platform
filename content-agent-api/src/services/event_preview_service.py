@@ -175,3 +175,4 @@ class EventPreviewService:
         text = text.replace(title, " ", 1)
         text = _WS_RE.sub(" ", text).strip()
         return text[:600]
+

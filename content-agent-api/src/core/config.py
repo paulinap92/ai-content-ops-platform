@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     app_host: str = "127.0.0.1"
     app_port: int = 8000
     max_concurrent_agents: int = 4
+    editor_token: SecretStr | None = None
+    editor_storage: str = "mongodb"
+    editor_database_url: SecretStr | None = None
+    site_database_url: SecretStr | None = None
 
     # Editorial behaviour
     editor_language: str = "pl"
@@ -77,7 +81,11 @@ class Settings(BaseSettings):
 
     @property
     def canarias_publish_enabled(self) -> bool:
-        return bool(self.canarias_api_url.strip() and self.canarias_editor_token and self.canarias_editor_token.get_secret_value())
+        return bool(self.site_database_url)
+
+    @property
+    def ai_configured(self) -> bool:
+        return bool(self.openai_api_key if self.model_provider == "openai" else self.anthropic_api_key)
 
 
 settings = Settings()

@@ -78,3 +78,4 @@ class EventImportService:
 
     async def shutdown(self) -> None:
         self._executor.shutdown(wait=False, cancel_futures=True)
+

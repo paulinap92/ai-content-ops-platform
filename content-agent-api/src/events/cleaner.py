@@ -91,3 +91,4 @@ def _walk_for_event(value: Any) -> dict[str, Any] | None:
             if found is not None:
                 return found
     return None
+

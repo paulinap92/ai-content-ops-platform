@@ -144,3 +144,4 @@ EVENT_SOURCE_BY_ID = {source.source_id: source for source in EVENT_SOURCES}
 
 if len(EVENT_SOURCE_BY_ID) != len(EVENT_SOURCES):
     raise RuntimeError("Duplicate event source_id in EVENT_SOURCES")
+

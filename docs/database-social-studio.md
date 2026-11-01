@@ -26,3 +26,4 @@ Open http://127.0.0.1:8000. Use the new tabs.
 
 ## Next steps for Instagram/Facebook
 Connect the user's Meta accounts through Metricool. Configure an authenticated server-side connector and implement a second, explicit approval-to-schedule step. Never store social access tokens in the browser or commit them to Git.
+

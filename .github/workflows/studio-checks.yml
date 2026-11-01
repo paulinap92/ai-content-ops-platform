@@ -1,19 +1,83 @@
-name: Content Studio
+name: Content Editor
 on:
   push:
-    branches: [feature/database-social-studio]
+    branches: [feature/database-social-studio, production]
   pull_request:
+permissions:
+  contents: read
 jobs:
-  tests:
+  persistence:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        storage: [postgres, mongodb]
+    container: python:3.13-bookworm
+    services:
+      jobdb:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_DB: canarias_cerca_jobs_test
+          POSTGRES_USER: canarias
+          POSTGRES_PASSWORD: isolated_ci_only
+        options: >-
+          --health-cmd "pg_isready -U canarias -d canarias_cerca_jobs_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      mongodb:
+        image: mongo:8.2
+    env:
+      EDITOR_STORAGE: ${{ matrix.storage }}
+      MONGODB_URI: mongodb://mongodb:27017
+      MONGODB_DB_NAME: cc_editor_ci
+      CC_SQL_TEST_URL: postgresql+psycopg://canarias:isolated_ci_only@jobdb:5432/canarias_cerca_jobs_test
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
       - run: pip install uv==0.13.4
       - run: uv sync --frozen
         working-directory: content-agent-api
+      - name: Seed only the disposable canonical schema
+        working-directory: content-agent-api
+        run: uv run --frozen python -c 'import os;from tests.sql_test_support import initialize;initialize(os.environ["CC_SQL_TEST_URL"])'
       - run: uv run --frozen python -m pytest -q
         working-directory: content-agent-api
-      - run: node --check content-agent-api/static/app.js
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t cc-content-editor:ci content-agent-api
+      - name: Run the isolated editor without any website process
+        run: |
+          set -eu
+          docker run -d --name cc-editor-ci --read-only --tmpfs /tmp:uid=10001,gid=10001,mode=1777 --tmpfs /app/output:uid=10001,gid=10001 --tmpfs /app/photo_inbox:uid=10001,gid=10001 -e EDITOR_STORAGE=postgres -e EDITOR_TOKEN=isolated-editor-ci-token-1234567890 -p 127.0.0.1:8017:8000 cc-content-editor:ci
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8017/health/live; then break; fi
+            sleep 2
+          done
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8017/login)" = 200
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8017/site/api/options)" = 401
+          test "$(docker exec cc-editor-ci id -u)" = 10001
+          docker exec cc-editor-ci python -c "assert b'src.core.run' in open('/proc/1/cmdline','rb').read()"
+          docker stop --time 30 cc-editor-ci
+          test "$(docker inspect --format '{{.State.ExitCode}}' cc-editor-ci)" = 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check content-agent-api/static/app.js && node --check content-agent-api/canarias_site/studio/studio.js
+      - name: Logs and cleanup
+        if: always()
+        run: |
+          docker logs cc-editor-ci || true
+          docker rm -f cc-editor-ci || true
+  windows-script:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse the local launcher without running Docker or reading user data
+        shell: powershell
+        run: |
+          $ccTokens = $null
+          $ccErrors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD 'tools\Start-ContentEditor.ps1'), [ref]$ccTokens, [ref]$ccErrors) | Out-Null
+          if ($ccErrors.Count -gt 0) { $ccErrors | Format-List; throw 'PowerShell syntax validation failed' }

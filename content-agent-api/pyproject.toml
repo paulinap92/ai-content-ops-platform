@@ -1,6 +1,6 @@
 [project]
 name = "canarias-cerca-editor-agent"
-version = "0.10.0"
+version = "0.11.0"
 description = "Canarias Cerca Editor Agent — FastAPI + LangGraph + Human-in-the-Loop"
 requires-python = ">=3.13,<3.14"
 dependencies = [
@@ -24,6 +24,10 @@ dependencies = [
   "trafilatura>=2.0.0,<3.0",
   "google-api-python-client>=2.149.0,<3.0",
   "google-auth>=2.35.0,<3.0",
+  "psycopg[binary,pool]>=3.3.4,<4",
+  "sqlalchemy>=2.0.52,<3",
+  "geoalchemy2>=0.18,<1",
+  "langgraph-checkpoint-postgres>=3,<4",
 ]
 
 [dependency-groups]

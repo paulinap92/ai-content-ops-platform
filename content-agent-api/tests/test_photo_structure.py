@@ -27,3 +27,4 @@ def test_old_island_municipality_structure_still_works() -> None:
     assert meta.site_area == ""
     assert meta.site_section == ""
     assert meta.municipality == "Guimar"
+

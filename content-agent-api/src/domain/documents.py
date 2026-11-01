@@ -1,8 +1,14 @@
 from datetime import datetime, timezone
 from typing import Annotated
 
-from beanie import Document, Indexed
+from beanie import Indexed
 from pydantic import Field
+from src.core.config import settings
+
+if settings.editor_storage == "postgres":
+    from src.core.document_store import Document
+else:
+    from beanie import Document
 
 
 class ContentDocument(Document):
@@ -15,6 +21,7 @@ class ContentDocument(Document):
     outline: str | None = None
     file_path: str | None = None
     error_message: str | None = None
+    site_target: dict | None = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -114,3 +121,4 @@ class EventSourceCatalogStateDocument(Document):
     class Settings:
         name = "event_source_catalog_state"
         use_state_management = True
+

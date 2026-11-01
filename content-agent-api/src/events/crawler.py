@@ -163,3 +163,4 @@ class GenericEventCrawler:
             first = start_path.split("/", 1)[0] if start_path else ""
             return not first or path.startswith(f"/{first}")
         return any(path.startswith(prefix) for prefix in allowed)
+

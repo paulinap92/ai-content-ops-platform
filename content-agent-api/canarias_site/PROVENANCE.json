@@ -1,0 +1,31 @@
+{
+  "canonical_repository": "paulinap92/canarias-backend",
+  "source_commit": "17e6050c98a25edcef4691b0215a869d9bc47b07",
+  "purpose": "Standalone canonical editorial access. No public API, refresh worker, scheduler, source registry or JSON writers are included.",
+  "files": [
+    "db/base.py",
+    "models/design_db.py",
+    "models/studio.py",
+    "repositories/base.py",
+    "repositories/dynamic_data.py",
+    "repositories/explore_entity.py",
+    "repositories/guide_content.py",
+    "services/studio.py",
+    "services/studio_media.py",
+    "services/site_settings.py",
+    "services/editorial_privacy.py",
+    "services/sql_editor.py",
+    "services/explore_import.py",
+    "services/dynamic_data/mappers.py",
+    "services/guide_content/dtos.py",
+    "services/guide_content/mappers.py",
+    "services/explore_entities/dtos.py",
+    "services/explore_entities/mappers.py",
+    "services/explore_entities/properties.py",
+    "api/guide_content_mappers.py",
+    "api/explore_canonical/mappers.py",
+    "api/explore_canonical/schemas.py",
+    "utils/islands.py",
+    "api/studio.py"
+  ]
+}

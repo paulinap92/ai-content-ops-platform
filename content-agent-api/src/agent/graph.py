@@ -36,3 +36,4 @@ def build_content_agent(checkpointer: BaseCheckpointSaver) -> CompiledStateGraph
     builder.add_edge("publish", END)
 
     return builder.compile(checkpointer=checkpointer)
+

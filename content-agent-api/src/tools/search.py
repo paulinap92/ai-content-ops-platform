@@ -29,3 +29,4 @@ def search_web(topic: str) -> str:
         formatted.append(f"[{i}] {url}\n{content}")
 
     return "\n\n".join(formatted)
+

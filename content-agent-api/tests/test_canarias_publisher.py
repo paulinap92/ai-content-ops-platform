@@ -28,3 +28,4 @@ def test_adapter_keeps_spanish_for_current_editor_and_all_translations() -> None
     assert item["source_url"] == "https://example.com"
     assert set(item["translations"]) == {"es", "en", "pl"}
     assert item["content_ops_status"] == "draft"
+

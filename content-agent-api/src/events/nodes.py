@@ -464,3 +464,4 @@ def _tavily_discover(source: EventSourceDefinition, limit: int) -> dict[str, Any
             break
     usage = data.get("usage") or {}
     return {"urls": urls, "credits": usage.get("credits")}
+

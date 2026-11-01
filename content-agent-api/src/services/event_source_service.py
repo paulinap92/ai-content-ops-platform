@@ -24,6 +24,16 @@ class EventSourceService:
     """Local editable catalog of official event-source links + analyst review state."""
 
     async def ensure_seeded(self) -> None:
+        from src.core.config import settings
+        if settings.editor_storage == "postgres":
+            from src.core.document_store import pool
+            async with pool().connection() as conn:
+                await conn.execute("SELECT pg_advisory_xact_lock(192744, 3)")
+                await self._ensure_seeded()
+            return
+        await self._ensure_seeded()
+
+    async def _ensure_seeded(self) -> None:
         marker = await EventSourceCatalogStateDocument.find_one(
             EventSourceCatalogStateDocument.key == "default_sources_seeded"
         )
@@ -228,3 +238,4 @@ class EventSourceService:
             notes=review.notes if review else "",
             last_checked_at=review.last_checked_at if review else None,
         )
+

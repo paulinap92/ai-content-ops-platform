@@ -84,3 +84,4 @@ async def preview_photo(photo_id: PhotoIdPath, service: PhotoServiceDep) -> Resp
 @router.delete("/{photo_id}", status_code=status.HTTP_204_NO_CONTENT, summary="Usuń metadata z kolejki")
 async def delete_photo(photo_id: PhotoIdPath, service: PhotoServiceDep) -> None:
     await service.delete_photo_metadata(photo_id)
+

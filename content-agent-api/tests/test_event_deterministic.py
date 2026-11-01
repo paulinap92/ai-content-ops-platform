@@ -32,3 +32,4 @@ def test_explicit_finished_event_is_filtered() -> None:
     fields = {"start_at": "2019-05-23T10:05:00"}
     assert is_past_event(fields, today=date(2026, 9, 29))
     assert not is_past_event({"start_at": "2026-10-03"}, today=date(2026, 9, 29))
+

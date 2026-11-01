@@ -26,3 +26,4 @@ def test_la_gomera_uses_canonical_event_pages_not_news_feed() -> None:
     assert source.candidate_path_prefixes == ("/evento/",)
     assert "/noticia/" in source.exclude_path_prefixes
     assert "/noticias/" in source.exclude_path_prefixes
+

@@ -1,7 +1,7 @@
 import os
 from typing import Annotated
 
-from fastapi import APIRouter, Path, status
+from fastapi import APIRouter, Path, status, HTTPException
 from fastapi.responses import FileResponse
 
 from src.api.dependencies import AgentServiceDep, CanariasPublisherDep
@@ -33,12 +33,16 @@ async def create_content(
         payload: ContentCreateRequest,
         service: AgentServiceDep,
 ) -> ContentCreatedResponse:
+    from src.core.config import settings
+    if not settings.ai_configured:
+        raise HTTPException(503, "Uzupełnij klucz wybranego dostawcy AI w prywatnej konfiguracji Content Editora. Edycja ręczna działa niezależnie.")
     return await service.create_content(
         topic=payload.topic,
         source_text=payload.source_text,
         source_url=payload.source_url,
         island_hint=payload.island_hint,
         content_type_hint=payload.content_type_hint,
+        site_target=payload.site_target,
     )
 
 
@@ -115,8 +119,8 @@ async def download_content(
     response_model=CanariasPublishResponse,
     summary="Wyślij gotowy draft do editora Canarias Cerca",
     description=(
-        "Wysyła finalny pakiet przez istniejące /api/editor/content. "
-        "Canarias Cerca zapisuje go jako edytowalny draft w swoim obecnym storage."
+        "Zapisuje finalny pakiet jako prywatną wersję roboczą w Content Editorze. "
+        "Publiczna strona zmienia się dopiero po osobnym zatwierdzeniu publikacji."
     ),
 )
 async def publish_to_canarias(
@@ -126,7 +130,7 @@ async def publish_to_canarias(
     publisher: CanariasPublisherDep,
 ) -> CanariasPublishResponse:
     file_path = await service.get_file_path(thread_id=thread_id)
-    return await publisher.publish_file(file_path=file_path, request=payload)
+    return await publisher.publish_file(file_path=file_path, request=payload, site_target=await service.get_site_target(thread_id))
 
 
 @router.delete(
@@ -139,3 +143,4 @@ async def delete_content(
         service: AgentServiceDep,
 ) -> None:
     await service.delete_content(thread_id=thread_id)
+

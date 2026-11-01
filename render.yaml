@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: canarias-content-editor
+    runtime: docker
+    region: frankfurt
+    plan: free
+    repo: https://github.com/paulinap92/ai-content-ops-platform
+    branch: production
+    dockerfilePath: content-agent-api/Dockerfile
+    dockerContext: content-agent-api
+    healthCheckPath: /health/live
+    autoDeployTrigger: "off"
+    envVars:
+      - key: EDITOR_STORAGE
+        value: postgres
+      - key: APP_ENV
+        value: production
+      - key: MAX_CONCURRENT_AGENTS
+        value: "2"
+      - key: SITE_DATABASE_URL
+        fromService:
+          type: web
+          name: canarias-cerca-api
+          envVarKey: DATABASE_URL
+      - key: EDITOR_TOKEN
+        generateValue: true

@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ContentCreateRequest(BaseModel):
+    site_target: dict[str, Any] | None = None
     topic: str = Field(
         min_length=3,
         max_length=500,
@@ -63,6 +64,7 @@ class ContentStatusResponse(BaseModel):
 
     thread_id: str
     topic: str
+    site_target: dict[str, Any] | None = None
     status: str
     revision_count: int
     outline: str | None = Field(
@@ -296,3 +298,4 @@ class EventPreviewResponse(BaseModel):
     stats: dict[str, Any] = Field(default_factory=dict)
     events: list[EventPreviewItem]
     note: str
+

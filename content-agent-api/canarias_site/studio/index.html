@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Canarias Cerca · Content Editor</title>
+    <link rel="stylesheet" href="assets/studio.css" />
+  </head>
+  <body>
+    <header hidden>
+      <div>
+        <small>CANARIAS CERCA</small>
+        <h1>Content Editor</h1>
+      </div>
+      <div>
+        <a href="https://www.canariascerca.es/" target="_blank" rel="noopener"
+          >Otwórz stronę ↗</a
+        ><button id="logout" hidden>Wyloguj</button>
+      </div>
+    </header>
+    <p id="status" role="status" aria-live="polite">Łączenie…</p>
+    <section id="login" class="card" hidden>
+      <h2>Logowanie do panelu strony</h2>
+      <p>
+        Klucz redakcyjny pozostaje w zabezpieczonej sesji. Nie zapisujemy go w
+        przeglądarce.
+      </p>
+      <form id="login-form">
+        <label
+          >Klucz Studia<input
+            name="token"
+            id="token"
+            type="password"
+            autocomplete="current-password"
+            required /></label
+        ><button type="submit">Zaloguj</button>
+      </form>
+    </section>
+    <main id="workspace" hidden>
+      <nav aria-label="Widoki Studia">
+        <button data-view="content" class="active">Treści strony</button
+        ><button data-view="settings">Sekcje i teksty strony</button
+        ><button data-view="media">Biblioteka zdjęć</button>
+      </nav>
+      <section id="content-view">
+        <div class="toolbar card">
+          <label>Wyspa<select id="island"></select></label
+          ><label
+            >Obszar<select id="kind">
+              <option value="guide">Guide — artykuły</option>
+              <option value="explore">Explore — miejsca i trasy</option>
+              <option value="calendar">Kalendarz</option>
+              <option value="news">Aktualności</option>
+            </select></label
+          ><label id="resource-label"
+            >Sekcja<select id="resource"></select
+            ><input id="month" type="month" hidden /></label
+          ><label
+            >Szukaj<input
+              id="search"
+              type="search"
+              placeholder="Tytuł, nazwa, miejscowość…" /></label
+          ><button id="reload">Odśwież</button><button id="new">+ Dodaj</button>
+        </div>
+        <div class="columns">
+          <aside class="card">
+            <div id="record-list"></div>
+            <div class="pagination">
+              <button id="prev">←</button><span id="page"></span
+              ><button id="next">→</button>
+            </div>
+          </aside>
+          <section class="card">
+            <h2 id="editor-title">Wybierz treść</h2>
+            <p id="record-status"></p>
+            <form id="record-form"></form>
+            <div id="edit-actions" class="actions" hidden>
+              <button id="improve-ai" type="button">Popraw artykuł z AI</button><button id="save">Zapisz roboczą</button
+              ><button id="preview">Podgląd i zmiany</button
+              ><button id="publish" class="primary">Opublikuj</button
+              ><button id="history">Historia</button>
+              <button id="rebase">Wczytaj aktualną wersję strony do porównania</button>
+            </div>
+            <div id="history-list"></div>
+          </section>
+        </div>
+      </section>
+      <section id="settings-view" hidden>
+        <div class="card">
+          <h2>Widoczność i teksty strony</h2>
+          <p>
+            Wyłączenie sekcji ukrywa ją w nawigacji i blokuje otwieranie w
+            interfejsie. Treści pozostają w bazie. Zmiany zobaczą odwiedzający
+            dopiero po publikacji.
+          </p>
+          <label
+            >Zakres zmiany<select id="scope">
+              <option value="global">Cała strona</option>
+            </select></label
+          >
+          <p id="settings-state"></p>
+          <form id="settings-form"></form>
+          <div class="actions">
+            <button id="save-settings">Zapisz roboczą</button
+            ><button id="preview-settings">Podgląd zmian</button
+            ><button id="publish-settings" class="primary">
+              Opublikuj ustawienia</button
+            ><button id="settings-history">Historia</button>
+          </div>
+          <div id="settings-history-list"></div>
+        </div>
+      </section>
+      <section id="media-view" class="card" hidden>
+        <h2>Zdjęcia strony</h2>
+        <p>
+          Wybierz wyspę w widoku treści. Użyj pliku JPEG, PNG lub WebP do 5 MB
+          albo wklej istniejący adres zdjęcia w edytowanym wpisie.
+        </p>
+        <label
+          >Dodaj zdjęcie<input
+            id="upload"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+        /></label>
+        <p id="media-status"></p>
+        <div id="media-list" class="gallery"></div>
+      </section>
+    </main>
+    <dialog id="preview-dialog">
+      <button id="close-preview">Zamknij</button>
+      <article id="preview-content"></article>
+      <h3>Zmiany względem opublikowanej wersji</h3>
+      <div id="change-list"></div>
+    </dialog>
+    <script type="module" src="assets/studio.js"></script>
+  </body>
+</html>

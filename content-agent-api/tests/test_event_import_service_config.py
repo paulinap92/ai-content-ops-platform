@@ -53,3 +53,4 @@ def test_event_preview_uses_top_level_checkpoint_namespace() -> None:
         assert graph.input_state["source_config"]["source_id"] == "la-laguna-agenda"
     finally:
         asyncio.run(service.shutdown())
+

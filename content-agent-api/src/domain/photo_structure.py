@@ -161,3 +161,4 @@ def parse_photo_folder(folder_path: str) -> FolderMetadata:
         municipality=municipality,
         place=place,
     )
+

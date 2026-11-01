@@ -68,3 +68,4 @@ def validate_content_package(
             "Final JSON is missing configured public_content languages: " + ", ".join(missing)
         )
     return package
+

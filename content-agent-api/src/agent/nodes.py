@@ -282,5 +282,7 @@ def publish(state: AgentState) -> dict:
 
     return {
         "file_path": str(file_path),
+        "content_package": payload,
         "status": "ready",
     }
+

@@ -27,3 +27,4 @@ Write-Host "Updated. Your existing .env, .venv, photo_inbox and output were pres
 Write-Host "Restart FastAPI, then press Ctrl+F5 in the browser." -ForegroundColor Yellow
 Write-Host "The first 'uv run' after this update may install the new Trafilatura/BeautifulSoup dependencies." -ForegroundColor Yellow
 Write-Host "You should see: v0.9.0, Events grouped by island with editable source links, and the updated Graph tab."
+

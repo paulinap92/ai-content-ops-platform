@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, HTTPException
 
 from src.services.agent_service import AgentService
 from src.services.photo_service import PhotoService
@@ -10,27 +10,37 @@ from src.services.event_import_service import EventImportService
 
 
 def get_agent_service(request: Request) -> AgentService:
-    service: AgentService = request.app.state.agent_service
+    service: AgentService = getattr(request.app.state, "agent_service", None)
+    if service is None:
+        raise HTTPException(503, "Uzupełnij prywatną konfigurację bazy Content Editora.")
     return service
 
 
 def get_canarias_publisher(request: Request) -> CanariasPublisherService:
-    service: CanariasPublisherService = request.app.state.canarias_publisher
+    service: CanariasPublisherService = getattr(request.app.state, "canarias_publisher", None)
+    if service is None:
+        raise HTTPException(503, "Uzupełnij prywatną konfigurację bazy Content Editora.")
     return service
 
 
 def get_photo_service(request: Request) -> PhotoService:
-    service: PhotoService = request.app.state.photo_service
+    service: PhotoService = getattr(request.app.state, "photo_service", None)
+    if service is None:
+        raise HTTPException(503, "Uzupełnij prywatną konfigurację bazy Content Editora.")
     return service
 
 
 def get_event_source_service(request: Request) -> EventSourceService:
-    service: EventSourceService = request.app.state.event_source_service
+    service: EventSourceService = getattr(request.app.state, "event_source_service", None)
+    if service is None:
+        raise HTTPException(503, "Uzupełnij prywatną konfigurację bazy Content Editora.")
     return service
 
 
 def get_event_import_service(request: Request) -> EventImportService:
-    service: EventImportService = request.app.state.event_import_service
+    service: EventImportService = getattr(request.app.state, "event_import_service", None)
+    if service is None:
+        raise HTTPException(503, "Uzupełnij prywatną konfigurację bazy Content Editora.")
     return service
 
 
@@ -39,3 +49,4 @@ PhotoServiceDep = Annotated[PhotoService, Depends(get_photo_service)]
 CanariasPublisherDep = Annotated[CanariasPublisherService, Depends(get_canarias_publisher)]
 EventSourceServiceDep = Annotated[EventSourceService, Depends(get_event_source_service)]
 EventImportServiceDep = Annotated[EventImportService, Depends(get_event_import_service)]
+

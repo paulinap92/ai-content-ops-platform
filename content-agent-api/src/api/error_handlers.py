@@ -41,3 +41,4 @@ def register_error_handlers(app: FastAPI) -> None:
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=ApiError(error="internal_error").model_dump()
         )
+

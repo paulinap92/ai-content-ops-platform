@@ -34,3 +34,4 @@ def test_cleaner_keeps_explicit_fields_and_trims_lalaguna_footer_noise() -> None
     assert result["text"].startswith("PIELES - TARASCA")
     assert "Últimas noticias" not in result["text"]
     assert "Noticia que no pertenece" not in result["text"]
+

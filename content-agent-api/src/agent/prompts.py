@@ -134,3 +134,4 @@ Zwróć JSON zgodny z tym przykładowym szkieletem. Nie kopiuj wartości przykł
 W polu sources umieść faktycznie użyte źródła. Jeśli ręcznie podany source_url jest prawdziwym źródłem materiału, również go zachowaj.
 editor_notes zawiera wyłącznie rzeczy do dalszej pracy redakcyjnej i NIE jest częścią publicznego artykułu.
 """
+

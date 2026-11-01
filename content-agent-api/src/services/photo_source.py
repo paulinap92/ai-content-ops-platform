@@ -213,3 +213,4 @@ def build_photo_source(
     if source == "local":
         return LocalPhotoSource(local_root)
     raise ValueError(f"Unsupported PHOTO_SOURCE='{source_name}'. Use 'local' or 'drive'.")
+

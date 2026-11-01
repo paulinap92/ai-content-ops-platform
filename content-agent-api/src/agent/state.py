@@ -26,8 +26,10 @@ class AgentState(TypedDict, total=False):
 
     # Export
     file_path: str
+    content_package: dict
 
     # Meta
     revision_count: int
     status: str  # researching|planning|awaiting_review|writing|exporting|ready|error
     error_message: str
+

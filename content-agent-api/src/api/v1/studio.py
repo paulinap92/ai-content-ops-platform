@@ -13,10 +13,8 @@ from pydantic import BaseModel, Field
 from src.core.config import settings
 
 async def require_local(request: Request) -> None:
-    # Local operator tool, not a public administration endpoint.
-    host = request.client.host if request.client else ""
-    if host not in {"127.0.0.1", "::1"}:
-        raise HTTPException(status_code=403, detail="Studio admin API is localhost-only")
+    from src.core.auth import require_editor
+    require_editor(request)
 
 
 router = APIRouter(prefix="/api/studio", tags=["Studio"], dependencies=[Depends(require_local)])
@@ -44,6 +42,9 @@ def client() -> AsyncIOMotorClient:
 
 @router.get("/database/collections")
 async def collections() -> dict[str, Any]:
+    if settings.editor_storage == "postgres":
+        from src.core.document_store import collection_names
+        return {"database": "Content Editor · prywatne dane PostgreSQL", "collections": await collection_names()}
     db_client = client()
     try:
         db = db_client[settings.mongodb_db_name]
@@ -58,6 +59,12 @@ async def collections() -> dict[str, Any]:
 @router.get("/database/collections/{name}")
 async def collection_rows(name: str, limit: int = Query(25, ge=1, le=100),
                           skip: int = Query(0, ge=0)) -> dict[str, Any]:
+    if settings.editor_storage == "postgres":
+        from src.core.document_store import browse, collection_names
+        if name not in await collection_names():
+            raise HTTPException(404, "Collection not found")
+        count, rows = await browse(name, limit, skip)
+        return {"collection": name, "count": count, "skip": skip, "rows": [safe(r) for r in rows]}
     db_client = client()
     try:
         db = db_client[settings.mongodb_db_name]
@@ -81,6 +88,10 @@ class SocialDraft(BaseModel):
 
 @router.get("/social/drafts")
 async def social_drafts() -> dict[str, Any]:
+    if settings.editor_storage == "postgres":
+        from src.core.document_store import browse
+        _, rows = await browse("social_drafts", 100)
+        return {"drafts": [safe(r) for r in rows], "publishing_connected": False}
     db_client = client()
     try:
         cursor = db_client[settings.mongodb_db_name]["social_drafts"].find({}).sort(
@@ -95,6 +106,10 @@ async def social_drafts() -> dict[str, Any]:
 async def create_social_draft(draft: SocialDraft) -> dict[str, Any]:
     if not set(draft.platforms).issubset(ALLOWED_PLATFORMS) or len(set(draft.platforms)) != len(draft.platforms):
         raise HTTPException(status_code=422, detail="Only unique instagram/facebook platforms are supported")
+    if settings.editor_storage == "postgres":
+        from src.core.document_store import save_social
+        document = {**draft.model_dump(), "status": "draft", "created_at": datetime.now(timezone.utc).isoformat(), "published_at": None}
+        return {"id": await save_social(document), "status": "draft", "message": "Zapisano wersję roboczą. Nic nie opublikowano w mediach społecznościowych."}
     db_client = client()
     try:
         document = {
@@ -107,3 +122,4 @@ async def create_social_draft(draft: SocialDraft) -> dict[str, Any]:
                 "message": "Saved locally. Nothing has been posted to social media."}
     finally:
         db_client.close()
+

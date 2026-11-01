@@ -115,3 +115,4 @@ The event subgraph now separates deterministic source facts from semantic LLM en
 - Added create/edit/delete source-link endpoints and UI controls.
 - EventImportGraph now receives the selected source config in graph state, allowing newly added links to run through the same generic importer without a source-specific parser.
 - The visual EventImportGraph was updated to show that `crawl` starts from the user-selected events-page link.
+

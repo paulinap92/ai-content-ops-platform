@@ -89,7 +89,8 @@ class AgentService:
             source_text: str = "",
             source_url: str = "",
             island_hint: str = "",
-            content_type_hint: str = ""
+            content_type_hint: str = "",
+            site_target: dict | None = None,
     ) -> ContentCreatedResponse:
         thread_id = str(uuid.uuid4())
 
@@ -97,7 +98,8 @@ class AgentService:
             thread_id=thread_id,
             topic=topic,
             status="researching",
-            revision_count=0
+            revision_count=0,
+            site_target=site_target
         )
         await doc.insert()
 
@@ -127,6 +129,7 @@ class AgentService:
             return ContentStatusResponse(
                 thread_id=thread_id,
                 topic=doc.topic,
+                site_target=doc.site_target,
                 status="error",
                 revision_count=doc.revision_count,
                 error_message=doc.error_message,
@@ -152,6 +155,7 @@ class AgentService:
         return ContentStatusResponse(
             thread_id=thread_id,
             topic=doc.topic,
+            site_target=doc.site_target,
             status=current_status,
             revision_count=revision_count,
             outline=outline,
@@ -211,6 +215,16 @@ class AgentService:
             )
         await lock.acquire()
 
+        from src.core.config import settings
+        if settings.editor_storage == "postgres":
+            try:
+                doc.status = "planning" if action == "revise" else "writing"
+                doc.updated_at = datetime.now(timezone.utc)
+                await doc.save_changes()
+            except Exception:
+                lock.release()
+                raise
+
         config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
 
         self._spawn_background_task(
@@ -249,10 +263,22 @@ class AgentService:
             )
 
         file_path: str | None = graph_state.values.get("file_path")
+        package = graph_state.values.get("content_package")
+        if package:
+            import json
+            from pathlib import Path
+            from src.core.config import settings
+            path = Path(settings.output_dir) / (str(uuid.UUID(thread_id)) + ".json")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(package, ensure_ascii=False), encoding="utf-8")
+            file_path = str(path)
         if not file_path:
             raise AgentException("Content is ready but file_path is missing in AgentState.")
 
         return file_path
+
+    async def get_site_target(self, thread_id):
+        return (await self._get_doc_or_raise(thread_id)).site_target
 
     async def delete_content(self, thread_id: str) -> None:
         doc = await self._get_doc_or_raise(thread_id)
@@ -743,3 +769,4 @@ Przy docker stop woła się shutdown(). Ta metoda anuluje wszystkie aktywne back
 działające _run_graph_execution()), czeka przez asyncio.gather() aż faktycznie się zatrzymają, a dopiero potem zamyka 
 ThreadPoolExecutor. Dzięki temu żaden wątek nie próbuje pisać do MongoDB po tym jak połączenie jest już zamknięte.
 """
+

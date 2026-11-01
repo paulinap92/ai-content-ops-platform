@@ -40,3 +40,4 @@ class EventCandidate(BaseModel):
     validation_notes: list[str] = Field(default_factory=list)
     raw_excerpt: str = ""
     source_payload: dict[str, Any] = Field(default_factory=dict)
+

@@ -86,6 +86,7 @@ async function apiFetch(url, options = {}) {
   }
 
   const response = await fetch(url, { ...options, headers });
+  if(response.status===401){location.replace("/login");throw new Error("Sesja wygasła.");}
   if (!response.ok) {
     let detail = `${response.status} ${response.statusText}`;
     try {
@@ -108,6 +109,8 @@ async function checkHealth() {
       ? health.content_languages
       : ["es", "en", "pl"];
     state.canariasPublishEnabled = Boolean(health.canarias_publish_enabled);
+    $("create-button").disabled = !health.ai_configured;
+    $("editor-configuration").textContent = !health.ai_configured ? "Edycja strony działa. Aby uruchamiać LangGraph, dodaj klucz wybranego dostawcy AI w prywatnej konfiguracji Editora." : "";
     const languageBadge = $("language-status");
     if (languageBadge) {
       languageBadge.textContent = `Content · ${state.contentLanguages.map((lang) => lang.toUpperCase()).join(" · ")}`;
@@ -137,8 +140,8 @@ function updatePublishAvailability() {
   if (!button || !hint) return;
   button.disabled = !state.canariasPublishEnabled;
   hint.textContent = state.canariasPublishEnabled
-    ? "Treść trafi jako edytowalny draft do istniejącego Canarias editor/API."
-    : "Dodaj CANARIAS_API_URL do .env, żeby włączyć wysyłanie do Canarias Cerca.";
+    ? "Treść trafi do wersji roboczej w tym Content Editorze. Publikujesz ją osobno."
+    : "Ustaw SITE_DATABASE_URL w prywatnej konfiguracji Content Editora.";
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -414,7 +417,7 @@ function toggleRawJson() {
 async function publishToCanarias() {
   if (!state.currentThreadId) return;
   if (!state.canariasPublishEnabled) {
-    toast("Najpierw ustaw CANARIAS_API_URL w .env.", true);
+    toast("Najpierw ustaw SITE_DATABASE_URL w prywatnej konfiguracji Editora.", true);
     return;
   }
   const button = $("publish-canarias");
@@ -429,12 +432,14 @@ async function publishToCanarias() {
         featured: false,
       }),
     });
-    toast(`Sent to Canarias Cerca: ${result.section}/${result.slug}`);
+    toast(`Zapisano wersję roboczą: ${result.section}/${result.slug}`);
+    $("site-editor-frame").src="/site/?"+new URLSearchParams({kind:"guide",island:result.island,resource:result.section});
+    document.querySelector('[data-view="site"]').click();
   } catch (error) {
     toast(error.message, true);
   } finally {
     button.disabled = !state.canariasPublishEnabled;
-    button.textContent = "Send to Canarias Cerca";
+    button.textContent = "Zapisz w edytorze strony";
   }
 }
 
@@ -459,6 +464,7 @@ async function createDraft(event) {
   button.disabled = true;
   button.textContent = "Uruchamiam…";
   const payload = {
+    site_target: state.siteTarget || null,
     topic: $("topic").value.trim(),
     source_text: $("source_text").value.trim(),
     source_url: $("source_url").value.trim(),
@@ -468,6 +474,7 @@ async function createDraft(event) {
 
   try {
     const created = await apiFetch(CONTENT_API, { method: "POST", body: JSON.stringify(payload) });
+    state.siteTarget = null;
     toast("Graf wystartował.");
     await selectDraft(created.thread_id);
   } catch (error) {
@@ -1190,3 +1197,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadDrafts();
 });
 
+
+$("logout-editor").onclick=async()=>{await apiFetch("/auth/logout",{method:"POST"});location.replace("/login");};
+window.addEventListener("message",(event)=>{
+ const frame=$("site-editor-frame");
+ if(event.origin!==location.origin || event.source!==frame.contentWindow || event.data?.type!=="cc-editor-ai")return;
+ const record=event.data.record;
+ if(!record || record.identity?.kind!=="guide")return;
+ state.siteTarget={identity:record.identity,version:record.version,base_fingerprint:record.base_fingerprint,payload:record.draft};
+ $("topic").value=record.draft.name || record.draft.title || "Popraw artykuł";
+ $("source_text").value=record.draft.description || record.draft.short_description || "";
+ $("island_hint").value=[...$("island_hint").options].find(x=>x.text.toLowerCase().replaceAll(" ","-")===record.identity.island)?.value || "";
+ $("content_type_hint").value="guide";
+ document.querySelector('[data-view="editor"]').click();
+});

@@ -512,3 +512,4 @@ input:focus, textarea:focus, select:focus { border-color: #596c65; box-shadow: 0
   .event-source-add-form .field-wide, .event-config-grid .field-wide { grid-column: auto; }
   .event-config-actions, .event-config-actions-right { flex-direction: column; align-items: stretch; }
 }
+

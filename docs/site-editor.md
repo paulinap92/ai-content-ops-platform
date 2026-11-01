@@ -1,55 +1,40 @@
-# Site editing in Content Studio 0.10
+# Site editing in the standalone Content Editor
 
-The **Strona — edycja i sekcje** tab embeds the editorial workspace served by
-the Canarias Cerca backend. It lists existing Guide, Explore, calendar and news
-records and supports draft editing, explicit publication, hiding, revisions and
-restore. Section visibility and copy have global and per-island settings.
+The `/site/` workspace is served by the Content Editor itself. It is not an iframe
+or proxy to the public website service: the embedded view, its API, authentication
+and canonical SQL sessions all run in the editor's separate container.
 
-Configure the local `content-agent-api/.env`:
+A single signed, HttpOnly cookie protects the full editor, including AI routes,
+photos, private assets, API documentation and SQL editing. The public login screen
+and minimal liveness endpoint reveal no drafts or database credentials.
+Local Docker binds only to loopback and still requires login.
 
-```dotenv
-CANARIAS_API_URL=https://canarias-cerca-api.onrender.com
-CANARIAS_EDITOR_TOKEN=<private Studio token from backend configuration>
-```
+## Workflows
 
-The backend must enable `CANARIAS_STUDIO_ENABLED` and configure the corresponding
-`CANARIAS_STUDIO_TOKEN`. The token is forwarded only by the local server, never
-returned to browser JavaScript. The bridge accepts only approved `/studio/`
-workspace routes and remains loopback-only. Run local Studio on port 8002.
+- Choose an island and open a Guide article, Explore item, calendar event or news.
+- Save a private draft, inspect changes, then explicitly publish.
+- Restore a historical version into a draft before publishing it again.
+- In section settings, choose global or island scope, set a section/subsection to
+  Disabled, save the draft and publish settings. The content stays in SQL.
+- Select an existing Guide article and choose **Popraw artykuł z AI**. Its content
+  opens in the existing LangGraph workflow. Review the outline, approve generation
+  and send the result to a private article draft. Publication remains separate.
 
-The same workspace can be opened directly at the backend's `/studio/` URL with
-its own secure sign-in. This works independently of the local MongoDB/AI tools.
-The public page remains at https://www.canariascerca.es/.
+Site visibility is a UI control, not a privacy boundary for previously public
+information. Private drafts and editorial notes never enter the public API.
 
-## Editorial behavior
+## Storage
 
-- **Zapisz roboczą** changes only workspace data.
-- **Podgląd i zmiany** compares the draft to the public version.
-- **Opublikuj** applies a validated change in a transaction with revision history.
-- Restore creates a draft; it does not silently publish an older version.
-- Concurrent edits return a conflict instead of overwriting newer work.
-- Disabling a section hides it without deleting content or source history.
-- Live/Datos observations remain source-managed, with editorial visibility/copy.
+`SITE_DATABASE_URL` is available only to the editor process. There is no website
+worker or scheduler in this application. SQL pools are bounded and have statement
+and lock timeouts. Editor-state tables/checkpoints live in `cc_editor_private`;
+publication uses the existing canonical model and versioned draft/history tables.
+The canonical model was extracted from backend commit
+`17e6050c98a25edcef4691b0215a869d9bc47b07`; see `canarias_site/PROVENANCE.json`.
 
-AI Guide packages now use the private draft API. They never call the legacy
-immediate-publication endpoint. Existing workspace drafts are preserved on retry.
-Events preview cards can send validated candidates to a calendar draft; the
-operator reviews the result in the site workspace before publication.
+## Photos
 
-Photos can use existing public image URLs. Optional JPEG/PNG/WebP uploads require
-the backend's R2 object-store configuration. Source files and access keys are not
-stored in Render's temporary filesystem or in Git.
-
-## Reproducible local checks
-
-```sh
-cd content-agent-api
-uv sync --frozen
-uv run --frozen python -m pytest -q
-```
-
-The Docker build uses the committed lock file and excludes `.env`, local
-environments, output and photo folders from the image. Compose binds services to
-loopback; its API host port defaults to 8002. The local-only bridge should be run
-as a host process when Docker's gateway address would otherwise fail its explicit
-loopback restriction. It must not be broadened to arbitrary private networks.
+File uploads accept JPEG, PNG and WebP up to 5 MB. They require
+`R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and
+`R2_PUBLIC_BASE_URL` in the editor environment. Public image URLs can be edited
+without R2. No photo or export depends on Render's ephemeral filesystem.

@@ -52,3 +52,4 @@ def test_la_gomera_accepts_event_detail_and_rejects_news() -> None:
         source,
         "https://www.lagomera.es/noticia/el-cabildo-abre-la-inscripcion-para-cursar-formacion",
     )
+

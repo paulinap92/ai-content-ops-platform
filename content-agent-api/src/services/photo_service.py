@@ -334,3 +334,4 @@ class PhotoService:
             created_at=doc.created_at,
             updated_at=doc.updated_at,
         )
+

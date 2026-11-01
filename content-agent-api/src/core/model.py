@@ -42,3 +42,4 @@ def create_model(temperature: float | None = None) -> BaseChatModel:
                 f"Nieobsługiwany provider: '{settings.model_provider}'. "
                 "Ustaw MODEL_PROVIDER=openai lub MODEL_PROVIDER=anthropic."
             )
+

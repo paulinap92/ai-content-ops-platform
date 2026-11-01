@@ -40,3 +40,4 @@ class AgentException(APIException):
 
     def __init__(self, message: str = "Agent processing error") -> None:
         super().__init__(message, status.HTTP_500_INTERNAL_SERVER_ERROR, "agent_error")
+

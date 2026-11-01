@@ -223,3 +223,4 @@ def _normalize(value: str) -> str:
     decomposed = unicodedata.normalize("NFKD", value)
     without_accents = "".join(ch for ch in decomposed if not unicodedata.combining(ch))
     return " ".join(without_accents.lower().replace("\xa0", " ").split())
+

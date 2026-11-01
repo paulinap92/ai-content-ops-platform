@@ -1,93 +1,93 @@
-# Canarias Cerca Content Studio
+# Canarias Cerca Content Editor
 
-Editorial tools for preparing and maintaining Canarias Cerca content. Version **0.10.0**.
+A standalone editorial application built on the existing FastAPI and LangGraph
+project. One login covers site editing, AI drafts, photos, event discovery and
+social drafts. The same Docker image runs locally or online.
 
-The local Studio combines AI-assisted articles, a photo library and event discovery.
-The **Strona — edycja i sekcje** tab connects to the website backend's editorial
-workspace: existing content, private drafts, explicit publication, revision history,
-section visibility and site copy. The public website is https://www.canariascerca.es/.
+The public website and its refresh workers run separately. This application does
+not import, launch or proxy through the website server. It uses an independent,
+bounded SQL connection pool to read canonical content and publish approved edits.
+Saving a draft never publishes it. Section visibility changes only after Publish.
 
-## Site editing
+## Local Docker
 
-- Edit Guide articles, Explore places and route geometry, calendar events and news.
-- Save a private draft, compare it with the published version, then publish explicitly.
-- Hide entries and enable/disable primary sections or subsections globally or per island.
-- Change introductory text and section names/descriptions.
-- Restore an earlier revision into a new draft; stale tabs cannot overwrite newer edits.
-- Use existing image URLs or the backend's optional R2 upload library.
+From a checkout of the `production` branch, run:
 
-The workspace is also available directly at the Canarias backend's `/studio/` URL.
-The local Studio sends editorial requests through an authenticated server-side bridge.
-It never gives the browser direct database access. See [site editing](docs/site-editor.md)
-for setup and the publication model.
+```powershell
+& .\tools\Start-ContentEditor.ps1
+```
 
-## Preparation tools
+The launcher creates only this checkout's ignored `.env`, starts only the
+`cc-content-editor-local` Compose project and binds to a free loopback port from
+8004–8014. It never stops the website, existing databases or older Studio.
+The login key is copied to the local clipboard, not printed to the terminal.
 
-**Text Editor:** research, outline review and revisions, multilingual Markdown packages,
-and a private-draft adapter for Canarias Cerca. Existing workspace drafts are preserved
-on retries. The operator publishes from the site workspace.
-
-**Photos:** local folders or Google Drive, a folder/gallery browser, editable metadata,
-alt texts and naming review. Folder paths can identify island, section and place.
-Original-photo organization remains separate from publishing a photo on the website.
-
-**Events:** editable source library, same-domain discovery, deterministic event facts,
-JSON-LD and optional model enrichment, validation and human review. Preview cards can
-send a candidate to a calendar draft for final correction/publication.
-
-**Database:** a bounded read-only view of the local Studio MongoDB. Its Show/Hide button
-collapses the panel. Actual website visibility is controlled in the site workspace.
-
-**Social Media:** local Instagram/Facebook drafts. Posting and scheduling are not connected.
-
-## Local setup
-
-Requires Python 3.13, uv and MongoDB. From the repository root, start MongoDB:
+For manual startup, configure `content-agent-api/.env` and run:
 
 ```sh
-docker compose up -d mongodb
+docker compose -f compose.editor.yml up --build -d
 ```
 
-Create `content-agent-api/.env` from its example, configure the model provider and MongoDB,
-then run from `content-agent-api`:
+## Online
 
-```sh
-uv sync --frozen
-uv run python -m uvicorn app:app --host 127.0.0.1 --port 8002
-```
+`render.yaml` defines only the separate `canarias-content-editor` service on
+Render Free in Frankfurt. It references the existing website service's database
+variable inside Render, without placing a connection string in Git. It does not
+manage or redeploy the website. Deploy from `production`.
 
-Open http://127.0.0.1:8002. The local editorial bridge is loopback-only; keep this
-application private. The hosted workspace has independent authenticated access.
+Render Free sleeps when idle and shares its monthly free-instance allowance
+across a workspace. The editor has no keep-alive loop or automatic AI runs.
 
-Optional site connection:
+## Private configuration
 
-```dotenv
-CANARIAS_API_URL=https://canarias-cerca-api.onrender.com
-CANARIAS_EDITOR_TOKEN=<private token configured in the backend>
-```
+| Variable | Purpose |
+| --- | --- |
+| `EDITOR_TOKEN` | Required private login key, at least 32 characters |
+| `SITE_DATABASE_URL` | Canonical Canarias PostgreSQL/PostGIS connection |
+| `EDITOR_STORAGE` | `postgres` online; `postgres` or `mongodb` locally |
+| `EDITOR_DATABASE_URL` | Optional separate editor-state database; defaults to `SITE_DATABASE_URL` in Postgres mode |
+| `MONGODB_URI`, `MONGODB_DB_NAME` | Existing local Studio storage, when using `mongodb` |
+| `MODEL_PROVIDER` | Existing `openai` or `anthropic` integration |
+| `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` | Provider key, needed only to run AI |
+| `OPENAI_MODEL_NAME` / `ANTHROPIC_MODEL_NAME` | Model available to the configured provider account |
+| `TAVILY_API_KEY` | Optional discovery/search; pasted source text avoids web search |
 
-LLM keys and Tavily are required only for their corresponding preparation tools.
-The hosted site editor does not require an LLM or local MongoDB.
+Keep secrets in ignored local configuration or Render's private environment.
+Never put them in URLs, source files or screenshots. AI provider charges depend
+on the configured account; deploying the editor does not invoke a model.
 
-## Storage and deployment
+Existing local MongoDB data is preserved. There is no automatic migration or
+replacement of its collections. To share editor state between local and online
+instances, configure both for the same Postgres editor database.
 
-MongoDB stores local drafts, photo metadata, event-source configuration and LangGraph
-checkpoints. Final preparation packages use the local output folder. Public content
-and published settings are owned by the Canarias backend and PostgreSQL/PostGIS.
-The local Studio never synchronizes JSON files into the production database.
+## Persistence and publication
 
-Compose binds ports to loopback and defaults to port 8002 for Studio. Docker builds
-use the committed dependency lock and exclude local environment files and photo/output
-folders from the image. The localhost-only bridge is designed for the host-process
-setup above; see the integration documentation before using it through a Docker gateway.
+Postgres mode stores AI documents, source reviews and checkpoints in
+`cc_editor_private`. Generated JSON is retained in checkpoints and recreated for
+download after a restart. Canonical article drafts and history remain in the
+existing `design.cc_studio_documents` and `design.cc_studio_revisions` tables.
 
-## Tests
+Only an explicit publication changes canonical content or public site settings.
+Version checks reject stale edits; transactions keep publication and history
+consistent. AI can prepare a new private draft or improve a selected Guide
+article while preserving its identity and checking its original version.
 
-```sh
-cd content-agent-api
-uv run --frozen python -m pytest -q
-```
+Source-managed Live/Datos measurements remain managed by the website's jobs.
+Their visibility and editorial descriptions can be changed from this editor.
 
-Tests exercise package validation, source discovery/parsing, photo structure, private
-Guide-draft delivery and the loopback-only authenticated site bridge. Live MongoDB,
-LLM and hosted database end-to-end checks are separate from these unit tests.
+## Photos and social drafts
+
+Existing public photo URLs work without extra infrastructure. Uploading images
+requires the R2 configuration described in [site editing](docs/site-editor.md).
+Local-folder and Drive photo organization from the original project remains
+available. An online service cannot read folders on a user's computer.
+
+Social Media stores drafts; it does not publish to Meta automatically.
+
+## Validation
+
+CI covers MongoDB and PostgreSQL persistence, a LangGraph review resumed after
+restart, recovery of JSON exports after file loss, private AI draft delivery,
+canonical publication/history/conflict behavior, authentication and non-root
+Docker startup. External LLM calls are replaced with a deterministic test model.
+Only disposable CI databases are used by tests.
