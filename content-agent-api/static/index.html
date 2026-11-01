@@ -13,7 +13,7 @@
       <h1>Content Studio</h1>
     </div>
     <div class="topbar-actions">
-      <span class="status-dot status-neutral">v0.9.0</span>
+      <span class="status-dot status-neutral">v0.10.0</span>
       <span id="language-status" class="status-dot status-neutral">Content · ES · EN · PL</span>
       <span id="api-status" class="status-dot status-neutral">API</span>
       <a class="ghost-link" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
@@ -23,6 +23,7 @@
   <main class="shell">
     <nav class="tabs" aria-label="Widoki aplikacji">
       <button class="tab active" data-view="editor">Text Editor</button>
+      <button class="tab" data-view="site">Strona — edycja i sekcje</button>
       <button class="tab" data-view="photos">Photos</button>
       <button class="tab" data-view="events">Events</button>
       <button class="tab" data-view="graph">Graph</button>
@@ -30,6 +31,10 @@
       <button class="tab" data-view="social">Social Media</button>
     </nav>
 
+    <section id="view-site" class="view">
+      <section class="panel" style="padding:18px;margin-bottom:16px"><h2>Edycja opublikowanej strony</h2><p>Treści, widoczność sekcji, teksty strony, zdjęcia i historia zmian. Zapis roboczy nie publikuje zmian.</p><a class="ghost-link" href="https://canarias-cerca-api.onrender.com/studio/" target="_blank" rel="noreferrer">Otwórz panel w osobnej karcie ↗</a></section>
+      <iframe id="site-editor-frame" title="Content Studio — edycja strony" style="width:100%;height:85vh;border:1px solid #d6e0d4;border-radius:12px;background:#f4f6f2"></iframe>
+    </section>
     <section id="view-editor" class="view active">
       <div class="editor-grid">
         <aside class="panel draft-panel">
@@ -438,3 +443,4 @@
   <script src="/static/studio-extras.js" defer></script>
 </body>
 </html>
+

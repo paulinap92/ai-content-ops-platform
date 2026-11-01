@@ -77,7 +77,8 @@ class Settings(BaseSettings):
 
     @property
     def canarias_publish_enabled(self) -> bool:
-        return bool(self.canarias_api_url.strip())
+        return bool(self.canarias_api_url.strip() and self.canarias_editor_token and self.canarias_editor_token.get_secret_value())
 
 
 settings = Settings()
+

@@ -95,24 +95,33 @@ class CanariasPublisherService:
                 f"Bearer {settings.canarias_editor_token.get_secret_value()}"
             )
 
-        url = f"{self.base_url}/api/editor/content"
-        params = {
-            "island": package.island,
-            "section": request.section,
-        }
-
+        # The integration saves a private draft. Only the operator's separate
+        # Publish action in Content Studio can change canonical public content.
+        params = {"kind": "guide", "island": package.island, "resource": request.section,
+                  "q": package.slug, "limit": 100}
+        import hashlib
+        empty_hash = hashlib.sha256(b"null").hexdigest()
+        identity = {"kind": "guide", "island": package.island,
+                    "resource": request.section, "record_key": "new:" + package.slug}
+        base_fingerprint = empty_hash
         try:
-            async with httpx.AsyncClient(timeout=25.0) as client:
-                response = await client.post(
-                    url,
-                    params=params,
-                    json=item,
-                    headers=headers,
-                )
+            async with httpx.AsyncClient(timeout=65.0) as client:
+                listing = await client.get(f"{self.base_url}/studio/api/records", params=params, headers=headers)
+                if listing.status_code >= 400:
+                    raise AgentException(f"Content Studio API is unavailable ({listing.status_code}). Check URL, token and Studio activation.")
+                existing = next((r for r in listing.json().get("items", [])
+                                 if r.get("draft", {}).get("slug") == package.slug), None)
+                if existing:
+                    if existing.get("id"):
+                        return CanariasPublishResponse(status="already_in_studio", island=package.island,
+                            section=request.section, slug=package.slug, language=request.language,
+                            backend_response={"id": existing["id"], "message": "A workspace version already exists. Open Content Studio to review it; it has not been overwritten."})
+                    identity, base_fingerprint = existing["identity"], existing["base_fingerprint"]
+                response = await client.put(f"{self.base_url}/studio/api/draft", headers=headers,
+                    json={"identity": identity, "payload": item, "expected_version": 0,
+                          "base_fingerprint": base_fingerprint})
         except httpx.RequestError as exc:
-            raise AgentException(
-                f"Cannot reach Canarias Cerca backend at {self.base_url}: {exc}"
-            ) from exc
+            raise AgentException("Cannot reach the Canarias Cerca Content Studio API.") from exc
 
         if response.status_code >= 400:
             try:
@@ -136,3 +145,4 @@ class CanariasPublisherService:
             language=request.language,
             backend_response=backend_response,
         )
+

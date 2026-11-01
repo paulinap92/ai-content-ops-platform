@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl build-esse
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=ghcr.io/astral-sh/uv:0.10.0 /uv /uvx /bin/
-COPY pyproject.toml ./
-RUN uv sync --no-dev
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
 
 FROM python:3.13-slim AS runtime
 WORKDIR /app
@@ -29,3 +29,4 @@ RUN mkdir -p /app/output /app/photo_inbox
 
 EXPOSE 8000
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--loop", "uvloop", "--workers", "1", "--no-access-log"]
+

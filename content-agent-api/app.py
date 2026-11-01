@@ -16,6 +16,7 @@ from src.api.v1.content import router as content_router
 from src.api.v1.events import router as events_router
 from src.api.v1.photos import router as photos_router
 from src.api.v1.studio import router as studio_router
+from src.api.v1.site_editor import router as site_editor_router
 from src.core.config import settings
 from src.core.persistence import create_mongodb_checkpointer
 from src.domain.documents import (
@@ -107,7 +108,7 @@ def create_app() -> FastAPI:
             "dla Canarias Cerca. Finalny wynik to JSON gotowy do review/importu; "
             "finalny pakiet może być wysłany jako draft do editora Canarias Cerca. Photo Manager skanuje foldery/Drive i prowadzi kolejkę review zdjęć. Event Importer ma osobny lokalny LangGraph: crawl → clean → extract → validate → human_review."
         ),
-        version="0.9.0",
+        version="0.10.0",
         lifespan=lifespan,
         docs_url="/docs",
         redoc_url="/redoc",
@@ -118,6 +119,7 @@ def create_app() -> FastAPI:
     app.include_router(events_router)
     app.include_router(photos_router)
     app.include_router(studio_router)
+    app.include_router(site_editor_router)
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
     @app.get("/", include_in_schema=False)
@@ -142,3 +144,4 @@ async def health() -> dict[str, object]:
         "content_languages": list(settings.content_language_codes),
         "canarias_publish_enabled": settings.canarias_publish_enabled,
     }
+

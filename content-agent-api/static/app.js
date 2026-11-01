@@ -1121,12 +1121,30 @@ function renderEventPreview() {
       <p>${escapeHtml(item.description || item.raw_excerpt || "")}</p>
       ${notes}
       <a class="secondary-button event-preview-open" href="${escapeHtml(item.source_url)}" target="_blank" rel="noreferrer">Open official event ↗</a>`;
+    const send = document.createElement("button");
+    send.type = "button"; send.className = "secondary-button"; send.textContent = "Do wersji roboczej strony";
+    send.addEventListener("click", () => saveEventAsSiteDraft(item)); card.append(send);
     list.appendChild(card);
   });
 }
 
 // APP
 // -------------------------------------------------------------------------------------------------
+
+async function saveEventAsSiteDraft(item) {
+  try {
+    const start = String(item.start_date || "").slice(0, 10) || prompt("Podaj potwierdzoną datę wydarzenia (YYYY-MM-DD):");
+    if (!start || !/^\d{4}-\d{2}-\d{2}$/.test(start)) throw new Error("Do wersji roboczej kalendarza potrzebna jest potwierdzona data.");
+    const island = String(item.island || state.eventSources.find(s => s.source_id === state.currentEventSourceId)?.island || "").toLowerCase().replaceAll(" ", "-");
+    const bytes = new TextEncoder().encode(item.source_url || item.title + start);
+    const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map(v=>v.toString(16).padStart(2,"0")).join("");
+    const nullHash = [...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode("null")))].map(v=>v.toString(16).padStart(2,"0")).join("");
+    await apiFetch("/site/api/draft", {method:"PUT",body:JSON.stringify({identity:{kind:"calendar",island,resource:start.slice(0,7),record_key:"new:"+hash},expected_version:0,base_fingerprint:nullHash,payload:{title:item.title,description:item.description||item.raw_excerpt||"",start_date:start,end_date:String(item.end_date||start).slice(0,10),all_day:!item.start_time,location:item.location||item.venue||"",url:item.source_url||"",source_url:item.source_url||"",price:item.price||"",hidden:false}})});
+    $("site-editor-frame").src="/site/?"+new URLSearchParams({kind:"calendar",island,resource:start.slice(0,7)});
+    document.querySelector('[data-view="site"]').click();
+    toast("Wydarzenie zapisano roboczo. Sprawdź je w panelu przed publikacją.");
+  } catch (error) { toast(error.message,true); }
+}
 
 function initTabs() {
   document.querySelectorAll(".tab").forEach((tab) => {
@@ -1137,6 +1155,7 @@ function initTabs() {
       $(`view-${tab.dataset.view}`).classList.add("active");
       if (tab.dataset.view === "photos") await loadPhotoLibrary();
       if (tab.dataset.view === "events") await loadEventSources();
+      if (tab.dataset.view === "site" && !$("site-editor-frame").getAttribute("src")) $("site-editor-frame").src = "/site/";
     });
   });
 }
@@ -1170,3 +1189,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   await checkHealth();
   await loadDrafts();
 });
+
