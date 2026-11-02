@@ -8,7 +8,7 @@ services:
     branch: production
     dockerfilePath: content-agent-api/Dockerfile
     dockerContext: content-agent-api
-    healthCheckPath: /health/live
+    healthCheckPath: /health/ready
     autoDeployTrigger: "off"
     envVars:
       - key: EDITOR_STORAGE

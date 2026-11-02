@@ -59,6 +59,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             await document_store.initialize(value.get_secret_value())
         elif settings.editor_storage == "mongodb":
             motor_client = AsyncIOMotorClient(settings.mongodb_uri, serverSelectionTimeoutMS=5000)
+            app.state.mongo_client = motor_client
             await init_beanie(database=motor_client[settings.mongodb_db_name], document_models=[ContentDocument, PhotoDocument, EventSourceDocument, EventSourceCatalogStateDocument, EventSourceReviewDocument])
         else:
             raise ValueError("EDITOR_STORAGE must be mongodb or postgres")
@@ -140,6 +141,13 @@ def create_app() -> FastAPI:
     @app.get("/health/live", include_in_schema=False)
     async def live():
         return {"status": "ok", "service": "content-editor"}
+
+    @app.get("/health/ready", include_in_schema=False)
+    async def readiness():
+        from fastapi.responses import JSONResponse
+        from src.core.readiness import editor_ready
+        ready = await editor_ready(app)
+        return JSONResponse({"status": "ok" if ready else "not_ready"}, status_code=200 if ready else 503)
 
     return app
 

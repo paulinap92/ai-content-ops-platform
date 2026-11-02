@@ -58,7 +58,7 @@ def require_editor(request):
 
 
 async def authentication(request, call_next):
-    public = request.url.path in {"/login", "/auth/login", "/health/live", "/robots.txt"}
+    public = request.url.path in {"/login", "/auth/login", "/health/live", "/health/ready", "/robots.txt"}
     if not public:
         try:
             require_editor(request)

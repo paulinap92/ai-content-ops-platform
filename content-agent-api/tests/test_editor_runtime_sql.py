@@ -39,6 +39,7 @@ def test_langgraph_review_resumes_after_restart_and_exports_survive_file_loss(tm
             time.sleep(.05)
         raise AssertionError('Graph did not reach '+status)
     with TestClient(app,base_url='https://editor.test') as client:
+        assert client.get('/health/ready').json()=={'status':'ok'}
         assert client.get('/api/v1/content').status_code==401
         assert client.post('/auth/login',json={'token':TOKEN}).status_code==200
         started=client.post('/api/v1/content',json={'topic':'Restart test','source_text':'Trusted source facts'})
@@ -47,6 +48,7 @@ def test_langgraph_review_resumes_after_restart_and_exports_survive_file_loss(tm
         assert wait(client,thread,'awaiting_review')['outline']
     # New application lifespan, new pool and new checkpointer.
     with TestClient(app,base_url='https://editor.test') as client:
+        assert client.get('/health/ready').status_code==200
         assert client.post('/auth/login',json={'token':TOKEN}).status_code==200
         assert wait(client,thread,'awaiting_review')['outline']
         result=client.post('/api/v1/content/'+thread+'/decision',json={'action':'approve'})
