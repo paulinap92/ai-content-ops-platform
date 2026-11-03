@@ -7,6 +7,7 @@ import {resolve,extname} from 'node:path';
 import {chromium} from 'playwright';
 
 const assets=fileURLToPath(new URL('../canarias_site/studio/',import.meta.url));
+const staticAssets=fileURLToPath(new URL('../static/',import.meta.url));
 const defaults=JSON.parse(await readFile(resolve(assets,'default_copy.json'),'utf8'));
 const config={global:{sections:{},features:{},copy:{'home.title':'Hola, somos las Islas Canarias.'}},islands:{}};
 const identity={kind:'settings',island:'global',resource:'site',record_key:'site'};
@@ -15,6 +16,14 @@ const requests=[],writes=[];
 const options={islands:['el-hierro','la-palma','la-gomera','tenerife','gran-canaria','fuerteventura','lanzarote','la-graciosa'],sections:{explore:'Explore',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos',guide:'Guía'},features:{guide:['crafts','culture','history','food','geology','nature'],explore:['places','beaches'],datos:['climate']},copy_defaults:{'home.title':'Hola, somos las Islas Canarias.','home.description':'Ocho islas, miles de lugares por descubrir.','island.description':'','nav.guide':'Guía',...defaults}};
 const server=createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');const path=url.pathname;
+ if(path==='/health/ready'){res.setHeader('Content-Type','application/json');res.end('{"status":"ok"}');return;}
+ if(path==='/health'){res.writeHead(500,{'Content-Type':'application/json'});res.end('{"detail":"optional configuration unavailable"}');return;}
+ if(path==='/api/v1/content'){res.setHeader('Content-Type','application/json');res.end('[]');return;}
+ if(path==='/' || path.startsWith('/static/')){
+  const name=path==='/'?'index.html':path.slice('/static/'.length);
+  if(!['index.html','styles.css','app.js','studio-extras.js'].includes(name)){res.writeHead(404);res.end();return;}
+  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);res.end(await readFile(resolve(staticAssets,name)));return;
+ }
  if(path.startsWith('/site/api/')){
   res.setHeader('Content-Type','application/json');
   if(req.method!=='GET'){
@@ -85,6 +94,10 @@ try{
  assert.equal(await page.locator('#content-view').isVisible(),true,'AI article links retain selected content');
  assert.equal(await page.locator('#island').inputValue(),'el-hierro');
  assert.equal(await page.locator('#resource').inputValue(),'crafts');
+ await page.goto(origin);
+ await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
+ await page.frameLocator('#site-editor-frame').locator('[data-copy="home.title"] textarea').waitFor();
+ await page.screenshot({path:'test-results/site-editor/unified-editor.png',fullPage:false});
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
  assert.ok(writes.every(r=>r.path==='/site/api/draft'),'UI test never publishes');
  console.log('EDITOR UI PASS: site tree, real text, automatic article selection, contextual switches, inheritance, draft preservation, empty state and direct links.');
