@@ -684,6 +684,7 @@ function renderPhoto(photo) {
 
   const locked = ["approved", "skipped"].includes(photo.status);
   $("photo-form").querySelectorAll("input, textarea, button").forEach((el) => { el.disabled = locked; });
+  $("photo-use").disabled=false; // Approved metadata is locked; the photo remains selectable for a page.
 }
 
 function renderPhotoAltFields(altTexts = {}) {
