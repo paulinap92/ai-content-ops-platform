@@ -380,7 +380,7 @@ async function publish(which) {
   if (
     !confirm(
       which === "settings"
-        ? "Opublikować widoczność sekcji i teksty? Zmiana obejmie stronę publiczną."
+        ? "Opublikować zapisany szkic tekstów i widoczności? Obejmuje wszystkie zapisane zmiany ustawień strony, także z innych sekcji i wysp. Sprawdź podgląd różnic."
         : "Opublikować tę wersję na stronie?",
     )
   )
@@ -498,12 +498,16 @@ async function showHistory(which) {
 function scopeSettings() {
   const config = state.settings.draft;
   if (state.scope === "global") return config.global;
-  return (config.islands[state.scope] ??= {
+  return (config.islands[state.scope] ?? {
     sections: {},
     features: {},
     copy: {},
   });
 }
+function retainScope(scope) {
+  if(state.scope !== "global" && ["sections","features","copy"].some(key => Object.keys(scope[key]).length)) state.settings.draft.islands[state.scope] = scope;
+}
+function markSettingsDirty() {state.settingsDirty=true;$("settings-state").textContent="Niezapisane zmiany — zapisz szkic przed publikacją.";}
 function collectSettings() {
   if (!state.settings) return;
   const scope = scopeSettings();
@@ -518,6 +522,7 @@ function collectSettings() {
       scope.copy[key] = row.querySelector("textarea").value;
     else delete scope.copy[key];
   }
+  retainScope(scope);
 }
 async function loadSettings() {
   const data = await api(
@@ -571,15 +576,15 @@ function renderSettings() {
     const publishedValue = (state.scope === "global" ? published.global : published.islands?.[state.scope])?.copy?.[key] ?? published.global?.copy?.[key] ?? effectiveDefault;
     if(input.value !== publishedValue) row.append(node("small", "Obecnie na stronie: " + (publishedValue || "(pusty tekst)"), {class:"published-copy"}));
     if(key === "island.description" && state.scope === "global") row.append(node("small", "Każda wyspa ma swój opis. Wybierz ją w polu Zakres zmiany, aby zobaczyć i edytować ten tekst.", {class:"muted"}));
-    input.oninput = () => { toggle.checked = true; state.settingsDirty = true; };
-    toggle.onchange = () => { state.settingsDirty = true; };
+    input.oninput = () => { toggle.checked = true; markSettingsDirty(); };
+    toggle.onchange = () => { markSettingsDirty(); };
     label.append(input);
     row.append(label, check);
     body.append(row);
   }
   renderContextVisibility();
   $("settings-state").textContent =
-    `${statusLabel(state.settings)} · wersja ${state.settings.version}. Wyspa może nadpisać ustawienie globalne.`;
+    `${state.settingsDirty ? "Niezapisane zmiany · " : ""}${statusLabel(state.settings)} · wersja ${state.settings.version}. Publikacja obejmuje zapisany szkic tekstów i widoczności całej strony.`;
 }
 function copyLabel(key, defaults) {
   const direct = {"home.title":"Nagłówek strony startowej", "home.description":"Opis strony startowej", "island.description":"Opis wyspy", "guide.title":"Nagłówek Guide", "guide.description":"Opis Guide", "datos.title":"Nagłówek Datos", "datos.description":"Opis Datos"};
@@ -635,7 +640,7 @@ function renderContextVisibility() {
   const inherited=state.settings.draft.global[setting.kind]?.[setting.key] ?? true;
   const enabled=values[setting.key] ?? inherited;
   const toggle=node("button", enabled?"Widoczna na stronie":"Ukryta na stronie",{role:"switch","aria-checked":String(enabled),class:"visibility-switch",type:"button"});
-  toggle.onclick=()=>{collectSettings();values[setting.key]=!enabled;state.settingsDirty=true;renderContextVisibility();renderTree();};
+  toggle.onclick=()=>{collectSettings();values[setting.key]=!enabled;retainScope(scope);markSettingsDirty();renderContextVisibility();renderTree();};
   root.append(toggle);
   if(setting.kind === "features") {
     const parentKey=state.target.section;
@@ -643,7 +648,7 @@ function renderContextVisibility() {
   }
   if(state.scope!=="global" && Object.hasOwn(values,setting.key)){
     const reset=node("button","Jak na całej stronie",{class:"inherit-reset",type:"button"});
-    reset.onclick=()=>{delete values[setting.key];state.settingsDirty=true;renderContextVisibility();renderTree();};root.append(reset);
+    reset.onclick=()=>{delete values[setting.key];markSettingsDirty();renderContextVisibility();renderTree();};root.append(reset);
   }
 }
 function renderTree(){
