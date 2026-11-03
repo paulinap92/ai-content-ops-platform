@@ -102,6 +102,16 @@ try{
  await page.locator('[data-key="description"]').waitFor();await idle();
  assert.equal(await page.locator('#island').inputValue(),'canarias','regional news belongs to the whole site, not arbitrarily Tenerife');
  assert.equal(await page.locator('#tree-scope').inputValue(),'global');
+ await page.getByRole('switch').click();
+ await page.getByRole('button',{name:'Zapisz teksty i widoczność',exact:true}).click();await idle();
+ assert.equal(writes.at(-1).body.payload.global.sections.news,false,'news visibility is a section setting');
+ assert.equal(Object.hasOwn(writes.at(-1).body.payload.global.features,'news.news'),false);
+ await page.goto(origin+'/site/?kind=calendar&island=tenerife&resource=2026-11');
+ await page.locator('[data-key="description"]').waitFor();await idle();
+ assert.equal(await page.locator('#month').inputValue(),'2026-11');
+ await page.getByRole('switch').click();
+ await page.getByRole('button',{name:'Zapisz teksty i widoczność',exact:true}).click();await idle();
+ assert.equal(writes.at(-1).body.payload.islands.tenerife.sections.calendar,false,'calendar visibility must not create invalid month feature keys');
  await page.goto(origin);
  await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
  await page.frameLocator('#site-editor-frame').locator('[data-copy="home.title"] textarea').waitFor();

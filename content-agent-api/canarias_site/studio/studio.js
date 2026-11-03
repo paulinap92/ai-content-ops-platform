@@ -676,6 +676,8 @@ function renderTree(){
 async function navigate(section,resource=null,nextScope=state.scope){
  if(!warnUnsaved()){$("tree-scope").value=state.scope;return;}
  collectSettings();
+ if(section === "calendar" && resource) $("month").value = resource;
+ if(section === "calendar" || section === "news") resource = null;
  state.scope=nextScope === "canarias" && section === "news" ? "global" : nextScope;
  state.target={section,resource};
  const editable=["guide","explore","calendar","news"].includes(section) && (resource || section==="calendar" || section==="news");
