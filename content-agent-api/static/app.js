@@ -548,7 +548,7 @@ async function scanPhotos() {
   }
 }
 
-function sitePhoto(image){const id='site:'+image.media_id;const folder=[image.island,image.site_area||'Biblioteka strony',image.site_section,image.municipality,image.place].filter(Boolean).join('/');return {...image,photo_id:id,source:'site',status:'ready',current_name:image.filename,folder_path:folder,alt_texts:{es:image.alt||''},suggested_filename:image.filename,public_url:image.url};}
+function sitePhoto(image){const id='site:'+image.media_id;const islandLabel=CANARY_ISLAND_ORDER.find(n=>n.toLowerCase().replaceAll(' ','-')===image.island)||image.island;const folder=[islandLabel,image.site_area||'Biblioteka strony',image.site_section,image.municipality,image.place].filter(Boolean).join('/');return {...image,photo_id:id,source:'site',status:'ready',current_name:image.filename,folder_path:folder,alt_texts:{es:image.alt||''},suggested_filename:image.filename,public_url:image.url};}
 async function loadPhotoLibrary() {
   try{const data=await apiFetch('/site/api/media?island=global');state.photoAssets=(data.items||[]).map(sitePhoto);state.photoStorage=data.storage||'trwała biblioteka strony';}
   catch(error){state.photoAssets=[];$("photo-upload-status").textContent=error.message;}
@@ -1117,7 +1117,7 @@ function renderEventPreview() {
   const list = $("event-preview-list");
   const events = state.currentEventPreview || [];
   if (!events.length) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">◌</div><p>Crawler nie znalazł poprawnych eventów. Sprawdź source config albo discovery URL-i.</p></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">◌</div><p>Nie znaleziono wydarzeń z potwierdzonym tytułem i datą. Możesz wybrać inne źródło lub dodać wydarzenie ręcznie.</p></div>';
     return;
   }
   list.innerHTML = "";
