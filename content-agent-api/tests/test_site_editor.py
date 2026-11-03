@@ -37,5 +37,5 @@ def test_new_inspection_routes_require_the_existing_private_login():
  from canarias_site.api.inspection import router as inspect_router
  app=FastAPI();app.middleware("http")(authentication);app.include_router(inspect_router)
  with TestClient(app,base_url="https://editor.example") as client:
-  for path in ["/site/api/database/tables","/site/api/database/tables/entities","/site/api/coverage","/site/api/data?section=live&resource=weather"]:
+  for path in ["/site/api/database/tables","/site/api/database/tables/entities","/site/api/coverage","/site/api/data?section=live&resource=weather","/site/api/analytics/options","/site/api/analytics/series","/site/api/current?kind=guide"]:
    assert client.get(path).status_code==401

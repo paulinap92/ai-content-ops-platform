@@ -43,6 +43,8 @@ def validate_identity(identity: dict) -> dict:
             raise ValueError("Invalid settings identity")
     elif island not in VALID_ISLANDS and not (kind == "news" and island == "canarias"):
         raise ValueError("Unknown island")
+    elif kind == "live-point" and resource in {"weather", "air-quality", "coastal"}:
+        pass
     elif kind == "guide" and resource in VALID_SECTIONS:
         pass
     elif kind == "explore" and resource in EXPLORE_RESOURCES:
@@ -78,6 +80,11 @@ def validate_payload(identity: dict, payload: dict) -> dict:
         raise ValueError("hidden must be a boolean")
     if identity["kind"] == "guide":
         sql_editor._validate_item(value)
+    if identity["kind"] == "live-point":
+        from canarias_site.utils.islands import point_is_on_island
+        lat, lon = value.get("latitude"), value.get("longitude")
+        if any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) for v in (lat,lon)) or not point_is_on_island(lon,lat,identity["island"]):
+            raise ValueError("Podaj współrzędne punktu na wybranej wyspie lub przy jej wybrzeżu.")
     if identity["kind"] == "calendar":
         start = str(value.get("start_date") or "")
         end = str(value.get("end_date") or start)
@@ -108,6 +115,9 @@ async def canonical_items(session, kind, island, resource, *, lock=False):
     if kind == "settings":
         row = await session.scalar(select(StudioDocument).where(StudioDocument.kind == "settings"))
         return [("site", row.published if row and row.published is not None else empty_settings())]
+    if kind == "live-point":
+        rows=(await session.scalars(select(StudioDocument).where(StudioDocument.kind==kind,StudioDocument.island==island,StudioDocument.resource==resource,StudioDocument.published.is_not(None)))).all()
+        return [(r.record_key,r.published) for r in rows]
     if kind == "guide":
         island_id = await sql_editor.ExploreImporter(session).island_id(island)
         query = select(ContentItem).where(ContentItem.module == "guide", ContentItem.island_entity_id == island_id, ContentItem.section == resource)
@@ -206,6 +216,14 @@ async def publish(session, document_id, expected_version):
     kind, island, resource = (identity[k] for k in ("kind", "island", "resource"))
     if kind == "settings":
         row.published = public
+    elif kind == "live-point":
+        await session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended('studio-live-points-quota',0))"))
+        if current is None:
+            from sqlalchemy import func
+            count=await session.scalar(select(func.count()).select_from(StudioDocument).where(StudioDocument.kind=='live-point',StudioDocument.published.is_not(None)))
+            if count>=30:raise ValueError("Limit 30 własnych punktów Live. Edytuj istniejący punkt zamiast dodawać następny.")
+            row.record_key='custom-'+str(row.id)
+        row.published={**public,'id':row.record_key,'island':island,'editorial_override':True}
     elif kind == "guide":
         if current is None:
             await sql_editor.create_item(session, island, resource, public)

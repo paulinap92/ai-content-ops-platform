@@ -2,7 +2,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, Integer, Text, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Integer, LargeBinary, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -35,4 +35,13 @@ class StudioRevision(Base):
     version: Mapped[int] = mapped_column(Integer)
     action: Mapped[str] = mapped_column(Text)
     payload: Mapped[dict] = mapped_column(JSONB)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class StudioAsset(Base):
+    __tablename__ = "cc_studio_assets"
+    __table_args__ = {"schema":"design"}
+    digest: Mapped[str] = mapped_column(Text,primary_key=True)
+    mime_type: Mapped[str] = mapped_column(Text)
+    data: Mapped[bytes] = mapped_column(LargeBinary)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))

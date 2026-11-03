@@ -12,7 +12,7 @@ const defaults=JSON.parse(await readFile(resolve(assets,'default_copy.json'),'ut
 const config={global:{sections:{},features:{},copy:{'home.title':'Hola, somos las Islas Canarias.'}},islands:{}};
 const identity={kind:'settings',island:'global',resource:'site',record_key:'site'};
 const settings={id:'settings-fixture',identity,version:1,status:'published',draft:config,published:config,base_fingerprint:'0'.repeat(64)};
-const requests=[],writes=[];
+const requests=[],writes=[];const uploaded=[];
 const options={islands:['el-hierro','la-palma','la-gomera','tenerife','gran-canaria','fuerteventura','lanzarote','la-graciosa'],sections:{explore:'Explore',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos',guide:'Guía'},features:{guide:['crafts','culture','history','food','geology','nature'],explore:['places','beaches','food-producers','diving-spots','routes','fauna','flora','airports','ports','ferries','titsa-stops','titsa-routes','tilp-routes'],live:['weather','air-quality','marine','tides','alerts','seismic','volcanic','webcams','live-beaches'],datos:['climate','tourism','geology','economy']},copy_defaults:{'home.title':'Hola, somos las Islas Canarias.','home.description':'Ocho islas, miles de lugares por descubrir.','island.description':'','nav.guide':'Guía',...defaults}};
 const coverageFixture={islands:options.islands,explore:{'food-producers':{total:9,islands:{'gran-canaria':3,fuerteventura:6}},'diving-spots':{total:1,islands:{'el-hierro':1}},places:{total:8,islands:{tenerife:1}}},guide:{history:{total:8,islands:Object.fromEntries(options.islands.map(i=>[i,1]))},explore:{total:48,islands:Object.fromEntries(options.islands.map(i=>[i,6]))}},calendar:[{island:'tenerife',month:'2026-11',count:3}],live:[{resource:'weather',island:'tenerife',available:true,status:'ok',updated_at:'2026-11-03T06:00:00Z'}],climate:[{resource:'weather',island:'tenerife',count:24,first:'2026-11-02T06:00:00Z',last:'2026-11-03T06:00:00Z'}],statistics:[],notes:'Synthetic fixture, no hosted database.'};
 const server=createServer(async(req,res)=>{
@@ -29,8 +29,13 @@ const server=createServer(async(req,res)=>{
   res.setHeader('Content-Type','application/json');
   if(req.method!=='GET'){
    let body='';for await(const chunk of req)body+=chunk;writes.push({path,method:req.method,body:JSON.parse(body)});
+   if(path==='/site/api/media'){const value={url:'https://public.example/own.jpg',filename:writes.at(-1).body.filename,alt:'Photo',credit:'Owner'};uploaded.push(value);res.end(JSON.stringify(value));return;}
    res.end(JSON.stringify({...settings,draft:writes.at(-1).body.payload,version:2,status:'draft'}));return;
   }
+  if(path==='/site/api/media'){res.end(JSON.stringify({items:uploaded,upload_enabled:true}));return;}
+  if(path==='/site/api/analytics/options'){res.end(JSON.stringify({points:[{resource:'weather',point_id:'santa-cruz',name:'Santa Cruz'}],metrics:{weather:{temperature:['Temperatura','°C']},'air-quality':{pm10:['PM10','µg/m³']},seismic:{magnitude:['Magnituda','']}}}));return;}
+  if(path==='/site/api/analytics/series'){res.end(JSON.stringify({resource:'weather',metric:'temperature',title:'Temperatura',unit:'°C',date_from:'2026-11-01',date_to:'2026-11-03',resolution:'day',aggregation:'Synthetic fixture',rows:[{time:'2026-11-01T12:00:00Z',value:20,samples:2},{time:'2026-11-03T12:00:00Z',value:23,samples:2}]}));return;}
+  if(path==='/site/api/current'){res.end(JSON.stringify({published:{name:'Aktualna treść',description:'Current body'},base_fingerprint:'0'.repeat(64)}));return;}
   if(path==='/site/api/coverage'){res.end(JSON.stringify(coverageFixture));return;}
   if(path==='/site/api/database/tables'){res.end(JSON.stringify({tables:[{name:'entities'},{name:'climate_observations'},{name:'live_snapshots'}],readonly:true}));return;}
   if(path.startsWith('/site/api/database/tables/')){const table=path.split('/').at(-1);const rows=[{id:'entity-1',canonical_name:'Tenerife',entity_type:'island'},{id:'entity-2',canonical_name:'El Hierro',entity_type:'island'}].filter(r=>!url.searchParams.get('q')||r.canonical_name.includes(url.searchParams.get('q')));res.end(JSON.stringify({table,columns:[{name:'id',type:'uuid'},{name:'canonical_name',type:'text'},{name:'entity_type',type:'text'}],rows,count:rows.length,offset:0,limit:25,readonly:true}));return;}
@@ -41,7 +46,7 @@ const server=createServer(async(req,res)=>{
    if(p.kind==='settings'){res.end(JSON.stringify({items:[settings],count:1}));return;}
    const payload={name:p.island==='tenerife'?'Historia de Tenerife':'Artesanía de El Hierro',description:'Treść istniejącego artykułu z wybranej kategorii.',hidden:false};
    const item={id:null,identity:{kind:p.kind,island:p.island,resource:p.resource,record_key:'existing-fixture'},draft:payload,published:payload,status:'published',version:0,base_fingerprint:'0'.repeat(64)};
-   if(p.kind==='calendar'){const items=[5,7,12].map(day=>({...item,identity:{...item.identity,record_key:'event-'+day},draft:{title:'Fiesta '+day,start_date:p.resource+'-'+String(day).padStart(2,'0'),end_date:p.resource+'-'+String(day).padStart(2,'0'),description:'Wydarzenie kalendarza',all_day:true},published:{title:'Fiesta '+day,description:'Wydarzenie kalendarza'}}));res.end(JSON.stringify({items,count:3}));return;}
+   if(p.kind==='calendar'){const items=[5,7,12].map(day=>({...item,identity:{...item.identity,record_key:'event-'+day},draft:{title:'Fiesta '+day,start_date:p.resource+'-'+String(day).padStart(2,'0'),end_date:p.resource+'-'+String(day).padStart(2,'0'),description:'Wydarzenie kalendarza',all_day:true,location:day===7?'La Laguna':'Santa Cruz',category:day===7?'Fiesta':'Cultura'},published:{title:'Fiesta '+day,description:'Wydarzenie kalendarza'}}));res.end(JSON.stringify({items,count:3}));return;}
    if(p.kind==='explore'&&p.resource==='food-producers'&&p.island==='tenerife'){res.end(JSON.stringify({items:[],count:0}));return;}
    if(p.kind==='guide'&&p.resource==='explore')item.draft=item.published={name:'Destacado de '+p.island,description:'Karta widoczna w Explore → Destacados.'};
    if(p.kind==='explore'&&p.resource==='diving-spots')item.draft=item.published={name:'Centro de Buceo',description:'Punkt nurkowy z katalogu.'};
@@ -50,7 +55,7 @@ const server=createServer(async(req,res)=>{
   res.writeHead(404);res.end('{}');return;
  }
  const name=path==='/site/'?'index.html':path.startsWith('/site/assets/')?path.slice('/site/assets/'.length):null;
- if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js'].includes(name)){res.writeHead(404);res.end();return;}
+ if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js','charts.js'].includes(name)){res.writeHead(404);res.end();return;}
  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);
  res.end(await readFile(resolve(assets,name)));
 });
@@ -141,6 +146,9 @@ try{
  assert.match(await page.locator('#inspection-view').innerText(),/Santa Cruz/);
  await page.locator('#site-tree').getByRole('button',{name:'Datos',exact:true}).click();await idle();
  assert.match(await page.locator('#inspection-view').innerText(),/climate_observations/);
+ await page.locator('.chart-plot svg').waitFor();
+ assert.equal(await page.getByLabel('Miasto lub punkt pomiarowy').inputValue(),'santa-cruz');
+ await page.locator('#inspection-view').screenshot({path:'test-results/site-editor/climate-chart.png'});
  await page.locator('#site-tree').getByRole('button',{name:'Baza danych',exact:true}).click();await idle();
  await page.getByLabel('Tabela bazy danych').selectOption('entities');
  await page.getByLabel('Szukaj w tabeli').fill('Tenerife');
@@ -150,9 +158,15 @@ try{
  await page.goto(origin+'/site/?kind=calendar&island=tenerife&resource=2026-11');
  await page.getByRole('button',{name:'Fiesta 7',exact:true}).waitFor();await idle();
  assert.equal(await page.locator('.calendar-day').count(),42);
+ await page.locator('#calendar-town').selectOption('La Laguna');await idle();
+ assert.equal(await page.locator('.calendar-event').count(),1);
  await page.getByRole('button',{name:'Fiesta 7',exact:true}).click();
  assert.equal(await page.locator('#editor-title').innerText(),'Fiesta 7');
- await page.locator('#calendar-grid').screenshot({path:'test-results/site-editor/calendar-month.png'});
+ await page.getByRole('button',{name:'Historia wersji treści',exact:true}).click();
+ await page.getByRole('dialog').waitFor();assert.match(await page.locator('#history-dialog-content').innerText(),/nie był jeszcze edytowany/);await page.locator('#close-history').click();
+ await page.locator('#rebase').click();await page.locator('#preview-dialog[open]').waitFor();await page.locator('#close-preview').click();
+ await page.locator('#site-tree').getByRole('button',{name:'Transporte',exact:true}).click();await idle();assert.equal(await page.locator('#site-tree').getByRole('button',{name:'Aeropuertos',exact:true}).count(),1);
+ await page.locator('#inspection-view').screenshot({path:'test-results/site-editor/transport.png'});
  await page.goto(origin);
  await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
  await page.frameLocator('#site-editor-frame').locator('[data-copy="home.title"] textarea').waitFor();
@@ -161,7 +175,12 @@ try{
  await page.getByRole('button',{name:'Telefon',exact:true}).click();
  assert.equal(await page.locator('#website-preview-frame').evaluate(e=>e.getBoundingClientRect().width),390);
  assert.equal(await page.getByRole('button',{name:'LangGraph',exact:true}).count(),0);
+ await page.goto(origin+'/site/?section=live-points&resource=weather&island=tenerife');await idle();await page.locator('#new').click();await idle();assert.equal(await page.locator('#kind').inputValue(),'live-point');assert.equal(await page.locator('[data-key="latitude"]').count(),1);
+ await page.goto(origin+'/site/?view=media');await idle();await page.locator('#media-island').selectOption('tenerife');await idle();
+ await page.locator('#upload').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a4mQAAAAASUVORK5CYII=','base64')});
+ await page.waitForFunction(()=>document.querySelector('#media-list').children.length===1);assert.equal(uploaded.length,1);assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is encoded as JPEG before durable upload');
+ await page.goto(origin+'/site/?kind=guide&island=tenerife&resource=history');await idle();await page.locator('#improve-ai').click();await page.waitForURL(origin+'/?edit=article');await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
- assert.ok(writes.every(r=>r.path==='/site/api/draft'),'UI test never publishes');
+ assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)),'UI test never publishes');
  console.log('EDITOR UI PASS: site tree, real text, automatic article selection, contextual switches, inheritance, draft preservation, empty state and direct links.');
 }finally{await browser.close();server.close();}

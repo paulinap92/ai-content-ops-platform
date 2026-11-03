@@ -61,3 +61,14 @@ without R2. No photo or export depends on Render's ephemeral filesystem.
 - **Podgląd strony** embeds the published website in desktop or phone width.
   Draft article preview and the publication diff remain separate from the live site.
 - The LangGraph engine remains part of AI generation; it is not a navigation tab.
+
+
+## Pełny przepływ edycji (2026-11-03)
+
+- Historia otwiera okno również dla starej treści bez zapisanych wersji i wyjaśnia zakres historii. Wczytanie aktualnej wersji działa bez uprzedniego zapisu i zachowuje formularz. Poprawa z AI otwiera formularz pracy AI także przy wejściu bezpośrednio na `/site/`.
+- Transport ma osobną pozycję Transporte: lotniska, porty, promy, przystanki i linie TITSA oraz TILP.
+- Calendario filtruje miesięczne wpisy po miejscowości, kategorii, publikacji, datach i tekście. Ręczne `Dodaj` oraz `Wydarzenia → Do wersji roboczej strony` zapisują szkic. Dopiero `Opublikuj wydarzenie` udostępnia treść na stronie; importowany szkic otwiera się po swoim kluczu, a nie jako przypadkowy pierwszy wpis.
+- Clima udostępnia wykresy: punkt / miejscowość, pogoda lub jakość powietrza, wielkość, zakres dat i przedział. Dodatkowo dostępne są tabela wykresu i CSV. Geología pokazuje zdarzenia sejsmiczne. Braki w szeregu nie są interpolowane. Domyślnie agregacja oznacza średnią zapisanych wartości w dniu UTC, nie nowy oficjalny wskaźnik meteorologiczny.
+- Zakładka Zdjęcia otwiera bibliotekę strony. JPEG/PNG/WebP do 20 MB są w przeglądarce zmniejszane do maks. 1920 px i JPEG, a wynik ma limit 5 MB. Podpis autora i alt można wpisać przed wgraniem. Wybór zdjęcia przypisuje je do otwartego formularza, wymagającego osobnego zapisu i publikacji.
+- Gdy R2 nie jest skonfigurowane, biblioteka korzysta z addytywnej tabeli `design.cc_studio_assets` w istniejącej bazie. Limit tej biblioteki to 100 MB, pliki są deduplikowane według SHA256. Publiczny backend udostępnia wyłącznie konkretne obrazy pod `/api/media/{sha256}`; administracja wymaga dotychczasowej sesji. Przesłanie do biblioteki udostępnia sam plik pod publicznym adresem, co jest opisane przy wgrywaniu. Nie tworzy nowej płatnej usługi.
+- Własne punkty Live: wybierz wyspę i pogodę, jakość powietrza lub morze/pływy. `Dodaj → Zapisz treść roboczą → Włącz punkt w jobach Live`. Koordynator korzysta wyłącznie z opublikowanej konfiguracji, a wyniki zapisuje dotychczasowym mechanizmem z blokadą lidera. Edycja szkicu nie zmienia aktywnego punktu. Ukrycie i publikacja wyłączają punkt w następnym cyklu; dotychczasowe pomiary pozostają. Limit 30 własnych punktów obejmuje całą bibliotekę konfiguracji. Pomiar modelowy pojawi się po udanym odświeżeniu, nie natychmiast po zapisaniu punktu. Ten formularz nie tworzy stacji IGN ani danych sejsmicznych.

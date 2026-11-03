@@ -10,7 +10,7 @@ from sqlalchemy.pool import NullPool
 
 from canarias_site.db.base import Base
 from canarias_site.models.design_db import ContentItem, NewsItem
-from canarias_site.models.studio import StudioDocument, StudioRevision
+from canarias_site.models.studio import StudioDocument, StudioRevision, StudioAsset
 from canarias_site.services import studio
 from canarias_site.services.site_settings import empty_settings, published_settings
 
@@ -22,7 +22,7 @@ pytestmark=pytest.mark.skipif(not URL,reason="Disposable PostgreSQL required")
 async def session():
     engine=create_async_engine(URL,poolclass=NullPool)
     async with engine.begin() as connection:
-        await connection.run_sync(lambda c:Base.metadata.create_all(c,tables=[StudioDocument.__table__,StudioRevision.__table__]))
+        await connection.run_sync(lambda c:Base.metadata.create_all(c,tables=[StudioDocument.__table__,StudioRevision.__table__,StudioAsset.__table__]))
     async with engine.connect() as connection:
         transaction = await connection.begin()
         async with async_sessionmaker(bind=connection,expire_on_commit=False,join_transaction_mode="create_savepoint")() as session:
@@ -184,3 +184,50 @@ async def test_ai_improves_bound_article_as_private_draft_and_preserves_identity
     assert saved['published']['description']=='Original body'
     row=await session.scalar(select(ContentItem).where(ContentItem.slug==slug))
     assert row.title=='Original' and row.body=='Original body'
+
+
+@pytest.mark.asyncio
+async def test_live_point_requires_publish_then_preserves_history_when_disabled(session):
+    identity=dict(kind='live-point',island='tenerife',resource='weather',record_key='new:'+uuid4().hex)
+    payload=dict(name='Private draft location',latitude=28.46,longitude=-16.25,hidden=False)
+    draft=await studio.save_draft(session,identity,payload,0,studio.fingerprint(None))
+    assert not await studio.canonical_value(session,identity)
+    active=await studio.publish(session,draft['id'],draft['version'])
+    assert active['published']['id'].startswith('custom-')
+    assert active['published']['island']=='tenerife'
+    payload['hidden']=True
+    changed=await studio.save_draft(session,active['identity'],payload,active['version'],active['base_fingerprint'])
+    assert not changed['published']['hidden']
+    disabled=await studio.publish(session,changed['id'],changed['version'])
+    assert disabled['published']['hidden'] and len((await studio.history(session,disabled['id']))['items'])>=4
+    with pytest.raises(ValueError):studio.validate_payload(identity,dict(name='Bad point',latitude=52,longitude=16))
+
+@pytest.mark.asyncio
+async def test_uploaded_photo_persists_in_sql_without_r2_and_deduplicates(session,monkeypatch):
+    import base64
+    from canarias_site.services import studio_media
+    for key in studio_media.R2_KEYS:monkeypatch.delenv(key,raising=False)
+    data=b'\xff\xd8\xffisolated-photo-test'
+    image=await studio_media.upload(session,'tenerife','own.jpg',base64.b64encode(data).decode(),'My landscape','Owner')
+    assert '/api/media/' in image['url'] and image['alt']=='My landscape'
+    digest=image['url'].rsplit('/',1)[1]
+    assert (await session.get(StudioAsset,digest)).data==data
+    again=await studio_media.upload(session,'tenerife','duplicate.jpg',base64.b64encode(data).decode())
+    assert again['url']==image['url']
+
+@pytest.mark.asyncio
+async def test_chart_city_metric_dates_and_real_gaps(session):
+    from datetime import datetime,timezone,date
+    from canarias_site.services import analytics
+    from canarias_site.models.design_db import ClimateObservation
+    island=await studio.sql_editor.ExploreImporter(session).island_id('tenerife')
+    point='chart-test-'+uuid4().hex
+    for index,(day,value) in enumerate([(1,10),(1,14),(3,20)]):
+        session.add(ClimateObservation(id=1900000000+index,resource='weather',island_entity_id=island,point_id=point,observed_at=datetime(2026,1,day,index,tzinfo=timezone.utc),latitude=28.46,longitude=-16.25,source='Synthetic test',payload={'name':'Test city','temperature':value},ingested_at=datetime.now(timezone.utc)))
+    await session.flush()
+    options=await analytics.options(session,'tenerife')
+    assert any(p['point_id']==point and p['name']=='Test city' for p in options['points'])
+    result=await analytics.series(session,'tenerife','weather','temperature',point,date(2026,1,1),date(2026,1,3))
+    assert [r['value'] for r in result['rows']]==[12,20] # Jan 2 must stay absent.
+    assert (await analytics.series(session,'tenerife','weather','humidity',point,date(2026,1,1),date(2026,1,3)))['rows'][0]['value'] is None
+    with pytest.raises(HTTPException):await analytics.series(session,'tenerife','weather','unknown',point)

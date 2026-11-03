@@ -56,7 +56,7 @@
       </details>
       <section id="inspection-view" hidden></section>
       <section id="content-view" hidden>
-        <section id="calendar-view" hidden><div class="calendar-toolbar"><button id="calendar-prev" type="button">← Poprzedni miesiąc</button><button id="calendar-today" type="button">Bieżący miesiąc</button><button id="calendar-next" type="button">Następny miesiąc →</button></div><div id="calendar-available-months"></div><div id="calendar-grid"></div></section>
+        <section id="calendar-view" hidden><div class="calendar-toolbar"><button id="calendar-prev" type="button">← Poprzedni miesiąc</button><button id="calendar-today" type="button">Bieżący miesiąc</button><button id="calendar-next" type="button">Następny miesiąc →</button></div><p class="view-help">Własne wydarzenie: Dodaj → Zapisz treść roboczą → Podgląd i zmiany → Opublikuj wydarzenie. Import z zakładki Wydarzenia również trafia najpierw do szkicu.</p><div id="calendar-filters" class="inspection-toolbar"><label>Miejscowość<select id="calendar-town"><option value="">Wszystkie</option></select></label><label>Kategoria<select id="calendar-category"><option value="">Wszystkie</option></select></label><label>Stan<select id="calendar-state"><option value="">Wszystkie</option><option value="published">Opublikowane</option><option value="draft">Szkice</option><option value="hidden">Ukryte</option></select></label><label>Od<input id="calendar-from" type="date"></label><label>Do<input id="calendar-to" type="date"></label><button id="calendar-clear" type="button">Wyczyść filtry</button></div><div id="calendar-available-months"></div><div id="calendar-grid"></div></section>
         <h2>Treści tej części strony</h2>
         <div class="toolbar card">
           <label hidden>Wyspa<select id="island"></select></label
@@ -64,7 +64,7 @@
              hidden>Obszar<select id="kind">
               <option value="guide">Guide — artykuły</option>
               <option value="explore">Explore — miejsca i trasy</option>
-              <option value="calendar">Kalendarz</option>
+              <option value="calendar">Kalendarz</option><option value="live-point">Własne punkty Live</option>
               <option value="news">Aktualności</option>
             </select></label
           ><label id="resource-label" hidden
@@ -88,7 +88,7 @@
           </aside>
           <section class="card">
             <h2 id="editor-title">Wybierz treść</h2>
-            <p id="record-status"></p>
+            <p id="record-status"></p><p id="record-feedback" role="status" aria-live="polite"></p>
             <form id="record-form"></form>
             <div id="edit-actions" class="actions" hidden>
               <button id="improve-ai" type="button">Popraw artykuł z AI</button><button id="save">Zapisz treść roboczą</button
@@ -103,9 +103,9 @@
       </section>
 
       <section id="media-view" class="card" hidden>
-        <h2>Zdjęcia strony</h2>
+        <h2>Zdjęcia strony</h2><label>Wyspa zdjęcia<select id="media-island"></select></label>
         <p>
-          Wybierz wyspę w widoku treści. Użyj pliku JPEG, PNG lub WebP do 5 MB
+          Wybierz wyspę poniżej. Użyj pliku JPEG, PNG lub WebP do 20 MB; zmniejszymy go przed wysłaniem
           albo wklej istniejący adres zdjęcia w edytowanym wpisie.
         </p>
         <label
@@ -114,7 +114,7 @@
             type="file"
             accept="image/jpeg,image/png,image/webp"
         /></label>
-        <p id="media-status"></p>
+        <label>Opis zdjęcia (alt)<input id="media-alt" maxlength="300" placeholder="Co przedstawia zdjęcie?"></label><label>Autor / podpis<input id="media-credit" maxlength="200" value="Canarias Cerca"></label><p id="media-status"></p>
         <div id="media-list" class="gallery"></div>
       </section>
       </div>
@@ -125,6 +125,7 @@
       <h3>Zmiany względem opublikowanej wersji</h3>
       <div id="change-list"></div>
     </dialog>
+    <dialog id="history-dialog"><button id="close-history" type="button">Zamknij historię</button><div id="history-dialog-content"></div></dialog>
     <script type="module" src="assets/studio.js"></script>
   </body>
 </html>

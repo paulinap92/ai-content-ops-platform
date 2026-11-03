@@ -9,7 +9,7 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from canarias_site.db.base import Base
-from canarias_site.models.studio import StudioDocument, StudioRevision
+from canarias_site.models.studio import StudioDocument, StudioRevision, StudioAsset
 from src.core.auth import require_editor
 from src.core.document_store import connection_string
 
@@ -54,7 +54,7 @@ async def session_scope():
     async with _lock:
         if engine not in _initialized:
             async with engine.begin() as connection:
-                await connection.run_sync(lambda c: Base.metadata.create_all(c, tables=[StudioDocument.__table__, StudioRevision.__table__]))
+                await connection.run_sync(lambda c: Base.metadata.create_all(c, tables=[StudioDocument.__table__, StudioRevision.__table__, StudioAsset.__table__]))
             _initialized.add(engine)
     async with async_sessionmaker(engine, expire_on_commit=False)() as session:
         session.info["studio_atomic"] = True

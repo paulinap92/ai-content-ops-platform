@@ -1,4 +1,5 @@
 """Private inspection routes use an enforced read-only SQL transaction."""
+from datetime import date
 from fastapi import APIRouter, Depends, Query, Request, HTTPException
 from sqlalchemy.exc import DBAPIError
 from src.core.auth import require_editor
@@ -28,3 +29,14 @@ async def coverage(db=Depends(session)):
 @router.get('/data')
 async def data(section:str,resource:str,island:str='global',offset:int=Query(0,ge=0,le=10000000),limit:int=Query(25,ge=1,le=100),metric:str|None=Query(None,max_length=200),db=Depends(session)):
     return await inspection.data_rows(db,section,resource,island,offset,limit,metric)
+
+
+@router.get('/analytics/options')
+async def analytics_options(island:str='global',db=Depends(session)):
+    from canarias_site.services import analytics
+    return await analytics.options(db,island)
+
+@router.get('/analytics/series')
+async def analytics_series(island:str='global',resource:str='weather',metric:str='temperature',point_id:str=Query('',max_length=200),date_from:date|None=None,date_to:date|None=None,resolution:str=Query('day',pattern='^(day|hour)$'),db=Depends(session)):
+    from canarias_site.services import analytics
+    return await analytics.series(db,island,resource,metric,point_id,date_from,date_to,resolution)

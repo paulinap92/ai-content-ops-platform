@@ -41,6 +41,8 @@ class Upload(BaseModel):
     island: str
     filename: str = Field(min_length=1, max_length=180)
     data: str = Field(max_length=7_000_000)
+    alt: str = Field("",max_length=300)
+    credit: str = Field("",max_length=200)
 
 
 def translate_error(exc):
@@ -60,7 +62,7 @@ async def studio_page():
 
 @router.get("/site/assets/{name}", include_in_schema=False)
 async def studio_asset(name: str):
-    if name not in {"studio.js", "studio.css", "editorialText.js", "inspector.js"}:
+    if name not in {"studio.js", "studio.css", "editorialText.js", "inspector.js", "charts.js"}:
         raise HTTPException(404)
     return FileResponse(ASSETS / name, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
 
@@ -81,6 +83,15 @@ async def records(session: Session, kind: str, island: str, resource: str, q: st
         return await service.list_records(session, kind, island, resource, q, offset, limit)
     except ValueError as exc:
         translate_error(exc)
+
+
+@router.get("/site/api/current", include_in_schema=False)
+async def current(session: Session, kind: str, island: str, resource: str, record_key: str):
+    try:
+        identity=service.validate_identity(dict(kind=kind,island=island,resource=resource,record_key=record_key))
+        value=service.json_value(await service.canonical_value(session,identity))
+        return {"published":value,"base_fingerprint":service.fingerprint(value)}
+    except ValueError as exc:translate_error(exc)
 
 
 @router.put("/site/api/draft", include_in_schema=False)
@@ -117,9 +128,11 @@ async def restore(document_id: str, payload: Restore, session: Session):
 
 @router.get("/site/api/media", include_in_schema=False)
 async def media(session: Session, island: str):
-    if island not in VALID_ISLANDS:
+    if island not in (*VALID_ISLANDS,"global"):
         raise HTTPException(400, "Unknown island")
-    rows = (await session.scalars(select(StudioDocument).where(StudioDocument.kind == "media", StudioDocument.island == island).order_by(StudioDocument.updated_at.desc()).limit(200))).all()
+    query=select(StudioDocument).where(StudioDocument.kind=="media")
+    if island!="global":query=query.where(StudioDocument.island==island)
+    rows=(await session.scalars(query.order_by(StudioDocument.updated_at.desc()).limit(200))).all()
     return {"items": [row.published for row in rows], "upload_enabled": studio_media.enabled()}
 
 
@@ -134,6 +147,6 @@ async def rebase(document_id: str, payload: Version, session: Session):
 @router.post("/site/api/media", include_in_schema=False)
 async def upload(payload: Upload, session: Session):
     try:
-        return await studio_media.upload(session, payload.island, payload.filename, payload.data)
+        return await studio_media.upload(session, payload.island, payload.filename, payload.data, payload.alt, payload.credit)
     except ValueError as exc:
         translate_error(exc)

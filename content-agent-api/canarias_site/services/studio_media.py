@@ -11,13 +11,17 @@ import httpx
 from fastapi import HTTPException
 from sqlalchemy import select, text
 
-from canarias_site.models.studio import StudioDocument
+from canarias_site.models.studio import StudioDocument, StudioAsset
 from canarias_site.utils.islands import VALID_ISLANDS
 
 R2_KEYS = ("R2_ACCOUNT_ID", "R2_BUCKET", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_PUBLIC_BASE_URL")
 
 
 def enabled():
+    return True
+
+
+def r2_enabled():
     return all(os.getenv(k) for k in R2_KEYS)
 
 
@@ -59,24 +63,30 @@ def signed_upload(data, mime, key, *, now=None):
     return f"https://{host}{path}", headers, public_base.rstrip("/") + "/" + key
 
 
-async def upload(session, island, filename, encoded):
+async def upload(session, island, filename, encoded, alt="", credit=""):
+    from sqlalchemy import func
     if island not in VALID_ISLANDS:
         raise ValueError("Unknown island")
-    if not enabled():
-        raise HTTPException(503, "Wgrywanie plików wymaga skonfigurowanej biblioteki R2. Możesz użyć istniejącego publicznego URL zdjęcia.")
     data, mime, ext = image_data(encoded)
     digest = hashlib.sha256(data).hexdigest()
     await session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"), {"key": f"studio-media:{island}:{digest}"})
     row = await session.scalar(select(StudioDocument).where(StudioDocument.kind == "media", StudioDocument.island == island, StudioDocument.record_key == digest))
     if row:
         return row.published
-    key = f"editor/{digest}.{ext}"
-    url, headers, public_url = signed_upload(data, mime, key)
-    async with httpx.AsyncClient(timeout=40, follow_redirects=False) as client:
-        response = await client.put(url, content=data, headers=headers)
-        if response.status_code not in {200, 201, 204}:
-            raise HTTPException(502, "Biblioteka zdjęć odrzuciła plik. Sprawdź konfigurację R2.")
-    payload = {"url": public_url, "filename": filename[:180], "mime_type": mime, "size": len(data)}
+    if r2_enabled():
+        key=f"editor/{digest}.{ext}";url,headers,public_url=signed_upload(data,mime,key)
+        async with httpx.AsyncClient(timeout=40,follow_redirects=False) as client:
+            response=await client.put(url,content=data,headers=headers)
+            if response.status_code not in {200,201,204}:raise HTTPException(502,"Biblioteka zdjęć odrzuciła plik.")
+    else:
+        await session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended('studio-assets-quota',0))"))
+        asset=await session.get(StudioAsset,digest)
+        if not asset:
+            used=await session.scalar(select(func.coalesce(func.sum(func.octet_length(StudioAsset.data)),0)))
+            if used+len(data)>100_000_000:raise HTTPException(413,"Biblioteka osiągnęła limit 100 MB. Zmniejsz zdjęcie lub skonfiguruj większy magazyn R2.")
+            session.add(StudioAsset(digest=digest,mime_type=mime,data=data,created_at=datetime.now(timezone.utc)))
+        public_url=os.getenv('CANARIAS_PUBLIC_API_URL','https://canarias-cerca-api.onrender.com').rstrip('/')+'/api/media/'+digest
+    payload={"url":public_url,"filename":filename[:180],"mime_type":mime,"size":len(data),"alt":alt[:300],"credit":credit[:200]}
     session.add(StudioDocument(id=uuid4(), kind="media", island=island, resource="images", record_key=digest, draft=payload, published=payload, base_fingerprint=digest, version=1, status="published", updated_at=datetime.now(timezone.utc)))
     await session.commit()
     return payload

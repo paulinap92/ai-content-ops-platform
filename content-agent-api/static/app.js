@@ -1151,7 +1151,7 @@ async function saveEventAsSiteDraft(item) {
     const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map(v=>v.toString(16).padStart(2,"0")).join("");
     const nullHash = [...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode("null")))].map(v=>v.toString(16).padStart(2,"0")).join("");
     await apiFetch("/site/api/draft", {method:"PUT",body:JSON.stringify({identity:{kind:"calendar",island,resource:start.slice(0,7),record_key:"new:"+hash},expected_version:0,base_fingerprint:nullHash,payload:{title:item.title,description:item.description||item.raw_excerpt||"",start_date:start,end_date:String(item.end_date||start).slice(0,10),all_day:!item.start_time,location:item.location||item.venue||"",url:item.source_url||"",source_url:item.source_url||"",price:item.price||"",hidden:false}})});
-    $("site-editor-frame").src="/site/?"+new URLSearchParams({kind:"calendar",island,resource:start.slice(0,7)});
+    $("site-editor-frame").src="/site/?"+new URLSearchParams({kind:"calendar",island,resource:start.slice(0,7),record_key:"new:"+hash});
     document.querySelector('[data-view="site"]').click();
     toast("Wydarzenie zapisano roboczo. Sprawdź je w panelu przed publikacją.");
   } catch (error) { toast(error.message,true); }
@@ -1206,10 +1206,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 $("logout-editor").onclick=async()=>{await apiFetch("/auth/logout",{method:"POST"});location.replace("/login");};
 window.addEventListener("message",(event)=>{
  const frame=$("site-editor-frame");
+ if(event.origin===location.origin && event.source===$("photo-library-frame").contentWindow && event.data?.type==='cc-editor-image'){
+  frame.contentWindow.postMessage({type:'cc-editor-use-image',image:event.data.image},location.origin);document.querySelector('[data-view="site"]').click();return;
+ }
  if(event.origin!==location.origin || event.source!==frame.contentWindow)return;
  if(event.data?.type==="cc-editor-ready"){state.siteConnected=true;$("api-status").textContent="Edytor · połączony";$("api-status").className="status-dot status-ready";return;}
  if(event.data?.type!=="cc-editor-ai")return;
- const record=event.data.record;
+ openArticleImprovement(event.data.record);
+});
+function openArticleImprovement(record){
  if(!record || record.identity?.kind!=="guide")return;
  state.siteTarget={identity:record.identity,version:record.version,base_fingerprint:record.base_fingerprint,payload:record.draft};
  $("topic").value=record.draft.name || record.draft.title || "Popraw artykuł";
@@ -1217,7 +1222,9 @@ window.addEventListener("message",(event)=>{
  $("island_hint").value=[...$("island_hint").options].find(x=>x.text.toLowerCase().replaceAll(" ","-")===record.identity.island)?.value || "";
  $("content_type_hint").value="guide";
  document.querySelector('[data-view="editor"]').click();
-});
+ $("topic").focus();toast("Artykuł wczytany. Wpisz oczekiwane poprawki i uruchom pracę AI.");
+}
+window.addEventListener("DOMContentLoaded",()=>{const raw=sessionStorage.getItem("cc-editor-ai-record");if(raw){sessionStorage.removeItem("cc-editor-ai-record");try{openArticleImprovement(JSON.parse(raw));}catch(e){toast(e.message,true);}}});
 
 $("preview-desktop").onclick=()=>{$("website-preview-shell").classList.remove("phone-preview");};
 $("preview-phone").onclick=()=>{$("website-preview-shell").classList.add("phone-preview");};
