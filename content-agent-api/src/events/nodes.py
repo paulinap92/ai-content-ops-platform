@@ -125,6 +125,8 @@ def extract(state: EventImportState) -> dict[str, Any]:
     json_ld_count = 0
     llm_count = 0
     rejected = 0
+    deterministic_count = 0
+    ai_skipped = 0
 
     model = None
     structured_model = None
@@ -135,6 +137,18 @@ def extract(state: EventImportState) -> dict[str, Any]:
         if isinstance(json_ld, dict):
             candidate = _from_json_ld(source, page["url"], page.get("text", ""), json_ld)
             json_ld_count += 1
+        elif not settings.ai_configured:
+            # Explicit source facts remain usable when optional AI is not configured.
+            ai_skipped += 1
+            if not html_fields.get('title') or not html_fields.get('start_at'):
+                rejected += 1
+                continue
+            candidate=EventCandidate(source_id=source.source_id,source_name=source.name,island=source.island,
+                title=str(html_fields['title']),start_at=html_fields['start_at'],end_at=html_fields.get('end_at'),
+                venue=html_fields.get('venue'),municipality=html_fields.get('municipality'),locality=html_fields.get('locality'),
+                price=html_fields.get('price'),description=str(page.get('text',''))[:6000],source_url=str(page['url']),
+                extraction_method='html',raw_excerpt=str(page.get('text',''))[:900],source_payload={'html_fields':html_fields,'ai_enriched':False})
+            deterministic_count += 1
         else:
             if structured_model is None:
                 model = create_model(settings.model_temperature_analytical)
@@ -158,6 +172,8 @@ def extract(state: EventImportState) -> dict[str, Any]:
             "extracted": len(events),
             "json_ld": json_ld_count,
             "llm": llm_count,
+            "deterministic": deterministic_count,
+            "ai_skipped": ai_skipped,
             "rejected": rejected,
         }
     )

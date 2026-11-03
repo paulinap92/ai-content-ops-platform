@@ -12,24 +12,28 @@ const defaults=JSON.parse(await readFile(resolve(assets,'default_copy.json'),'ut
 const config={global:{sections:{},features:{},copy:{'home.title':'Hola, somos las Islas Canarias.'}},islands:{}};
 const identity={kind:'settings',island:'global',resource:'site',record_key:'site'};
 const settings={id:'settings-fixture',identity,version:1,status:'published',draft:config,published:config,base_fingerprint:'0'.repeat(64)};
-const requests=[],writes=[];const uploaded=[];
+const requests=[],writes=[];const uploaded=[];let optionalHealthFailure=true;
 const options={islands:['el-hierro','la-palma','la-gomera','tenerife','gran-canaria','fuerteventura','lanzarote','la-graciosa'],sections:{explore:'Explore',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos',guide:'Guía'},features:{guide:['crafts','culture','history','food','geology','nature'],explore:['places','beaches','food-producers','diving-spots','routes','fauna','flora','airports','ports','ferries','titsa-stops','titsa-routes','tilp-routes'],live:['weather','air-quality','marine','tides','alerts','seismic','volcanic','webcams','live-beaches'],datos:['climate','tourism','geology','economy']},copy_defaults:{'home.title':'Hola, somos las Islas Canarias.','home.description':'Ocho islas, miles de lugares por descubrir.','island.description':'','nav.guide':'Guía',...defaults}};
 const coverageFixture={islands:options.islands,explore:{'food-producers':{total:9,islands:{'gran-canaria':3,fuerteventura:6}},'diving-spots':{total:1,islands:{'el-hierro':1}},places:{total:8,islands:{tenerife:1}}},guide:{history:{total:8,islands:Object.fromEntries(options.islands.map(i=>[i,1]))},explore:{total:48,islands:Object.fromEntries(options.islands.map(i=>[i,6]))}},calendar:[{island:'tenerife',month:'2026-11',count:3}],live:[{resource:'weather',island:'tenerife',available:true,status:'ok',updated_at:'2026-11-03T06:00:00Z'}],climate:[{resource:'weather',island:'tenerife',count:24,first:'2026-11-02T06:00:00Z',last:'2026-11-03T06:00:00Z'}],statistics:[],notes:'Synthetic fixture, no hosted database.'};
 const server=createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');const path=url.pathname;
  if(path==='/health/ready'){res.setHeader('Content-Type','application/json');res.end('{"status":"ok"}');return;}
- if(path==='/health'){res.writeHead(500,{'Content-Type':'application/json'});res.end('{"detail":"optional configuration unavailable"}');return;}
+ if(path==='/health'){res.writeHead(optionalHealthFailure?500:200,{'Content-Type':'application/json'});res.end(JSON.stringify(optionalHealthFailure?{detail:'optional configuration unavailable'}:{photo_source:'drive',ai_configured:false,content_languages:['es','en','pl']}));return;}
  if(path==='/api/v1/content'){res.setHeader('Content-Type','application/json');res.end('[]');return;}
  if(path==='/' || path.startsWith('/static/')){
   const name=path==='/'?'index.html':path.slice('/static/'.length);
   if(!['index.html','styles.css','app.js','studio-extras.js'].includes(name)){res.writeHead(404);res.end();return;}
   res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);res.end(await readFile(resolve(staticAssets,name)));return;
  }
+ if(path==='/api/v1/events/sources'){res.setHeader('Content-Type','application/json');res.end('[]');return;}
+ if(path==='/api/v1/photos/folders'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify([{path:'',total_count:1},{path:'Tenerife',total_count:1},{path:'Tenerife/Explore',total_count:1},{path:'Tenerife/Explore/volcanoes',total_count:1}]));return;}
+ if(path==='/api/v1/photos' || path==='/api/v1/photos/drive-1'){res.setHeader('Content-Type','application/json');const photo={photo_id:'drive-1',current_name:'Teide.jpg',source:'drive',status:'approved',folder_path:'Tenerife/Explore/volcanoes',island:'Tenerife',site_area:'Explore',site_section:'volcanoes',alt_texts:{es:'Teide'},tags:[],web_view_link:'https://drive.google.com/file/d/fixture'};res.end(JSON.stringify(path.endsWith('drive-1')?photo:[photo]));return;}
+ if(path==='/api/v1/photos/drive-1/preview'){res.setHeader('Content-Type','image/png');res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64'));return;}
  if(path.startsWith('/site/api/')){
   res.setHeader('Content-Type','application/json');
   if(req.method!=='GET'){
    let body='';for await(const chunk of req)body+=chunk;writes.push({path,method:req.method,body:JSON.parse(body)});
-   if(path==='/site/api/media'){const value={url:'https://public.example/own.jpg',filename:writes.at(-1).body.filename,alt:'Photo',credit:'Owner'};uploaded.push(value);res.end(JSON.stringify(value));return;}
+   if(path==='/site/api/media'){const value={media_id:'upload-'+(uploaded.length+1),island:'tenerife',url:'https://public.example/own.jpg',filename:writes.at(-1).body.filename,alt:'Photo',credit:'Owner'};uploaded.push(value);res.end(JSON.stringify(value));return;}
    res.end(JSON.stringify({...settings,draft:writes.at(-1).body.payload,version:2,status:'draft'}));return;
   }
   if(path==='/site/api/media'){res.end(JSON.stringify({items:uploaded,upload_enabled:true}));return;}
@@ -63,7 +67,7 @@ const server=createServer(async(req,res)=>{
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin=`http://127.0.0.1:${server.address().port}`;
 const browser=await chromium.launch();
-const page=await browser.newPage();await page.route('https://www.canariascerca.es/**',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Public site preview fixture</title><p>Podgląd strony</p>'}));const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const page=await browser.newPage();await page.route('https://www.canariascerca.es/**',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Public site preview fixture</title><p>Podgląd strony</p>'}));await page.route('https://public.example/**',r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')}));page.on('dialog',d=>d.accept());const errors=[];page.on('pageerror',e=>errors.push(e.message));
 await mkdir('test-results/site-editor',{recursive:true});
 async function idle(){await page.waitForFunction(()=>!document.querySelector('#save-settings').disabled);}
 try{
@@ -177,11 +181,15 @@ try{
  await page.getByRole('button',{name:'Telefon',exact:true}).click();
  assert.equal(await page.locator('#website-preview-frame').evaluate(e=>e.getBoundingClientRect().width),390);
  assert.equal(await page.getByRole('button',{name:'LangGraph',exact:true}).count(),0);
- await page.goto(origin+'/site/?section=live-points&resource=weather&island=tenerife');await idle();await page.locator('#new').click();await idle();assert.equal(await page.locator('#kind').inputValue(),'live-point');assert.equal(await page.locator('[data-key="latitude"]').count(),1);
- await page.goto(origin+'/site/?view=media');await idle();await page.locator('#media-island').selectOption('tenerife');await idle();
- await page.locator('#upload').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')});
- await page.waitForFunction(()=>document.querySelector('#media-list').children.length===1 || document.querySelector('#status').classList.contains('error'));assert.equal(uploaded.length,1,await page.locator('#status').innerText());assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is encoded as JPEG before durable upload');
- await page.goto(origin+'/site/?kind=guide&island=tenerife&resource=history');await idle();await page.locator('#improve-ai').click();await page.waitForURL(origin+'/?edit=article');await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');
+ await page.goto(origin+'/site/?section=live&resource=weather&island=tenerife');await idle();assert.equal(await page.locator('#site-tree').getByRole('button',{name:'Własne punkty Live',exact:true}).count(),0);await page.getByRole('button',{name:'Dodaj punkt',exact:true}).click();await idle();assert.equal(await page.locator('#kind').inputValue(),'live-point');assert.equal(await page.locator('[data-key="latitude"]').count(),1);
+ optionalHealthFailure=false;await page.goto(origin);await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
+ await page.getByRole('button',{name:'Wydarzenia',exact:true}).click();await page.locator('#new-manual-event').click();
+ const editor=page.frameLocator('#site-editor-frame');await editor.getByRole('heading',{name:'Nowe wydarzenie',exact:true}).waitFor();assert.equal(await editor.locator('#island').inputValue(),'tenerife');assert.equal(await editor.locator('#kind').inputValue(),'calendar');
+ await page.goto(origin);await page.frameLocator('#site-editor-frame').locator('#tree-scope').selectOption('tenerife');await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Guía',exact:true}).click();await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Historia',exact:true}).click();await page.frameLocator('#site-editor-frame').locator('[data-key="description"]').waitFor();
+ await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Wybierz zdjęcie z biblioteki',exact:true}).click();await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).waitFor();assert.match(await page.locator('#photo-folder-tree').innerText(),/volcanoes/);assert.equal(await page.locator('#photo-library-frame').count(),0,'one photo library, no duplicate iframe');
+ await page.locator('#photo-upload-file').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')});await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='own.jpg');assert.equal(uploaded.length,1);assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is JPEG before durable upload');
+ await page.locator('#view-photos').screenshot({path:'test-results/site-editor/unified-photo-library.png'});await page.locator('#photo-use').click();await page.frameLocator('#site-editor-frame').locator('[data-key="image_url"]').waitFor();assert.equal(await page.frameLocator('#site-editor-frame').locator('[data-key="image_url"]').inputValue(),'https://public.example/own.jpg');
+ await page.frameLocator('#site-editor-frame').locator('#improve-ai').click();await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
  assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)),'UI test never publishes');
  console.log('EDITOR UI PASS: site tree, real text, automatic article selection, contextual switches, inheritance, draft preservation, empty state and direct links.');

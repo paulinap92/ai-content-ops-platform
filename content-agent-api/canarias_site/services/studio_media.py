@@ -72,7 +72,7 @@ async def upload(session, island, filename, encoded, alt="", credit=""):
     await session.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))"), {"key": f"studio-media:{island}:{digest}"})
     row = await session.scalar(select(StudioDocument).where(StudioDocument.kind == "media", StudioDocument.island == island, StudioDocument.record_key == digest))
     if row:
-        return row.published
+        return {**row.published,"media_id":str(row.id),"island":row.island}
     if r2_enabled():
         key=f"editor/{digest}.{ext}";url,headers,public_url=signed_upload(data,mime,key)
         async with httpx.AsyncClient(timeout=40,follow_redirects=False) as client:
@@ -87,6 +87,7 @@ async def upload(session, island, filename, encoded, alt="", credit=""):
             session.add(StudioAsset(digest=digest,mime_type=mime,data=data,created_at=datetime.now(timezone.utc)))
         public_url=os.getenv('CANARIAS_PUBLIC_API_URL','https://canarias-cerca-api.onrender.com').rstrip('/')+'/api/media/'+digest
     payload={"url":public_url,"filename":filename[:180],"mime_type":mime,"size":len(data),"alt":alt[:300],"credit":credit[:200]}
-    session.add(StudioDocument(id=uuid4(), kind="media", island=island, resource="images", record_key=digest, draft=payload, published=payload, base_fingerprint=digest, version=1, status="published", updated_at=datetime.now(timezone.utc)))
+    row=StudioDocument(id=uuid4(), kind="media", island=island, resource="images", record_key=digest, draft=payload, published=payload, base_fingerprint=digest, version=1, status="published", updated_at=datetime.now(timezone.utc))
+    session.add(row)
     await session.commit()
-    return payload
+    return {**payload,"media_id":str(row.id),"island":row.island}

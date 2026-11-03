@@ -91,7 +91,7 @@ async function apiFetch(url, options = {}) {
     let detail = `${response.status} ${response.statusText}`;
     try {
       const body = await response.json();
-      detail = body.detail || body.error || JSON.stringify(body);
+      detail = typeof body.detail==="string"?body.detail:Array.isArray(body.details)?body.details.join(" · "):body.error || JSON.stringify(body);
     } catch (_) {}
     throw new Error(detail);
   }
@@ -113,8 +113,9 @@ async function checkHealth() {
       ? health.content_languages
       : ["es", "en", "pl"];
     state.canariasPublishEnabled = Boolean(health.canarias_publish_enabled);
+    state.driveConnected=health.photo_source==="drive";
     $("create-button").disabled = !health.ai_configured;
-    $("editor-configuration").textContent = !health.ai_configured ? "Edycja strony działa. Aby uruchamiać LangGraph, dodaj klucz wybranego dostawcy AI w prywatnej konfiguracji Editora." : "";
+    $("editor-configuration").textContent = !health.ai_configured ? "AI jest niedostępne: brakuje klucza dostawcy w konfiguracji serwera. Artykuły i wydarzenia możesz dodawać ręcznie; import odczytuje jawne daty i tytuły ze źródeł." : "";
     const languageBadge = $("language-status");
     if (languageBadge) {
       languageBadge.textContent = `Content · ${state.contentLanguages.map((lang) => lang.toUpperCase()).join(" · ")}`;
@@ -543,11 +544,15 @@ async function scanPhotos() {
     toast(error.message, true);
   } finally {
     button.disabled = false;
-    button.textContent = "Scan folders";
+    button.textContent = "Odśwież katalog Drive / źródła";
   }
 }
 
+function sitePhoto(image){const id='site:'+image.media_id;const folder=[image.island,image.site_area||'Biblioteka strony',image.site_section,image.municipality,image.place].filter(Boolean).join('/');return {...image,photo_id:id,source:'site',status:'ready',current_name:image.filename,folder_path:folder,alt_texts:{es:image.alt||''},suggested_filename:image.filename,public_url:image.url};}
 async function loadPhotoLibrary() {
+  try{const data=await apiFetch('/site/api/media?island=global');state.photoAssets=(data.items||[]).map(sitePhoto);state.photoStorage=data.storage||'trwała biblioteka strony';}
+  catch(error){state.photoAssets=[];$("photo-upload-status").textContent=error.message;}
+  $("photo-storage-status").textContent=(state.driveConnected?'Google Drive: połączony.':'Google Drive: niepołączony w tym wdrożeniu. Katalog zapisanych opisów pozostaje dostępny.')+' Pliki przesłane: '+(state.photoStorage||'biblioteka strony')+'.';
   await Promise.all([loadPhotoFolders(), loadPhotos()]);
 }
 
@@ -557,6 +562,9 @@ async function loadPhotoFolders() {
     const folders = await apiFetch(`${PHOTO_API}/folders${photoQuery()}`);
     root.innerHTML = "";
 
+    const counts=new Map(folders.map(f=>[f.path,{...f}]));
+    for(const photo of (state.photoAssets||[]).filter(()=>!photoStatusFilter()||photoStatusFilter()==='ready')){for(const path of ['',...photo.folder_path.split('/').map((_,i,a)=>a.slice(0,i+1).join('/'))]){const row=counts.get(path)||{path,total_count:0};row.total_count++;counts.set(path,row);}}
+    folders.splice(0,folders.length,...[...counts.values()].sort((a,b)=>a.path.localeCompare(b.path)));
     const all = folders.find((folder) => folder.path === "") || { total_count: 0 };
     root.appendChild(folderButton("", "Wszystkie zdjęcia", all.total_count, 0));
 
@@ -591,6 +599,7 @@ async function loadPhotos() {
   const extra = state.currentPhotoFolder ? { folder: state.currentPhotoFolder } : {};
   try {
     const photos = await apiFetch(`${PHOTO_API}${photoQuery(extra)}`);
+    const term=state.currentPhotoFolder||'';photos.push(...(state.photoAssets||[]).filter(p=>(!term||p.folder_path===term||p.folder_path.startsWith(term+'/'))&&(!photoStatusFilter()||photoStatusFilter()==='ready')));
     $("photo-count").textContent = photos.length;
     $("photo-gallery-title").textContent = state.currentPhotoFolder || "Wszystkie zdjęcia";
 
@@ -608,7 +617,7 @@ async function loadPhotos() {
       const location = [photo.municipality, photo.place].filter(Boolean).join(" · ");
       const subtitle = site || location || photo.island || "brak metadata";
       button.innerHTML = `
-        <div class="photo-card-image"><img src="${PHOTO_API}/${photo.photo_id}/preview" alt="" loading="lazy" /></div>
+        <div class="photo-card-image"><img src="${photo.public_url||`${PHOTO_API}/${photo.photo_id}/preview`}" alt="" loading="lazy" /></div>
         <div class="photo-card-copy">
           <strong>${escapeHtml(photo.current_name)}</strong>
           <span>${escapeHtml(subtitle)}</span>
@@ -626,7 +635,8 @@ async function loadPhotos() {
 async function selectPhoto(photoId) {
   state.currentPhotoId = photoId;
   try {
-    const photo = await apiFetch(`${PHOTO_API}/${photoId}`);
+    const photo = photoId.startsWith("site:")?(state.photoAssets||[]).find(p=>p.photo_id===photoId):await apiFetch(`${PHOTO_API}/${photoId}`);
+    if(!photo)throw new Error("Zdjęcie nie jest już dostępne w katalogu.");
     renderPhoto(photo);
     await loadPhotos();
   } catch (error) {
@@ -635,6 +645,7 @@ async function selectPhoto(photoId) {
 }
 
 function renderPhoto(photo) {
+  state.selectedPhoto=photo;
   $("photo-preview-empty").classList.add("hidden");
   $("photo-preview-content").classList.remove("hidden");
   $("photo-editor-empty").classList.add("hidden");
@@ -642,10 +653,13 @@ function renderPhoto(photo) {
 
   $("photo-preview-title").textContent = photo.current_name;
   setStatus($("photo-status"), photo.status);
-  $("photo-image").src = `${PHOTO_API}/${photo.photo_id}/preview?ts=${Date.now()}`;
+  $("photo-image").src = photo.public_url||`${PHOTO_API}/${photo.photo_id}/preview?ts=${Date.now()}`;
+  $("photo-image").onerror=()=>{$("photo-use-status").textContent='Nie można odczytać oryginału. Jeśli jest na Drive, podłącz Google Drive w konfiguracji serwera; opis w katalogu pozostaje zachowany.';};
+  $("photo-credit").value=photo.credit||'';$("photo-use-status").textContent=photo.source==='site'?'Plik jest w bibliotece strony. Wybór przypisze go do otwartej treści.':'Oryginał pozostaje w '+(photo.source==='drive'?'Google Drive':'źródle plików')+'. Użycie na stronie utworzy publiczną kopię w bibliotece strony.';
+  $("photo-approve").hidden=photo.source==='site';$("photo-skip").hidden=photo.source==='site';
   $("photo-folder").textContent = photo.folder_path || "/";
   $("photo-current-name").textContent = photo.current_name;
-  $("photo-source").textContent = photo.source;
+  $("photo-source").textContent = photo.source==="site"?state.photoStorage:photo.source==="drive"?"Google Drive":"Źródło plików serwera";
 
   const driveLink = $("photo-drive-link");
   if (photo.web_view_link) {
@@ -710,10 +724,9 @@ async function savePhotoMetadata(event) {
   event.preventDefault();
   if (!state.currentPhotoId) return;
   try {
-    const photo = await apiFetch(`${PHOTO_API}/${state.currentPhotoId}`, {
-      method: "PATCH",
-      body: JSON.stringify(photoPayload()),
-    });
+    let photo;
+    if(state.currentPhotoId.startsWith('site:')){const v=photoPayload();const image=await apiFetch('/site/api/media/'+state.currentPhotoId.slice(5),{method:'PATCH',body:JSON.stringify({filename:v.suggested_filename,alt:v.alt_texts.es||v.alt_texts.pl||'',credit:$("photo-credit").value,site_area:v.site_area,site_section:v.site_section,municipality:v.municipality,place:v.place,category:v.category,tags:v.tags})});photo=sitePhoto(image);await loadPhotoLibrary();}
+    else photo=await apiFetch(`${PHOTO_API}/${state.currentPhotoId}`, {method:'PATCH',body:JSON.stringify(photoPayload())});
     renderPhoto(photo);
     toast("Metadata zapisane.");
     await Promise.all([loadPhotoFolders(), loadPhotos()]);
@@ -744,7 +757,7 @@ async function decidePhoto(action) {
 }
 
 function clearPhotoSelection() {
-  state.currentPhotoId = null;
+  state.currentPhotoId = null;state.selectedPhoto=null;
   $("photo-preview-empty").classList.remove("hidden");
   $("photo-preview-content").classList.add("hidden");
   $("photo-editor-empty").classList.remove("hidden");
@@ -1094,7 +1107,7 @@ async function previewSelectedEventSource() {
     toast(error.message, true);
   } finally {
     button.disabled = false;
-    button.textContent = "Run import preview";
+    button.textContent = "Pobierz propozycje wydarzeń";
   }
 }
 
@@ -1206,10 +1219,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 $("logout-editor").onclick=async()=>{await apiFetch("/auth/logout",{method:"POST"});location.replace("/login");};
 window.addEventListener("message",(event)=>{
  const frame=$("site-editor-frame");
- if(event.origin===location.origin && event.source===$("photo-library-frame").contentWindow && event.data?.type==='cc-editor-image'){
-  frame.contentWindow.postMessage({type:'cc-editor-use-image',image:event.data.image},location.origin);document.querySelector('[data-view="site"]').click();return;
- }
  if(event.origin!==location.origin || event.source!==frame.contentWindow)return;
+ if(event.data?.type==="cc-editor-open-photos"){document.querySelector('[data-view="photos"]').click();$("photo-selection-target").textContent="Wybierz zdjęcie do: "+(event.data.title||"otwartej treści");const option=[...$("photo-upload-island").options].find(o=>o.value===event.data.island);if(option)$("photo-upload-island").value=option.value;return;}
  if(event.data?.type==="cc-editor-ready"){state.siteConnected=true;$("api-status").textContent="Edytor · połączony";$("api-status").className="status-dot status-ready";return;}
  if(event.data?.type!=="cc-editor-ai")return;
  openArticleImprovement(event.data.record);
@@ -1228,3 +1239,18 @@ window.addEventListener("DOMContentLoaded",()=>{const raw=sessionStorage.getItem
 
 $("preview-desktop").onclick=()=>{$("website-preview-shell").classList.remove("phone-preview");};
 $("preview-phone").onclick=()=>{$("website-preview-shell").classList.add("phone-preview");};
+
+async function photoFilePayload(file){
+ if(file.size>20000000)throw new Error('Zdjęcie może mieć do 20 MB.');
+ const bitmap=await createImageBitmap(file),factor=Math.min(1,1920/Math.max(bitmap.width,bitmap.height)),canvas=document.createElement('canvas');canvas.width=Math.round(bitmap.width*factor);canvas.height=Math.round(bitmap.height*factor);canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
+ const data=canvas.toDataURL('image/jpeg',0.86).split(',')[1];if(data.length>7000000)throw new Error('Zmniejsz zdjęcie przed wysłaniem.');return data;
+}
+async function uploadLibraryPhoto(file,alt,credit){
+ const image=await apiFetch('/site/api/media',{method:'POST',body:JSON.stringify({island:$("photo-upload-island").value,filename:file.name.replace(/\.[^.]+$/,'.jpg'),alt,credit,data:await photoFilePayload(file)})});return image;
+}
+$("photo-upload-file").onchange=async()=>{const file=$("photo-upload-file").files[0];if(!file)return;$("photo-upload-file").disabled=true;$("photo-upload-status").textContent='Przesyłam do biblioteki strony…';try{const image=await uploadLibraryPhoto(file,$("photo-upload-alt").value,$("photo-upload-credit").value);$("photo-upload-status").textContent='Zapisano: '+image.filename+'. Plik jest w trwałej bibliotece strony, nie w Google Drive. Wybierz go, aby przypisać do treści.';state.currentPhotoFolder='';await loadPhotoLibrary();await selectPhoto('site:'+image.media_id);}catch(e){$("photo-upload-status").textContent=e.message;}finally{$("photo-upload-file").disabled=false;$("photo-upload-file").value='';}};
+$("photo-use").onclick=async()=>{const photo=state.selectedPhoto;if(!photo)return;$("photo-use").disabled=true;try{let image=photo.source==='site'?{url:photo.public_url,filename:photo.current_name,alt:photo.alt_texts?.es||'',credit:photo.credit||''}:null;if(!image){const r=await fetch(`${PHOTO_API}/${photo.photo_id}/preview`);if(!r.ok){let d=await r.json().catch(()=>({}));throw new Error(d.details?.join(' · ')||d.detail||'Nie można pobrać oryginału zdjęcia.');}const blob=await r.blob();image=await uploadLibraryPhoto(new File([blob],photo.current_name,{type:blob.type}),photo.alt_texts?.es||'',$('photo-credit').value);}
+ $('site-editor-frame').contentWindow.postMessage({type:'cc-editor-use-image',image},location.origin);document.querySelector('[data-view="site"]').click();
+ }catch(e){$('photo-use-status').textContent=e.message;}finally{$('photo-use').disabled=false;}};
+$("new-manual-event").onclick=()=>{const raw=$('event-island-filter').value||'Tenerife',island=raw.toLowerCase().replaceAll(' ','-');$('site-editor-frame').src='/site/?'+new URLSearchParams({kind:'calendar',island,resource:new Date().toISOString().slice(0,7),new:'1'});document.querySelector('[data-view="site"]').click();};
+window.addEventListener('DOMContentLoaded',()=>{for(const [slug,name]of [['tenerife','Tenerife'],['gran-canaria','Gran Canaria'],['lanzarote','Lanzarote'],['fuerteventura','Fuerteventura'],['la-palma','La Palma'],['la-gomera','La Gomera'],['el-hierro','El Hierro'],['la-graciosa','La Graciosa']])$('photo-upload-island').append(new Option(name,slug));const target=sessionStorage.getItem('cc-editor-photo-target');if(target){sessionStorage.removeItem('cc-editor-photo-target');const i=JSON.parse(target);$('site-editor-frame').src='/site/?'+new URLSearchParams({...i});$('photo-selection-target').textContent='Wybierz zdjęcie do otwartej treści.';}if(new URLSearchParams(location.search).get('library')==='photos')document.querySelector('[data-view="photos"]').click();});

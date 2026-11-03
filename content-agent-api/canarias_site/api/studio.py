@@ -133,7 +133,7 @@ async def media(session: Session, island: str):
     query=select(StudioDocument).where(StudioDocument.kind=="media")
     if island!="global":query=query.where(StudioDocument.island==island)
     rows=(await session.scalars(query.order_by(StudioDocument.updated_at.desc()).limit(200))).all()
-    return {"items": [row.published for row in rows], "upload_enabled": studio_media.enabled()}
+    return {"items": [{**row.published,"media_id":str(row.id),"island":row.island} for row in rows if row.published], "upload_enabled": studio_media.enabled(),"storage":"R2" if studio_media.r2_enabled() else "Neon PostgreSQL"}
 
 
 @router.post("/site/api/documents/{document_id}/rebase", include_in_schema=False)
@@ -150,3 +150,29 @@ async def upload(payload: Upload, session: Session):
         return await studio_media.upload(session, payload.island, payload.filename, payload.data, payload.alt, payload.credit)
     except ValueError as exc:
         translate_error(exc)
+
+
+class MediaMetadata(BaseModel):
+    model_config=ConfigDict(extra='forbid')
+    filename:str=Field(max_length=180)
+    alt:str=Field('',max_length=300)
+    credit:str=Field('',max_length=200)
+    site_area:str=Field('',max_length=100)
+    site_section:str=Field('',max_length=100)
+    municipality:str=Field('',max_length=200)
+    place:str=Field('',max_length=200)
+    category:str=Field('',max_length=100)
+    tags:list[str]=Field(default_factory=list,max_length=30)
+
+@router.patch('/site/api/media/{media_id}',include_in_schema=False)
+async def media_metadata(media_id:str,payload:MediaMetadata,session:Session):
+    from uuid import UUID
+    from datetime import datetime,timezone
+    try:key=UUID(media_id)
+    except ValueError:raise HTTPException(400,'Nieprawidłowe zdjęcie.')
+    row=await session.get(StudioDocument,key,with_for_update=True)
+    if not row or row.kind!='media':raise HTTPException(404,'Nie znaleziono zdjęcia.')
+    value={**row.published,**payload.model_dump()}
+    row.published=value;row.draft=value;row.version+=1;row.updated_at=datetime.now(timezone.utc)
+    await session.commit()
+    return {**value,'media_id':str(row.id),'island':row.island}

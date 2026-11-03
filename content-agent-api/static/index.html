@@ -117,9 +117,9 @@
     <section id="view-events" class="view">
       <div class="events-toolbar panel">
         <div>
-          <p class="eyebrow">EVENT IMPORTER · LOCAL LANGGRAPH</p>
-          <h2>Event Importer</h2>
-          <p class="muted toolbar-copy">Źródła eventów są zarządzane tutaj lokalnie i pogrupowane według wyspy. Możesz otwierać, dodawać, edytować i usuwać linki do oficjalnych agend, a potem uruchomić ten sam EventImportGraph.</p>
+          <p class="eyebrow">KALENDARZ I ŹRÓDŁA</p>
+          <h2>Wydarzenia</h2>
+          <p class="muted toolbar-copy">Dodaj wydarzenie ręcznie albo pobierz propozycje z oficjalnego źródła. Sprawdzone propozycje trafiają do szkicu kalendarza; publikację zatwierdzasz osobno. Import jawnych dat i tytułów działa bez AI.</p>
         </div>
         <div class="toolbar-actions">
           <select id="event-island-filter" aria-label="Filtr wyspy">
@@ -134,9 +134,9 @@
             <option value="blocked">Blocked</option>
             <option value="ignore">Ignore</option>
           </select>
-          <button id="add-event-source" class="secondary-button" type="button">+ Add source</button>
+          <button id="new-manual-event" class="primary-button" type="button">+ Dodaj wydarzenie ręcznie</button><button id="add-event-source" class="secondary-button" type="button">+ Add source</button>
           <button id="refresh-event-sources" class="secondary-button" type="button">Refresh</button>
-          <button id="preview-event-source" class="primary-button" type="button" disabled>Run import preview</button>
+          <button id="preview-event-source" class="primary-button" type="button" disabled>Pobierz propozycje wydarzeń</button>
         </div>
       </div>
 
@@ -284,34 +284,34 @@
       </section>
     </section>
 
-    <section id="view-photos" class="view"><iframe id="photo-library-frame" src="/site/?view=media" title="Biblioteka własnych zdjęć" style="width:100%;height:calc(100dvh - 160px);min-height:600px;border:0"></iframe></section>
-    <section id="view-photo-importer" class="view">
+    <section id="view-photos" class="view">
       <div class="photos-toolbar panel">
         <div>
-          <p class="eyebrow">PHOTO LIBRARY · V0.6</p>
-          <h2>Drive / folder browser</h2>
-          <p class="muted toolbar-copy">Przeglądaj zdjęcia dokładnie według folderów. Ta sama hierarchia może odwzorowywać strukturę Canarias Cerca.</p>
+          <p class="eyebrow">BIBLIOTEKA ZDJĘĆ</p>
+          <h2>Zdjęcia strony i katalog Google Drive</h2>
+          <p class="muted toolbar-copy">Oryginały Drive pozostają na Drive. Pliki przesłane tutaj są zapisywane w trwałej bibliotece strony. Wybranie zdjęcia do treści wymaga osobnego zapisu i publikacji wpisu.</p>
         </div>
         <div class="toolbar-actions">
           <select id="photo-status-filter" aria-label="Filtr statusu">
             <option value="">Wszystkie statusy</option>
-            <option value="new" selected>New</option>
-            <option value="review">Review</option>
+            <option value="new">Nowe</option>
+            <option value="review">Do sprawdzenia</option><option value="ready">Biblioteka strony</option>
             <option value="approved">Approved</option>
             <option value="skipped">Skipped</option>
           </select>
-          <button id="scan-photos" class="primary-button" type="button">Scan folders</button>
+          <button id="scan-photos" class="primary-button" type="button">Odśwież katalog Drive / źródła</button>
         </div>
       </div>
 
+      <div class="panel photo-upload-bar"><p id="photo-storage-status" role="status">Ładowanie źródeł…</p><p id="photo-selection-target" class="muted"></p><label>Wyspa<select id="photo-upload-island"></select></label><label>Opis zdjęcia<input id="photo-upload-alt" maxlength="300"></label><label>Autor<input id="photo-upload-credit" value="Canarias Cerca" maxlength="200"></label><label class="primary-button">Prześlij plik<input id="photo-upload-file" type="file" accept="image/jpeg,image/png,image/webp"></label><p id="photo-upload-status" role="status"></p></div>
       <div class="photo-browser-grid">
         <aside class="panel photo-folders-panel">
           <div class="panel-heading">
             <div><p class="eyebrow">STRUKTURA</p><h2>Foldery</h2></div>
           </div>
           <div class="drive-structure-hint">
-            <strong>Drive = struktura strony</strong>
-            <code>Tenerife / Explore / natural-pools / Guimar / Puertito de Guimar</code>
+            <strong>Jedna biblioteka, dwa źródła</strong>
+            <span>Foldery Google Drive oraz pliki przesłane do biblioteki strony.</span>
           </div>
           <div id="photo-folder-tree" class="photo-folder-tree">
             <p class="muted">Kliknij Scan folders.</p>
@@ -358,10 +358,10 @@
             <div id="photo-alt-fields"></div>
             <label class="field"><span>Tagi (po przecinku)</span><input id="photo-tags" placeholder="costa, puertito, paseo" /></label>
             <label class="field"><span>Proponowana nazwa</span><input id="photo-filename" /></label>
-            <div class="photo-actions">
-              <button id="photo-save" class="secondary-button" type="submit">Save metadata</button>
+            <label class="field"><span>Autor / podpis</span><input id="photo-credit" maxlength="200"></label><button id="photo-use" class="primary-button" type="button">Użyj w otwartej treści</button><p id="photo-use-status" class="muted" role="status"></p><div class="photo-actions">
+              <button id="photo-save" class="secondary-button" type="submit">Zapisz opis w katalogu</button>
               <button id="photo-skip" class="secondary-button danger-outline" type="button">Skip</button>
-              <button id="photo-approve" class="primary-button" type="button">Approve + rename</button>
+              <button id="photo-approve" class="primary-button" type="button">Zatwierdź i zmień nazwę oryginału</button>
             </div>
           </form>
         </section>

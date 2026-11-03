@@ -3,6 +3,7 @@ from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_openai import ChatOpenAI
 
 from src.core.config import settings
+from src.services.exceptions import APIException
 
 
 def create_model(temperature: float | None = None) -> BaseChatModel:
@@ -17,7 +18,7 @@ def create_model(temperature: float | None = None) -> BaseChatModel:
     match settings.model_provider.lower():
         case "openai":
             if settings.openai_api_key is None:
-                raise ValueError("Brak OPENAI_API_KEY w .env")
+                raise APIException("AI jest niedostępne: brakuje OPENAI_API_KEY w konfiguracji serwera. Ręczne dodawanie treści działa bez AI.",503,"ai_not_configured")
             return ChatOpenAI(
                 api_key=settings.openai_api_key,
                 model=settings.openai_model_name,
@@ -28,7 +29,7 @@ def create_model(temperature: float | None = None) -> BaseChatModel:
 
         case "anthropic":
             if settings.anthropic_api_key is None:
-                raise ValueError("Brak ANTHROPIC_API_KEY w .env")
+                raise APIException("AI jest niedostępne: brakuje ANTHROPIC_API_KEY w konfiguracji serwera. Ręczne dodawanie treści działa bez AI.",503,"ai_not_configured")
             return ChatAnthropic(
                 api_key=settings.anthropic_api_key,
                 model=settings.anthropic_model_name,

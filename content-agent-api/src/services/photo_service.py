@@ -253,7 +253,10 @@ class PhotoService:
 
     async def read_preview(self, photo_id: str) -> tuple[bytes, str]:
         doc = await self._get_doc(photo_id)
-        return await asyncio.to_thread(self.source.read_bytes, doc.source_file_id)
+        if doc.source!=self.source.name:
+            raise BusinessRuleException("Oryginał tego zdjęcia jest w Google Drive. Ten serwer nie jest obecnie połączony z tym źródłem. Katalog i opis pozostają zachowane.")
+        try:return await asyncio.to_thread(self.source.read_bytes, doc.source_file_id)
+        except FileNotFoundError as exc:raise BusinessRuleException("Oryginału nie ma na tym serwerze. Katalog jest zachowany; podłącz źródło plików lub prześlij zdjęcie do biblioteki strony.") from exc
 
     async def delete_photo_metadata(self, photo_id: str) -> None:
         doc = await self._get_doc(photo_id)

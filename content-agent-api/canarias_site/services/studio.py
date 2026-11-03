@@ -221,7 +221,7 @@ async def publish(session, document_id, expected_version):
         if current is None:
             from sqlalchemy import func
             count=await session.scalar(select(func.count()).select_from(StudioDocument).where(StudioDocument.kind=='live-point',StudioDocument.published.is_not(None)))
-            if count>=30:raise ValueError("Limit 30 własnych punktów Live. Edytuj istniejący punkt zamiast dodawać następny.")
+            if count>=30:raise ValueError("Limit 30 punktów dodanych przez edytor Live. Edytuj istniejący punkt zamiast dodawać następny.")
             row.record_key='custom-'+str(row.id)
         row.published={**public,'id':row.record_key,'island':island,'editorial_override':True}
     elif kind == "guide":

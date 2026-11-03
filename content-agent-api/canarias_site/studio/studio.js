@@ -33,7 +33,7 @@ function statusLabel(item) {
  return ({published:"Opublikowane", draft:"Wersja robocza", new:"Nowy szkic"})[item.status] || item.status;
 }
 function resourceLabel(key) { return resourceLabels[key] || String(key).replaceAll("-", " "); }
-const inspection=createInspector({root:document.getElementById("inspection-view"),api,label:key=>islandOrder.includes(key)?islandName(key):resourceLabel(key),onIsland:(island,section,resource)=>task(()=>navigate(section,resource,island))});
+const inspection=createInspector({root:document.getElementById("inspection-view"),api,label:key=>islandOrder.includes(key)?islandName(key):resourceLabel(key),onIsland:(island,section,resource)=>task(()=>navigate(section,resource,island)),onManagePoints:(resource,island,create)=>task(()=>manageLivePoints(resource,island,create))});
 const labels = {
   name: "Nazwa",
   title: "Tytuł",
@@ -324,8 +324,14 @@ function renderRecord() {
       ),
     );
   }
+  if(item.identity.kind!=="live-point"){const choose=node('button','Wybierz zdjęcie z biblioteki',{type:'button',class:'wide'});choose.onclick=()=>task(async()=>{
+    if(parent!==window)parent.postMessage({type:'cc-editor-open-photos',island:item.identity.island,title:item.draft.name||item.draft.title},location.origin);
+    else {if(state.dirty||!state.record.id)await save('record');sessionStorage.setItem('cc-editor-photo-target',JSON.stringify(state.record.identity));location.assign('/?library=photos');}
+  });fields.append(choose);}
   $("record-form").replaceChildren(fields, advanced);
   $("edit-actions").hidden = false;
+  $("save").textContent=item.identity.kind==="live-point"?"Zapisz i włącz punkt":"Zapisz treść roboczą";
+  $("publish").hidden=item.identity.kind==="live-point";
   $("publish").disabled = !item.id;
   $("publish").textContent=item.identity.kind==="calendar"?"Opublikuj wydarzenie":item.identity.kind==="live-point"?"Włącz punkt w jobach Live":"Opublikuj treść";
   $("improve-ai").hidden=item.identity.kind!=="guide";
@@ -709,13 +715,12 @@ function renderTree(){
  }
  add("transport",null,"Transporte");
  if(state.target.section==="transport")for(const r of ["airports","ports","ferries","titsa-stops","titsa-routes","tilp-routes"])add("transport",r,resourceLabel(r),true);
- add("live-points",null,"Własne punkty Live");
- if(state.target.section==="live-points")for(const r of ["weather","air-quality","coastal"])add("live-points",r,resourceLabel(r),true);
- add("media",null,"Zdjęcia");
+
  add("coverage",null,"Kompletność danych");
  add("database",null,"Baza danych");
 }
 async function navigate(section,resource=null,nextScope=state.scope){
+ document.querySelectorAll("[data-live-back]").forEach(e=>e.remove());
  if(!warnUnsaved()){$("tree-scope").value=state.scope;return;}
  collectSettings();
  if(section === "calendar" && resource) $("month").value = resource;
@@ -728,7 +733,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  const editable=!transport && ["guide","explore","calendar","news","live-points"].includes(section) && (resource || section==="calendar" || section==="news");
  $("scope").value=state.scope;$("tree-scope").value=state.scope;
  $("context-path").textContent=section==="database"?"Cała baza strony":section==="coverage"?"Wszystkie wyspy":state.scope==="global"?"Cała strona":islandName(state.scope);
- $("context-title").textContent=section==="home"?(state.scope==="global"?"Strona startowa":"Opis wyspy"):section==="media"?"Zdjęcia":section==="database"?"Baza danych":section==="coverage"?"Kompletność danych":[section==="transport"?"Transporte":section==="live-points"?"Własne punkty Live":state.options.sections[section],resource?resourceLabel(resource):null].filter(Boolean).join(" / ");
+ $("context-title").textContent=section==="home"?(state.scope==="global"?"Strona startowa":"Opis wyspy"):section==="media"?"Zdjęcia":section==="database"?"Baza danych":section==="coverage"?"Kompletność danych":[section==="transport"?"Transporte":section==="live-points"?"Punkty pomiarowe Live":state.options.sections[section],resource?resourceLabel(resource):null].filter(Boolean).join(" / ");
  $("context-help").textContent=section==="database"?"Przeglądaj rzeczywistą bazę PostgreSQL: tabele, kolumny i rekordy. Ten widok jest tylko do odczytu.":section==="coverage"?"Zestawienie rzeczywistych danych według katalogu i wyspy; puste źródła są pokazane wprost.":editable?"Po lewej wybierz wpis. Otwieramy pierwszy automatycznie; możesz porównać go z opublikowaną wersją poniżej formularza.":["live","datos"].includes(section)?"Tutaj zmieniasz teksty i widoczność tej części. Pomiary i wykresy są aktualizowane przez joby, a nie ręcznie.":"Edytuj teksty widoczne na stronie. Zapis roboczy zachowuje szkic; publikacja udostępnia zmiany odwiedzającym.";
  renderTree();renderSettings();
  $("island").value=state.scope==="global"?"tenerife":state.scope;
@@ -736,7 +741,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  if(section==="coverage"){view("inspection");await inspection.showCoverage();return;}
  if(section==="media"){if(state.scope!=="global")$("media-island").value=state.scope;view("media");await loadMedia();return;}
  if(section==="live"||section==="datos"||transport){view("inspection");await inspection.showData(transport?"explore":section,resource||(section==="live"?"weather":"climate"),state.scope);return;}
- if(editable && state.scope==="global" && section==="live-points"){view("inspection");$("inspection-view").append(node("h2","Własne punkty Live"),node("p","Wybierz wyspę po lewej. Dodaj punkt, zapisz szkic, a następnie włącz go w jobach. Pomiary pojawią się po udanym odświeżeniu źródła, zgodnie z harmonogramem danego źródła. Wyłączenie punktu zachowuje jego historię."));return;}
+ if(editable && state.scope==="global" && section==="live-points"){view("inspection");$("inspection-view").append(node("h2","Punkty pomiarowe Live"),node("p","Wybierz wyspę po lewej. Zapisany punkt będzie używany przy następnej aktualizacji danych. Wyłączenie zachowuje dotychczasowe pomiary."));return;}
  if(editable && state.scope==="global" && section!=="news"){view("inspection");await inspection.showCoverage(section,resource);return;}
  if(editable){
   $("kind").value=section==="live-points"?"live-point":section === "explore" && resource === "featured" ? "guide" : section;resources();
@@ -785,11 +790,13 @@ async function init() {
   $("tree-scope").replaceChildren(new Option("Cała strona","global"),...islandOrder.filter(v=>state.options.islands.includes(v)).map(v=>new Option(islandName(v),v)));
   $("tree-scope").onchange=()=>task(()=>navigate(state.target.section,state.target.resource,$("tree-scope").value));
   await loadSettings();
-  if(["database","coverage","media"].includes(requested.get("view"))) await navigate(requested.get("view"));
+  if(requested.get("view")==="media"){if(parent!==window)parent.postMessage({type:"cc-editor-open-photos"},location.origin);else location.assign("/?library=photos");return;}
+  if(["database","coverage"].includes(requested.get("view"))) await navigate(requested.get("view"));
   else if(["transport","live-points"].includes(requested.get("section"))) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(Object.hasOwn(state.options.sections,requested.get("section")) && (!requested.get("resource") || state.options.features[requested.get("section")]?.includes(requested.get("resource")) || requested.get("section")==="explore" && requested.get("resource")==="featured")) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(requested.has("kind")) {const p=params();await navigate(p.kind,p.resource,p.island);}
   else await navigate("home");
+  if(requested.get("new")==="1")await newRecord();
   parent.postMessage({type:"cc-editor-ready"},location.origin);
 }
 for (const key of ["island", "kind", "resource", "month"]) {
@@ -828,8 +835,7 @@ $("next").onclick = () =>
     state.offset += 100;
     await loadRecords();
   });
-$("new").onclick = () =>
-  task(async () => {
+async function newRecord() {
     if (!warnUnsaved()) return;
     const { kind, island, resource } = params();
     const payload =
@@ -891,8 +897,9 @@ $("new").onclick = () =>
       base_fingerprint: await digest(null),
     };
     renderRecord();
-  });
-$("save").onclick = () => task(() => save("record"));
+}
+$("new").onclick=()=>task(newRecord);
+$("save").onclick = () => task(async()=>{const point=state.record?.identity.kind==="live-point";await save("record");if(point)await publish("record");});
 $("publish").onclick = () => task(() => publish("record"));
 $("preview").onclick = () => task(() => preview("record"));
 $("history").onclick = () => task(() => showHistory("record"));
@@ -977,3 +984,12 @@ for(const [id,delta] of [["calendar-prev",-1],["calendar-next",1],["calendar-tod
 });
 
 window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==parent||event.data?.type!=='cc-editor-use-image')return;const image=event.data.image;if(!state.record){message('Najpierw wybierz artykuł, wydarzenie lub miejsce. Potem wybierz zdjęcie w bibliotece.',true);return;}state.record.draft={...recordPayload(),image_url:image.url,image_alt:image.alt||image.filename,image_credit:image.credit||''};renderRecord();state.dirty=true;view('content');message('Zdjęcie przypisano do formularza. Zapisz szkic, aby zachować wybór.');});
+
+async function manageLivePoints(resource,island,create){
+ const scope=island==='global'?'global':island,mode=['marine','tides'].includes(resource)?'coastal':resource;
+ await navigate('live-points',mode,scope);
+ if(scope==='global')return;
+ state.target={section:'live',resource};renderTree();$("context-title").textContent='Live / '+resourceLabel(resource)+' / Punkty';
+ const back=node('button','← Wróć do danych Live',{type:'button'});back.onclick=()=>task(()=>navigate('live',resource,scope));$("content-location").before(back);back.dataset.liveBack='1';
+ if(create)await newRecord();
+}

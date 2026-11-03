@@ -33,3 +33,17 @@ def test_explicit_finished_event_is_filtered() -> None:
     assert is_past_event(fields, today=date(2026, 9, 29))
     assert not is_past_event({"start_at": "2026-10-03"}, today=date(2026, 9, 29))
 
+
+
+def test_import_extracts_explicit_tenerife_event_without_ai_key(monkeypatch):
+    from src.events import nodes
+    from src.core.config import settings
+    from src.events.source_catalog import EVENT_SOURCES
+    source=next(s for s in EVENT_SOURCES if s.island.lower()=='tenerife')
+    monkeypatch.setattr(nodes,'settings',settings.model_copy(update={'openai_api_key':None,'anthropic_api_key':None}))
+    monkeypatch.setattr(nodes,'create_model',lambda *a,**k: (_ for _ in ()).throw(AssertionError('No model should be created')))
+    from dataclasses import asdict
+    result=nodes.extract({'source_id':source.source_id,'source_config':asdict(source),'cleaned_pages':[{'url':'https://official.example/event','text':'Fiesta publicada por la fuente','html_fields':{'title':'Fiesta de Tenerife','start_at':'2099-11-07T18:00:00','venue':'Santa Cruz'}},{'url':'https://official.example/no-date','text':'Sin fecha','html_fields':{'title':'No date'}}]})
+    assert len(result['events'])==1
+    assert result['events'][0]['title']=='Fiesta de Tenerife' and result['events'][0]['extraction_method']=='html'
+    assert result['stats']['llm']==0 and result['stats']['deterministic']==1
