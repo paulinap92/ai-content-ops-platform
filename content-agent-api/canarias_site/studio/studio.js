@@ -922,7 +922,7 @@ $("upload").onchange = () =>
     let file = $("upload").files[0];
     if (!file) return;
     if(file.size>20_000_000)throw new Error("Wybierz zdjęcie mniejsze niż 20 MB.");
-    const bitmap=await createImageBitmap(file);const factor=Math.min(1,1920/Math.max(bitmap.width,bitmap.height));
+    let bitmap;try{bitmap=await createImageBitmap(file);}catch{throw new Error("Nie udało się odczytać zdjęcia. Wybierz poprawny plik JPEG, PNG lub WebP.");}const factor=Math.min(1,1920/Math.max(bitmap.width,bitmap.height));
     const canvas=document.createElement('canvas');canvas.width=Math.round(bitmap.width*factor);canvas.height=Math.round(bitmap.height*factor);canvas.getContext('2d').drawImage(bitmap,0,0,canvas.width,canvas.height);bitmap.close();
     file=new File([await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.86))],file.name.replace(/\.[^.]+$/,'.jpg'),{type:'image/jpeg'});
     if (file.size > 5_000_000)
@@ -936,7 +936,7 @@ $("upload").onchange = () =>
     await api("/media", {
       method: "POST",
       body: JSON.stringify({
-        island: state.options.islands.includes($("island").value) ? $("island").value : state.options.islands[0],
+        island:$("media-island").value,
         filename: file.name,
         alt:$("media-alt").value,credit:$("media-credit").value,
         data,

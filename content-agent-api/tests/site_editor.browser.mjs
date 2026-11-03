@@ -177,8 +177,8 @@ try{
  assert.equal(await page.getByRole('button',{name:'LangGraph',exact:true}).count(),0);
  await page.goto(origin+'/site/?section=live-points&resource=weather&island=tenerife');await idle();await page.locator('#new').click();await idle();assert.equal(await page.locator('#kind').inputValue(),'live-point');assert.equal(await page.locator('[data-key="latitude"]').count(),1);
  await page.goto(origin+'/site/?view=media');await idle();await page.locator('#media-island').selectOption('tenerife');await idle();
- await page.locator('#upload').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a4mQAAAAASUVORK5CYII=','base64')});
- await page.waitForFunction(()=>document.querySelector('#media-list').children.length===1);assert.equal(uploaded.length,1);assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is encoded as JPEG before durable upload');
+ await page.locator('#upload').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')});
+ await page.waitForFunction(()=>document.querySelector('#media-list').children.length===1 || document.querySelector('#status').classList.contains('error'));assert.equal(uploaded.length,1,await page.locator('#status').innerText());assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is encoded as JPEG before durable upload');
  await page.goto(origin+'/site/?kind=guide&island=tenerife&resource=history');await idle();await page.locator('#improve-ai').click();await page.waitForURL(origin+'/?edit=article');await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
  assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)),'UI test never publishes');
