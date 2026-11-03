@@ -676,10 +676,10 @@ function renderTree(){
 async function navigate(section,resource=null,nextScope=state.scope){
  if(!warnUnsaved()){$("tree-scope").value=state.scope;return;}
  collectSettings();
- state.scope=nextScope;
+ state.scope=nextScope === "canarias" && section === "news" ? "global" : nextScope;
  state.target={section,resource};
  const editable=["guide","explore","calendar","news"].includes(section) && (resource || section==="calendar" || section==="news");
- if(editable && state.scope==="global")state.scope="tenerife";
+ if(editable && state.scope==="global" && section!=="news")state.scope="tenerife";
  $("scope").value=state.scope;$("tree-scope").value=state.scope;
  $("context-path").textContent=state.scope==="global"?"Cała strona":islandName(state.scope);
  $("context-title").textContent=section==="home"?(state.scope==="global"?"Strona startowa":"Opis wyspy"):section==="media"?"Zdjęcia":[state.options.sections[section],resource?resourceLabel(resource):null].filter(Boolean).join(" / ");
@@ -688,7 +688,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  $("island").value=state.scope==="global"?"tenerife":state.scope;
  if(section==="media"){view("media");await loadMedia();return;}
  if(editable){
-  $("kind").value=section;resources();$("island").value=state.scope;
+  $("kind").value=section;resources();$("island").value=section === "news" && state.scope === "global" ? "canarias" : state.scope;
   if(resource)$("resource").value=resource;
   $("calendar-month-control").hidden=section!=="calendar";
   $("month").hidden=section!=="calendar";

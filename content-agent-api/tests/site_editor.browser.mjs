@@ -98,6 +98,10 @@ try{
  assert.equal(await page.locator('#content-view').isVisible(),true,'AI article links retain selected content');
  assert.equal(await page.locator('#island').inputValue(),'el-hierro');
  assert.equal(await page.locator('#resource').inputValue(),'crafts');
+ await page.goto(origin+'/site/?kind=news&island=canarias&resource=news');
+ await page.locator('[data-key="description"]').waitFor();await idle();
+ assert.equal(await page.locator('#island').inputValue(),'canarias','regional news belongs to the whole site, not arbitrarily Tenerife');
+ assert.equal(await page.locator('#tree-scope').inputValue(),'global');
  await page.goto(origin);
  await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
  await page.frameLocator('#site-editor-frame').locator('[data-copy="home.title"] textarea').waitFor();
