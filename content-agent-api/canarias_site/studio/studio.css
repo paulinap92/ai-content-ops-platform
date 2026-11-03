@@ -378,3 +378,16 @@ input[type="checkbox"] {
 #published-record-preview img {max-width:100%;}
 @media(max-width:1050px){#workspace.editor-shell{grid-template-columns:200px minmax(0,1fr)}.editor-main{padding:18px}#content-view .columns{grid-template-columns:minmax(0,1fr)}#content-view .columns>aside{position:static;max-height:240px}.context-heading{align-items:start;flex-direction:column}}
 @media(max-width:600px){#workspace.editor-shell{grid-template-columns:minmax(0,1fr)}.site-outline{position:static;height:auto;max-height:42dvh;border-right:0;border-bottom:1px solid #d4dfd5}.site-outline nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.editor-main{padding:14px}.context-heading h1{font-size:23px}}
+
+/* Keep the article body close to the selected page, above secondary controls. */
+#status {max-width:none;}
+.editor-main:has(#content-view:not([hidden])) #context-help {display:none;}
+.editor-main:has(#content-view:not([hidden]))>.actions {gap:6px;margin:8px 0;}
+.editor-main:has(#content-view:not([hidden]))>.actions button {font-size:12px;padding:8px 10px;}
+.editor-main:has(#content-view:not([hidden])) #context-settings {margin:8px 0;}
+.editor-main:has(#content-view:not([hidden])) #context-settings>summary {padding:10px 16px;}
+#content-view>h2 {display:none;}
+#content-view .toolbar {padding:12px;margin-bottom:8px;}
+#content-location {margin:6px 0 10px;}
+#record-form label:has([data-key="description"]) {font-size:15px;}
+.parent-visibility-note {max-width:42ch;color:#76583e;font-size:12px;}

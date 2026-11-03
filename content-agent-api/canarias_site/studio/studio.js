@@ -224,7 +224,7 @@ async function loadRecords() {
     `${result.count ? state.offset + 1 : 0}–${state.offset + result.items.length} / ${result.count}`;
   $("prev").disabled = state.offset === 0;
   $("next").disabled = state.offset + 100 >= state.total;
-  message(`Wczytano wpisów: ${result.count}. Wybierz tytuł z listy, aby otworzyć pełną treść.`);
+  message(result.count?`Wczytano wpisów: ${result.count}. Wybrana treść jest otwarta do edycji.`:"Brak wpisów w wybranej części strony.");
 }
 function field(key, value, readonly = false) {
   const label = node("label", labels[key] || key);
@@ -281,6 +281,7 @@ function renderRecord() {
   const advanced = node("details");
   advanced.append(node("summary", "Dodatkowe pola i dane strukturalne"));
   const keys = new Set([
+    ...["name", "title", "short_description", "summary", "description"].filter(key => Object.hasOwn(item.draft,key)),
     ...Object.keys(item.draft),
     "image_url",
     "image_alt",
@@ -639,7 +640,9 @@ function renderContextVisibility() {
   const scope=scopeSettings(), values=scope[setting.kind] ||= {};
   const inherited=state.settings.draft.global[setting.kind]?.[setting.key] ?? true;
   const enabled=values[setting.key] ?? inherited;
-  const toggle=node("button", enabled?"Widoczna na stronie":"Ukryta na stronie",{role:"switch","aria-checked":String(enabled),class:"visibility-switch",type:"button"});
+  const parentHidden=setting.kind === "features" && (scope.sections[state.target.section] ?? state.settings.draft.global.sections[state.target.section] ?? true) === false;
+  const switchText=enabled?(parentHidden?"Podsekcja włączona, sekcja ukryta":"Widoczna na stronie"):"Ukryta na stronie";
+  const toggle=node("button", switchText,{role:"switch","aria-checked":String(enabled),class:"visibility-switch",type:"button"});
   toggle.onclick=()=>{collectSettings();values[setting.key]=!enabled;retainScope(scope);markSettingsDirty();renderContextVisibility();renderTree();};
   root.append(toggle);
   if(setting.kind === "features") {
