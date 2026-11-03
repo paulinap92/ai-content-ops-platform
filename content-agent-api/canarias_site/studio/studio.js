@@ -705,7 +705,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  const transport=section==="explore" && ["airports","ports","ferries","titsa-stops","titsa-routes","tilp-routes"].includes(resource);
  const editable=!transport && ["guide","explore","calendar","news"].includes(section) && (resource || section==="calendar" || section==="news");
  $("scope").value=state.scope;$("tree-scope").value=state.scope;
- $("context-path").textContent=state.scope==="global"?"Cała strona":islandName(state.scope);
+ $("context-path").textContent=section==="database"?"Cała baza strony":section==="coverage"?"Wszystkie wyspy":state.scope==="global"?"Cała strona":islandName(state.scope);
  $("context-title").textContent=section==="home"?(state.scope==="global"?"Strona startowa":"Opis wyspy"):section==="media"?"Zdjęcia":section==="database"?"Baza danych":section==="coverage"?"Kompletność danych":[state.options.sections[section],resource?resourceLabel(resource):null].filter(Boolean).join(" / ");
  $("context-help").textContent=section==="database"?"Przeglądaj rzeczywistą bazę PostgreSQL: tabele, kolumny i rekordy. Ten widok jest tylko do odczytu.":section==="coverage"?"Zestawienie rzeczywistych danych według katalogu i wyspy; puste źródła są pokazane wprost.":editable?"Po lewej wybierz wpis. Otwieramy pierwszy automatycznie; możesz porównać go z opublikowaną wersją poniżej formularza.":["live","datos"].includes(section)?"Tutaj zmieniasz teksty i widoczność tej części. Pomiary i wykresy są aktualizowane przez joby, a nie ręcznie.":"Edytuj teksty widoczne na stronie. Zapis roboczy zachowuje szkic; publikacja udostępnia zmiany odwiedzającym.";
  renderTree();renderSettings();
@@ -761,7 +761,7 @@ async function init() {
   $("tree-scope").onchange=()=>task(()=>navigate(state.target.section,state.target.resource,$("tree-scope").value));
   await loadSettings();
   if(["database","coverage"].includes(requested.get("view"))) await navigate(requested.get("view"));
-  else if(requested.get("section")==="explore" && requested.get("resource")==="featured") await navigate("explore","featured",requested.get("island")||"global");
+  else if(Object.hasOwn(state.options.sections,requested.get("section")) && (!requested.get("resource") || state.options.features[requested.get("section")]?.includes(requested.get("resource")) || requested.get("section")==="explore" && requested.get("resource")==="featured")) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(requested.has("kind")) {const p=params();await navigate(p.kind,p.resource,p.island);}
   else await navigate("home");
   parent.postMessage({type:"cc-editor-ready"},location.origin);

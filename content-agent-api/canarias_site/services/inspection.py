@@ -4,6 +4,8 @@ from datetime import date, datetime
 from decimal import Decimal
 from uuid import UUID
 import re
+import os
+import httpx
 
 from fastapi import HTTPException
 from sqlalchemy import text, select, func, or_, inspect
@@ -115,8 +117,29 @@ async def coverage(session):
     return clean({"islands":list(VALID_ISLANDS),"explore":explore,"guide":guide,"calendar":calendar,"live":live,"climate":climate,"statistics":statistics,"tables":await tables(session),"notes":"Liczby oznaczają rekordy w bazie, również ukryte. Zero nie jest błędem wczytywania ani potwierdzeniem kompletności źródeł."})
 
 
+async def transport_catalog(resource, island, offset, limit):
+    # These three public catalogues are still code-backed in the website API.
+    # Read that exact source; do not claim that absent SQL rows are missing data.
+    paths={'airports':'/transport/airports','ports':'/ports','ferries':'/ferries/routes'}
+    base=os.getenv('CANARIAS_API_URL','https://canarias-cerca-api.onrender.com').rstrip('/')
+    params={'island':island} if island in VALID_ISLANDS else {}
+    try:
+        async with httpx.AsyncClient(timeout=12,follow_redirects=False) as client:
+            response=await client.get(base+'/api/regions/canarias'+paths[resource],params=params)
+            response.raise_for_status();payload=response.json()
+    except (httpx.HTTPError,ValueError) as exc:
+        raise HTTPException(503,'Publiczny katalog transportu jest chwilowo niedostępny. Spróbuj ponownie.') from exc
+    rows=payload if isinstance(payload,list) else payload.get('routes',payload.get('features',[]))
+    rows=[{**r.get('properties',{}),'geometry':r.get('geometry')} if r.get('type')=='Feature' else r for r in rows]
+    return {'table':'Katalog publicznego API · '+resource,'columns':[], 'rows':clean(rows[offset:offset+limit]),'count':len(rows),'offset':offset,'limit':limit,'readonly':True,'reason':'Źródło: katalog transportu aplikacji. Te wpisy nie są obecnie przechowywane w tabelach SQL; podgląd pokazuje to samo źródło co strona.'}
+
+
 async def data_rows(session, section, resource, island, offset=0, limit=25, metric=None):
     if island not in (*VALID_ISLANDS,'global','canarias'):raise HTTPException(400,'Nieznana wyspa.')
+    if section=='explore' and resource in {'airports','ports','ferries'}:
+        return await transport_catalog(resource,island,offset,limit)
+    if section=='explore' and (resource.startswith('titsa-') and island not in {'tenerife','global','canarias'} or resource=='tilp-routes' and island not in {'la-palma','global','canarias'}):
+        return {'table':'TITSA · Tenerife' if resource.startswith('titsa-') else 'TILP · La Palma','rows':[],'columns':[],'count':0,'readonly':True,'reason':'Ten przewoźnik obsługuje inną wyspę. Wybierz Tenerife (TITSA) lub La Palma (TILP), albo Cały archipelag.'}
     ids=await island_ids(session);island_id=ids.get(island);filters={}
     if section=='live':
         if resource=='air-quality':table='climate_observations';filters['resource']='air-quality'
@@ -130,10 +153,8 @@ async def data_rows(session, section, resource, island, offset=0, limit=25, metr
         elif resource=='geology':table='volcanic_reports' if metric=='volcanic' else 'seismic_events'
         else:table='statistical_snapshots'
     elif section=='explore':
-        table={'titsa-stops':'cc_titsa_stops','titsa-routes':'cc_titsa_routes','tilp-routes':'cc_tilp_snapshot','airports':'places','ports':'places','ferries':'routes'}.get(resource)
+        table={'titsa-stops':'cc_titsa_stops','titsa-routes':'cc_titsa_routes','tilp-routes':'cc_tilp_snapshot'}.get(resource)
         if not table:raise HTTPException(404,'Brak źródła odczytu.')
-        if resource in {'airports','ports'}:filters['place_kind']='airport' if resource=='airports' else 'port'
-        if resource=='ferries':filters['route_kind']='ferry'
     else:raise HTTPException(404,'Nieznany obszar danych.')
     available={x['name'] for x in await tables(session)}
     if table not in available:return {"table":table,"columns":[],"rows":[],"count":0,"readonly":True,"reason":"Brak tabeli źródłowej w bazie."}

@@ -132,6 +132,11 @@ try{
  await page.locator('#site-tree').getByRole('button',{name:'Destacados',exact:true}).click();await idle();
  assert.ok(requests.some(r=>r.kind==='guide'&&r.resource==='explore'&&r.island==='el-hierro'),'Destacados must open its real editorial source');
  assert.match(await page.locator('#editor-title').innerText(),/Destacado/);
+ await page.goto(origin+'/site/?section=explore&resource=food-producers&island=tenerife');await idle();
+ await page.getByText('Brak wpisów dla Tenerife. W całej bazie: 9.',{exact:true}).waitFor();
+ assert.equal(await page.getByRole('button',{name:'Fuerteventura · 6',exact:true}).count(),1,'empty island must offer actual populated islands');
+ await page.locator('#site-tree').getByRole('button',{name:'Kompletność danych',exact:true}).click();await idle();
+ assert.match(await page.locator('#inspection-view').innerText(),/Bodegas y queserías/);
  await page.locator('#site-tree').getByRole('button',{name:'Live',exact:true}).click();await idle();
  assert.match(await page.locator('#inspection-view').innerText(),/Santa Cruz/);
  await page.locator('#site-tree').getByRole('button',{name:'Datos',exact:true}).click();await idle();
