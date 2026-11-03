@@ -623,6 +623,7 @@ async function loadPhotos() {
           <span>${escapeHtml(subtitle)}</span>
           <small>${escapeHtml(photo.status)}</small>
         </div>`;
+      const thumbnail=button.querySelector('img');thumbnail.onerror=()=>{thumbnail.hidden=true;const note=document.createElement('span');note.className='muted';note.textContent='Podłącz źródło, aby zobaczyć oryginał';button.querySelector('.photo-card-image').append(note);};
       button.addEventListener("click", () => selectPhoto(photo.photo_id));
       gallery.appendChild(button);
     });
@@ -653,8 +654,9 @@ function renderPhoto(photo) {
 
   $("photo-preview-title").textContent = photo.current_name;
   setStatus($("photo-status"), photo.status);
+  $("photo-image").hidden=false;
   $("photo-image").src = photo.public_url||`${PHOTO_API}/${photo.photo_id}/preview?ts=${Date.now()}`;
-  $("photo-image").onerror=()=>{$("photo-use-status").textContent='Nie można odczytać oryginału. Jeśli jest na Drive, podłącz Google Drive w konfiguracji serwera; opis w katalogu pozostaje zachowany.';};
+  $("photo-image").onerror=()=>{$("photo-image").hidden=true;$("photo-use-status").textContent='Nie można odczytać oryginału. Jeśli jest na Drive, podłącz Google Drive w konfiguracji serwera; opis w katalogu pozostaje zachowany.';};
   $("photo-credit").value=photo.credit||'';$("photo-use-status").textContent=photo.source==='site'?'Plik jest w bibliotece strony. Wybór przypisze go do otwartej treści.':'Oryginał pozostaje w '+(photo.source==='drive'?'Google Drive':'źródle plików')+'. Użycie na stronie utworzy publiczną kopię w bibliotece strony.';
   $("photo-approve").hidden=photo.source==='site';$("photo-skip").hidden=photo.source==='site';
   $("photo-folder").textContent = photo.folder_path || "/";
