@@ -26,8 +26,8 @@
       <button class="tab active" data-view="site">Strona — edycja i sekcje</button>
       <button class="tab" data-view="photos">Zdjęcia</button>
       <button class="tab" data-view="events">Wydarzenia</button>
-      <button class="tab" data-view="graph">LangGraph</button>
-      <button class="tab" data-view="database">Dane robocze</button>
+      <button class="tab" data-view="preview">Podgląd strony</button>
+      <button class="tab" data-view="database">Baza danych</button>
       <button class="tab" data-view="social">Social Media</button>
     </nav>
 
@@ -407,18 +407,12 @@
         <aside class="graph-note"><strong>Teraz:</strong><p>Bez Vision. Najpierw budujemy czytelną bibliotekę zdjęć i strukturę Drive zgodną ze strukturą strony. AI możemy dołożyć później tylko na żądanie.</p></aside>
       </section>
     </section>
-    <section id="view-database" class="view">
-      <div class="panel" style="padding:24px">
-        <div class="panel-heading"><div><p class="eyebrow">LOCAL DATA · READ ONLY</p><h2>Database Explorer</h2></div><button type="button" id="studio-db-toggle" class="secondary-button">Hide</button></div>
-        <div id="studio-db-body">
-          <p class="muted">Dane robocze AI i narzędzi. Treści publicznej strony edytujesz w widoku Strona — edycja i sekcje.</p>
-          <div class="toolbar-actions"><select id="studio-collection" aria-label="Collection"><option value="">Choose collection</option></select><button type="button" id="studio-db-refresh" class="secondary-button">Refresh</button></div>
-          <p id="studio-db-status" class="muted"></p>
-          <div style="overflow:auto"><table id="studio-db-table" style="width:100%;text-align:left"></table></div>
-          <div class="toolbar-actions"><button type="button" id="studio-db-prev" class="secondary-button">Previous</button><button type="button" id="studio-db-next" class="secondary-button">Next</button></div>
-        </div>
-      </div>
+    <section id="view-preview" class="view">
+      <div class="preview-toolbar"><strong>Opublikowana strona</strong><button id="preview-desktop" class="secondary-button" type="button">Komputer</button><button id="preview-phone" class="secondary-button" type="button">Telefon</button><a href="https://www.canariascerca.es/" target="_blank" rel="noopener">Otwórz w nowej karcie ↗</a></div>
+      <p class="muted">To działająca strona publiczna. Niezapisane i nieopublikowane poprawki oglądasz przez Podgląd zmian w edytorze.</p>
+      <div id="website-preview-shell"><iframe id="website-preview-frame" title="Podgląd opublikowanej strony Canarias Cerca"></iframe></div>
     </section>
+    <section id="view-database" class="view"><iframe id="canonical-db-frame" src="/site/?view=database" loading="lazy" title="Baza danych strony — PostgreSQL" style="display:block;width:100%;height:calc(100dvh - 160px);min-height:600px;border:0"></iframe></section>
     <section id="view-social" class="view">
       <div class="panel" style="padding:24px">
         <div class="panel-heading"><div><p class="eyebrow">FACEBOOK · INSTAGRAM</p><h2>Social Media Queue</h2></div><span class="status-pill status-neutral">Drafts only · not connected</span></div>

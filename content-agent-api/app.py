@@ -17,6 +17,7 @@ from src.api.v1.events import router as events_router
 from src.api.v1.photos import router as photos_router
 from src.api.v1.studio import router as studio_router
 from canarias_site.api.studio import router as site_editor_router
+from canarias_site.api.inspection import router as inspection_router
 from src.core.auth import router as auth_router, authentication
 from src.core.config import settings
 from src.core.persistence import create_editor_checkpointer
@@ -132,6 +133,7 @@ def create_app() -> FastAPI:
     app.include_router(photos_router)
     app.include_router(studio_router)
     app.include_router(site_editor_router)
+    app.include_router(inspection_router)
     app.mount("/static", StaticFiles(directory="static"), name="static")
 
     @app.get("/", include_in_schema=False)

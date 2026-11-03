@@ -43,3 +43,21 @@ File uploads accept JPEG, PNG and WebP up to 5 MB. They require
 `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and
 `R2_PUBLIC_BASE_URL` in the editor environment. Public image URLs can be edited
 without R2. No photo or export depends on Render's ephemeral filesystem.
+
+## Reading source data and inspecting the database
+
+- **Baza danych** shows ordinary paginated PostgreSQL tables in `design`, with
+  column metadata, search, ordering and expandable JSON cells. Every query uses
+  a read-only transaction, statement/lock timeouts and a validated table/column
+  list. It does not accept arbitrary SQL and excludes job control/credential tables.
+- **Live** and **Datos** show canonical snapshots, observations and statistics,
+  including source timestamps and honest empty states. No job or refresh is run.
+- **Kompletność danych** shows all catalogs/islands, editorial chapters, calendar
+  months, snapshot availability and history ranges. Counts include hidden records
+  and are not a claim that external source coverage is complete.
+- **Explore → Destacados** edits the same `guide/explore` articles used by the
+  public Explore endpoint. It is distinct from the `featured` flag on map places.
+- Calendar uses a month grid, dated entries and available-month navigation.
+- **Podgląd strony** embeds the published website in desktop or phone width.
+  Draft article preview and the publication diff remain separate from the live site.
+- The LangGraph engine remains part of AI generation; it is not a navigation tab.

@@ -518,3 +518,8 @@ input:focus, textarea:focus, select:focus { border-color: #596c65; box-shadow: 0
 .shell:has(#view-site.active) #editor-configuration {display:none;}
 .topbar {padding-block:12px;}
 .topbar h1 {font-size:26px;}
+
+#website-preview-shell {background:#233638;padding:12px;overflow:auto;border-radius:12px;}
+#website-preview-frame {display:block;width:100%;height:calc(100dvh - 230px);min-height:550px;border:0;background:#071a22;}
+#website-preview-shell.phone-preview #website-preview-frame {width:390px;height:844px;min-height:844px;margin:auto;border-radius:18px;}
+.preview-toolbar {display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}

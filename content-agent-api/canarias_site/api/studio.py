@@ -60,7 +60,7 @@ async def studio_page():
 
 @router.get("/site/assets/{name}", include_in_schema=False)
 async def studio_asset(name: str):
-    if name not in {"studio.js", "studio.css", "editorialText.js"}:
+    if name not in {"studio.js", "studio.css", "editorialText.js", "inspector.js"}:
         raise HTTPException(404)
     return FileResponse(ASSETS / name, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
 

@@ -31,3 +31,11 @@ def test_local_installation_also_requires_login_and_rejects_tampered_cookie():
   assert result.status_code==200 and "Secure;" not in result.headers["set-cookie"]
  assert valid_cookie(cookie_value(TOKEN),TOKEN)
  assert not valid_cookie(cookie_value(TOKEN)+"bad",TOKEN)
+
+
+def test_new_inspection_routes_require_the_existing_private_login():
+ from canarias_site.api.inspection import router as inspect_router
+ app=FastAPI();app.middleware("http")(authentication);app.include_router(inspect_router)
+ with TestClient(app,base_url="https://editor.example") as client:
+  for path in ["/site/api/database/tables","/site/api/database/tables/entities","/site/api/coverage","/site/api/data?section=live&resource=weather"]:
+   assert client.get(path).status_code==401

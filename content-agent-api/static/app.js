@@ -1164,6 +1164,7 @@ function initTabs() {
       document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
       tab.classList.add("active");
       $(`view-${tab.dataset.view}`).classList.add("active");
+      if(tab.dataset.view === "preview" && !$("website-preview-frame").getAttribute("src")) $("website-preview-frame").src="https://www.canariascerca.es/";
       if (tab.dataset.view === "photos") await loadPhotoLibrary();
       if (tab.dataset.view === "events") await loadEventSources();
       if (tab.dataset.view === "site" && !$("site-editor-frame").getAttribute("src")) $("site-editor-frame").src = "/site/";
@@ -1217,3 +1218,6 @@ window.addEventListener("message",(event)=>{
  $("content_type_hint").value="guide";
  document.querySelector('[data-view="editor"]').click();
 });
+
+$("preview-desktop").onclick=()=>{$("website-preview-shell").classList.remove("phone-preview");};
+$("preview-phone").onclick=()=>{$("website-preview-shell").classList.add("phone-preview");};
