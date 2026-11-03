@@ -231,3 +231,28 @@ async def test_chart_city_metric_dates_and_real_gaps(session):
     assert [r['value'] for r in result['rows']]==[12,20] # Jan 2 must stay absent.
     assert (await analytics.series(session,'tenerife','weather','humidity',point,date(2026,1,1),date(2026,1,3)))['rows'][0]['value'] is None
     with pytest.raises(HTTPException):await analytics.series(session,'tenerife','weather','unknown',point)
+
+
+@pytest.mark.asyncio
+async def test_passenger_chart_reports_missing_sources_without_fabricating_city_data(session):
+    from canarias_site.services.analytics import passengers
+    result=await passengers(session,'la-graciosa')
+    assert result['rows']==[] and result['reason'] and result['resolution']=='month'
+    with pytest.raises(HTTPException):await passengers(session,'tenerife',series='not-allowed')
+
+
+@pytest.mark.asyncio
+async def test_passenger_series_uses_real_months_and_keeps_more_than_100_values(session):
+    from datetime import datetime,timezone,date
+    from canarias_site.services import analytics
+    from canarias_site.models.design_db import StatisticalSnapshot
+    row=await session.scalar(select(StatisticalSnapshot).where(StatisticalSnapshot.dataset=='tourism:air-passengers',StatisticalSnapshot.target=='tenerife'))
+    payload={'source':'Synthetic test','history':[{'period':f'{2010+i//12}-{i%12+1:02d}','value':i+100} for i in range(150)],'flight_types':{'history':[{'period':'2022-01','foreign':12,'peninsular':8,'interinsular':3}]}}
+    if row:row.payload=payload
+    else:session.add(StatisticalSnapshot(id=1910000000,dataset='tourism:air-passengers',target='tenerife',payload=payload,ingested_at=datetime.now(timezone.utc)))
+    await session.flush()
+    result=await analytics.passengers(session,'tenerife')
+    assert len(result['rows'])==150 and result['rows'][-1]['value']==249
+    result=await analytics.passengers(session,'tenerife',date_from=date(2022,1,1),date_to=date(2022,3,31))
+    assert [r['value'] for r in result['rows']]==[244,245,246]
+    assert (await analytics.passengers(session,'tenerife',series='foreign'))['rows'][0]['value']==12

@@ -33,6 +33,7 @@ const server=createServer(async(req,res)=>{
    res.end(JSON.stringify({...settings,draft:writes.at(-1).body.payload,version:2,status:'draft'}));return;
   }
   if(path==='/site/api/media'){res.end(JSON.stringify({items:uploaded,upload_enabled:true}));return;}
+  if(path==='/site/api/analytics/passengers'){res.end(JSON.stringify({resource:'tourism',metric:'total',title:'Pasażerowie ogółem',unit:'osób',date_from:'2026-01-01',date_to:'2026-03-31',resolution:'month',aggregation:'Synthetic monthly fixture',points:[],metrics:{tourism:{total:['Pasażerowie ogółem','osób'],foreign:['Zagraniczne','osób']}},rows:[{time:'2026-01-01T12:00:00Z',value:100000,samples:1},{time:'2026-03-01T12:00:00Z',value:130000,samples:1}]}));return;}
   if(path==='/site/api/analytics/options'){res.end(JSON.stringify({points:[{resource:'weather',point_id:'santa-cruz',name:'Santa Cruz'}],metrics:{weather:{temperature:['Temperatura','°C']},'air-quality':{pm10:['PM10','µg/m³']},seismic:{magnitude:['Magnituda','']}}}));return;}
   if(path==='/site/api/analytics/series'){res.end(JSON.stringify({resource:'weather',metric:'temperature',title:'Temperatura',unit:'°C',date_from:'2026-11-01',date_to:'2026-11-03',resolution:'day',aggregation:'Synthetic fixture',rows:[{time:'2026-11-01T12:00:00Z',value:20,samples:2},{time:'2026-11-03T12:00:00Z',value:23,samples:2}]}));return;}
   if(path==='/site/api/current'){res.end(JSON.stringify({published:{name:'Aktualna treść',description:'Current body'},base_fingerprint:'0'.repeat(64)}));return;}
@@ -149,6 +150,7 @@ try{
  await page.locator('.chart-plot svg').waitFor();
  assert.equal(await page.getByLabel('Miasto lub punkt pomiarowy').inputValue(),'santa-cruz');
  await page.locator('#inspection-view').screenshot({path:'test-results/site-editor/climate-chart.png'});
+ await page.locator('#site-tree').getByRole('button',{name:'Turismo',exact:true}).click();await idle();await page.getByRole('img',{name:/Pasażerowie ogółem/}).waitFor();assert.equal(await page.getByLabel('Rozdzielczość wykresu').inputValue(),'month');
  await page.locator('#site-tree').getByRole('button',{name:'Baza danych',exact:true}).click();await idle();
  await page.getByLabel('Tabela bazy danych').selectOption('entities');
  await page.getByLabel('Szukaj w tabeli').fill('Tenerife');

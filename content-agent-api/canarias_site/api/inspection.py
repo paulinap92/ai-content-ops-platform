@@ -40,3 +40,8 @@ async def analytics_options(island:str='global',db=Depends(session)):
 async def analytics_series(island:str='global',resource:str='weather',metric:str='temperature',point_id:str=Query('',max_length=200),date_from:date|None=None,date_to:date|None=None,resolution:str=Query('day',pattern='^(day|hour)$'),db=Depends(session)):
     from canarias_site.services import analytics
     return await analytics.series(db,island,resource,metric,point_id,date_from,date_to,resolution)
+
+@router.get('/analytics/passengers')
+async def passenger_series(island:str='global',series:str='total',date_from:date|None=None,date_to:date|None=None,db=Depends(session)):
+    from canarias_site.services import analytics
+    return await analytics.passengers(db,island,series,date_from,date_to)

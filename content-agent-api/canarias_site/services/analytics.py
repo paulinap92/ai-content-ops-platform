@@ -16,7 +16,7 @@ async def options(db,island):
  if island in ids:where='WHERE island_entity_id=CAST(:island AS uuid)';params['island']=str(ids[island])
  rows=(await db.execute(text(f'''SELECT DISTINCT ON (resource,point_id) resource,point_id,payload->>'name' AS name,observed_at,latitude,longitude
  FROM design.climate_observations {where} ORDER BY resource,point_id,observed_at DESC'''),params)).mappings().all()
- return clean({'points':[dict(r) for r in rows],'metrics':METRICS})
+ return {'points':[clean(dict(r)) for r in rows],'metrics':METRICS}
 
 async def series(db,island,resource,metric,point_id='',date_from=None,date_to=None,resolution='day'):
  if resource not in METRICS or metric not in METRICS[resource]:raise HTTPException(400,'Nieznana seria pomiarowa.')
@@ -41,4 +41,34 @@ async def series(db,island,resource,metric,point_id='',date_from=None,date_to=No
  rows=(await db.execute(text(sql),params)).mappings().all()
  if len(rows)>10000:raise HTTPException(400,'Zbyt wiele punktów. Zawęź zakres lub wybierz miejscowość.')
  title,unit=METRICS[resource][metric]
- return clean({'resource':resource,'metric':metric,'title':title,'unit':unit,'point_id':point_id,'date_from':start,'date_to':end,'resolution':resolution,'rows':[dict(r) for r in rows],'readonly':True,'aggregation':'Zdarzenia' if resource=='seismic' else 'Średnia zapisanych pomiarów w przedziale UTC. Braki pozostają przerwami; modelowe dane nie są pomiarami stacji.'})
+ result=clean({'resource':resource,'metric':metric,'title':title,'unit':unit,'point_id':point_id,'date_from':start,'date_to':end,'resolution':resolution,'readonly':True,'aggregation':'Zdarzenia' if resource=='seismic' else 'Średnia zapisanych pomiarów w przedziale UTC. Braki pozostają przerwami; modelowe dane nie są pomiarami stacji.'})
+ result['rows']=[clean(dict(r)) for r in rows]
+ return result
+
+async def passengers(db,island,series='total',date_from=None,date_to=None):
+    import calendar,re,math
+    from sqlalchemy import select
+    from canarias_site.models.design_db import StatisticalSnapshot
+    ids=await island_ids(db)
+    if island not in {*ids,'global','canarias'}:raise HTTPException(400,'Nieznana wyspa.')
+    if date_from and date_to and date_from>date_to:raise HTTPException(400,'Data początku musi poprzedzać datę końca.')
+    choices={'total':['Pasażerowie ogółem','osób'],'foreign':['Zagraniczne','osób'],'peninsular':['Półwysep Iberyjski','osób'],'interinsular':['Między wyspami','osób']}
+    if series not in choices:raise HTTPException(400,'Nieznana seria pasażerów.')
+    row=await db.scalar(select(StatisticalSnapshot).where(StatisticalSnapshot.dataset=='tourism:air-passengers',StatisticalSnapshot.target==('canarias' if island=='global' else island)))
+    payload=row.payload if row else {};items=payload.get('history',[]) if series=='total' else payload.get('flight_types',{}).get('history',[])
+    rows=[]
+    for item in items:
+        period=str(item.get('period',''))
+        value=item.get('value' if series=='total' else series)
+        if not re.fullmatch(r'\d{4}-(0[1-9]|1[0-2])',period) or isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value):continue
+        when=date.fromisoformat(period+'-01')
+        if date_from and when<date_from.replace(day=1) or date_to and when>date_to:continue
+        rows.append({'time':period+'-01T12:00:00+00:00','value':value,'samples':1})
+    rows.sort(key=lambda r:r['time'])
+    first=date.fromisoformat(rows[0]['time'][:10]) if rows else date_from or date.today()-timedelta(days=365)
+    last=date.fromisoformat(rows[-1]['time'][:10]) if rows else date_to or date.today()
+    if len(rows)>5000:raise HTTPException(400,'Zawęź zakres danych.')
+    result=clean({'resource':'tourism','metric':series,'title':choices[series][0],'unit':'osób','date_from':first,'date_to':last.replace(day=calendar.monthrange(last.year,last.month)[1]),'resolution':'month','metrics':{'tourism':choices},'points':[],'readonly':True,'aggregation':str(payload.get('source') or 'Dane pasażerów z PostgreSQL')+'. Wartości miesięczne dla wyspy, bez podziału na miasta.','reason':'' if rows else 'Brak danych pasażerów dla wybranej wyspy, serii i dat.'})
+
+    result['rows']=[clean(r) for r in rows]
+    return result
