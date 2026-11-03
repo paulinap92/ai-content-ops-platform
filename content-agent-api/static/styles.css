@@ -513,3 +513,8 @@ input:focus, textarea:focus, select:focus { border-color: #596c65; box-shadow: 0
   .event-config-actions, .event-config-actions-right { flex-direction: column; align-items: stretch; }
 }
 
+/* The website editor is the main workspace; tools keep their own views. */
+.shell:has(#view-site.active) {max-width:none;width:100%;padding-inline:12px;}
+.shell:has(#view-site.active) #editor-configuration {display:none;}
+.topbar {padding-block:12px;}
+.topbar h1 {font-size:26px;}

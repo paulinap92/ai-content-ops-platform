@@ -263,6 +263,38 @@ dialog::backdrop {
 .muted {
   color: #5f7366;
 }
+.view-help {
+  margin: 0 0 16px;
+  color: #4e6659;
+}
+.copy-group {
+  margin: 16px 0;
+  padding: 12px 16px;
+  border: 1px solid #d4dfd5;
+  border-radius: 10px;
+}
+.copy-group summary {
+  font-weight: 700;
+  cursor: pointer;
+}
+.copy-group [data-copy] {
+  margin-top: 18px;
+}
+.published-copy {
+  display: block;
+  padding: 8px 10px;
+  background: #edf3ed;
+  white-space: pre-wrap;
+}
+.empty-state {
+  padding: 14px 0;
+  color: #5f7366;
+}
+.visibility-settings {
+  margin-top: 28px;
+  border-top: 1px solid #d4dfd5;
+  padding-top: 22px;
+}
 #history-list button,
 #settings-history-list button {
   margin: 6px;
@@ -306,3 +338,43 @@ input[type="checkbox"] {
     flex: 1;
   }
 }
+/* One workspace: site outline, contextual controls, and the selected content. */
+#workspace.editor-shell {display:grid;grid-template-columns:238px minmax(0,1fr);max-width:none;margin:0;padding:0;min-height:100dvh;}
+.site-outline {position:sticky;top:0;align-self:start;height:100dvh;overflow:auto;padding:22px 16px;background:#fff;border-right:1px solid #d4dfd5;}
+.outline-kicker {margin:0 0 8px;font-size:11px;font-weight:750;letter-spacing:.1em;color:#63766b;}
+.site-outline nav {display:flex;flex-direction:column;gap:3px;}
+.site-outline button {width:100%;text-align:left;border:0;background:transparent;padding:10px 12px;font-size:14px;}
+.site-outline button.tree-child {padding-left:26px;font-size:13px;color:#536c60;}
+.site-outline button[aria-current="page"] {background:#e3eee5;color:#153d30;font-weight:750;border-radius:8px;}
+.site-outline .tree-section {font-weight:700;}
+.site-outline>a {display:block;margin-top:20px;color:#2c614b;font-size:13px;}
+.editor-main {padding:24px 28px;min-width:0;}
+.context-heading {display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;}
+.context-heading h1 {font-size:26px;margin:0;color:#173d30;}
+#context-visibility {display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:end;}
+.visibility-switch {border-radius:999px;font-size:13px;}
+.visibility-switch[aria-checked="true"] {background:#d5ecdb;border-color:#9fc5a8;color:#1a5530;}
+.visibility-switch[aria-checked="false"] {background:#eee5df;border-color:#d5bcae;color:#775442;}
+.visibility-switch::before {content:"";display:inline-block;width:9px;height:9px;border-radius:50%;background:currentColor;margin-right:7px;}
+.inherit-reset {font-size:12px;background:transparent;border:0;text-decoration:underline;}
+#context-settings {margin:18px 0 24px;padding:0;background:#fff;border:1px solid #d4dfd5;border-radius:12px;}
+#context-settings>summary {padding:14px 20px;cursor:pointer;font-weight:700;}
+#context-settings .card {border:0;margin:0;padding-top:4px;}
+#settings-view h2 {display:none;}
+#settings-form .copy-group {padding:0;border:0;margin-top:8px;}
+#settings-form .copy-group>summary {display:none;}
+#settings-state {font-size:12px;margin:0 0 8px;}
+.editor-main>.actions {border:0;padding:0;margin:12px 0 16px;}
+#content-location {font-size:12px;}
+#content-view .columns {grid-template-columns:240px minmax(0,1fr);gap:18px;align-items:start;}
+#content-view .columns>aside {position:sticky;top:12px;max-height:75dvh;overflow:auto;padding:12px;}
+#content-view .columns>section {padding:22px;}
+#record-form .fields {grid-template-columns:minmax(0,1fr);}
+#record-form textarea[data-key="description"] {min-height:260px;resize:vertical;line-height:1.65;font-size:15px;}
+#record-form textarea[data-key="short_description"] {min-height:80px;}
+.article-preview {border-top:1px solid #d4dfd5;margin-top:22px;padding-top:16px;}
+.article-preview summary {cursor:pointer;font-weight:700;}
+#published-record-preview {padding:12px 0;line-height:1.7;overflow-wrap:anywhere;}
+#published-record-preview img {max-width:100%;}
+@media(max-width:1050px){#workspace.editor-shell{grid-template-columns:200px minmax(0,1fr)}.editor-main{padding:18px}#content-view .columns{grid-template-columns:minmax(0,1fr)}#content-view .columns>aside{position:static;max-height:240px}.context-heading{align-items:start;flex-direction:column}}
+@media(max-width:600px){#workspace.editor-shell{grid-template-columns:minmax(0,1fr)}.site-outline{position:static;height:auto;max-height:42dvh;border-right:0;border-bottom:1px solid #d4dfd5}.site-outline nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.editor-main{padding:14px}.context-heading h1{font-size:23px}}

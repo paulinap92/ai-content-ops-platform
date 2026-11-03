@@ -16,7 +16,7 @@
       <span class="status-dot status-neutral">v0.11.0</span>
       <span id="language-status" class="status-dot status-neutral">Content · ES · EN · PL</span>
       <span id="api-status" class="status-dot status-neutral">API</span>
-      <button id="logout-editor" class="secondary-button" type="button">Wyloguj</button><a class="ghost-link" href="/docs" target="_blank" rel="noreferrer">Swagger</a>
+      <button id="logout-editor" class="secondary-button" type="button">Wyloguj</button><a class="ghost-link" href="https://www.canariascerca.es/" target="_blank" rel="noreferrer">Otwórz stronę ↗</a>
     </div>
   </header>
 
@@ -32,8 +32,7 @@
     </nav>
 
     <section id="view-site" class="view active">
-      <section class="panel" style="padding:18px;margin-bottom:16px"><h2>Edycja opublikowanej strony</h2><p>Treści, widoczność sekcji, teksty strony, zdjęcia i historia zmian. Zapis roboczy nie publikuje zmian.</p><a class="ghost-link" href="/site/" target="_blank" rel="noreferrer">Otwórz panel w osobnej karcie ↗</a></section>
-      <iframe id="site-editor-frame" src="/site/" title="Content Editor — edycja strony" style="width:100%;height:85vh;border:1px solid #d6e0d4;border-radius:12px;background:#f4f6f2"></iframe>
+      <iframe id="site-editor-frame" src="/site/" title="Content Editor — edycja strony" style="display:block;width:100%;height:calc(100dvh - 160px);min-height:600px;border:0;background:#f4f6f2"></iframe>
     </section>
     <section id="view-editor" class="view">
       <div class="editor-grid">
@@ -412,7 +411,7 @@
       <div class="panel" style="padding:24px">
         <div class="panel-heading"><div><p class="eyebrow">LOCAL DATA · READ ONLY</p><h2>Database Explorer</h2></div><button type="button" id="studio-db-toggle" class="secondary-button">Hide</button></div>
         <div id="studio-db-body">
-          <p class="muted">MongoDB Content Editor. PostgreSQL Canarias Cerca nie jest podłączony. Brak edycji i zapytań SQL.</p>
+          <p class="muted">Dane robocze AI i narzędzi. Treści publicznej strony edytujesz w widoku Strona — edycja i sekcje.</p>
           <div class="toolbar-actions"><select id="studio-collection" aria-label="Collection"><option value="">Choose collection</option></select><button type="button" id="studio-db-refresh" class="secondary-button">Refresh</button></div>
           <p id="studio-db-status" class="muted"></p>
           <div style="overflow:auto"><table id="studio-db-table" style="width:100%;text-align:left"></table></div>

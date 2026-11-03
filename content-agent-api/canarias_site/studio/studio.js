@@ -9,8 +9,29 @@ const state = {
   total: 0,
   dirty: false,
   busy: false,
+  recordsLoaded: false,
+  target: {section:"home", resource:null},
   scope: "global",
 };
+const islandOrder = ["tenerife", "gran-canaria", "lanzarote", "fuerteventura", "la-palma", "la-gomera", "el-hierro", "la-graciosa"];
+const guideLabels = {history:"Historia", climate:"Clima", "historical-weather":"Tiempo histórico", geology:"Geología", nature:"Naturaleza", experiences:"Planes", food:"Comida", culture:"Cultura", music:"Música", fiestas:"Fiestas", products:"Productos", crafts:"Artesanía", heritage:"Patrimonio", stories:"Historias"};
+const guideGroups = {history:"Conoce la isla", geology:"Conoce la isla", climate:"Conoce la isla", "historical-weather":"Conoce la isla", nature:"Naturaleza", culture:"Cultura", heritage:"Cultura", music:"Cultura", fiestas:"Cultura", crafts:"Cultura", stories:"Cultura", food:"Sabores", products:"Sabores", experiences:"Experiencias"};
+const resourceLabels = {...guideLabels, places:"Lugares", beaches:"Playas", "natural-pools":"Piscinas naturales", marinas:"Puertos deportivos", "food-producers":"Bodegas y queserías", "diving-spots":"Buceo", "leisure-centers":"Ocio", "museums-visits":"Museos y visitas", "natural-spaces":"Espacios naturales", "surf-spots":"Surf", stargazing:"Mirar las estrellas", markets:"Mercados", volcanoes:"Volcanes", summits:"Cumbres", routes:"Rutas", fauna:"Fauna", flora:"Flora", news:"Noticias",weather:"Tiempo", "air-quality":"Calidad del aire",marine:"Mar",tides:"Mareas",alerts:"Avisos",seismic:"Sismos",volcanic:"Volcanes",webcams:"Webcams",tourism:"Turismo",population:"Población",economy:"Economía",housing:"Vivienda",environment:"Medio ambiente"};
+const islandDescriptions = {
+ "tenerife":"Hola, soy Tenerife. Tengo volcanes, bosques, playas y el pico más alto de España.",
+ "gran-canaria":"Hola, soy Gran Canaria. Tengo barrancos, pueblos de montaña y dunas junto al Atlántico.",
+ "lanzarote":"Hola, soy Lanzarote. Soy volcánica, árida y a veces parezco de otro planeta.",
+ "fuerteventura":"Hola, soy Fuerteventura. Tengo playas infinitas, viento y paisajes casi desérticos.",
+ "la-palma":"Hola, soy La Palma. Soy verde, abrupta y me gusta mirar las estrellas.",
+ "la-gomera":"Hola, soy La Gomera. Tengo laurisilva, barrancos profundos y pueblos tranquilos.",
+ "el-hierro":"Hola, soy El Hierro. Soy pequeña, volcánica, remota y voy a otro ritmo.",
+ "la-graciosa":"Hola, soy La Graciosa. No tengo asfalto, pero sí arena clara, mar y mucha calma."
+};
+function statusLabel(item) {
+ if(item.draft?.hidden) return "Wpis ukryty";
+ return ({published:"Opublikowane", draft:"Wersja robocza", new:"Nowy szkic"})[item.status] || item.status;
+}
+function resourceLabel(key) { return resourceLabels[key] || key.replaceAll("-", " "); }
 const labels = {
   name: "Nazwa",
   title: "Tytuł",
@@ -129,12 +150,13 @@ function warnUnsaved() {
 function resources() {
   const kind = $("kind").value;
   const selectedIsland = $("island").value;
-  const choices = kind === "news" ? ["canarias", ...state.options.islands] : state.options.islands;
+  const ordered = islandOrder.filter(v => state.options.islands.includes(v));
+  const choices = kind === "news" ? ["canarias", ...ordered] : ordered;
   $("island").replaceChildren(...choices.map((v) => new Option(islandName(v), v)));
   if (choices.includes(selectedIsland)) $("island").value = selectedIsland;
   const values =
     kind === "guide"
-      ? state.options.features.guide
+      ? Object.keys(guideLabels).filter(v => state.options.features.guide.includes(v))
       : kind === "explore"
         ? state.options.features.explore.filter(
             (x) =>
@@ -151,12 +173,16 @@ function resources() {
           ? ["news"]
           : [];
   $("resource").replaceChildren(
-    ...values.map((v) => new Option(v.replaceAll("-", " "), v)),
+    ...values.map((v) => new Option(resourceLabel(v), v)),
   );
   $("resource").hidden = kind === "calendar";
   $("month").hidden = kind !== "calendar";
 }
 async function loadRecords() {
+  const {kind,island,resource} = params();
+  const section = ({guide:"Guía", explore:"Explore", calendar:"Calendario", news:"Noticias"})[kind];
+  $("content-location").textContent = [islandName(island), section, kind === "guide" ? guideGroups[resource] : null, kind === "calendar" ? resource : resourceLabel(resource)].filter(Boolean).join(" → ");
+  message("Wczytuję treści wybranej wyspy i kategorii…");
   state.offset = state.offset || 0;
   const result = await api(
     "/records?" +
@@ -178,21 +204,27 @@ async function loadRecords() {
     b.append(
       node(
         "small",
-        `${item.status} · wersja ${item.version}${item.draft.hidden ? " · ukryte" : ""}`,
+        `${statusLabel(item)} · wersja ${item.version}${item.draft.hidden ? " · ukryte" : ""}`,
       ),
     );
     b.onclick = () => {
       if (!warnUnsaved()) return;
       state.record = item;
       renderRecord();
+      document.querySelectorAll(".record").forEach(e => e.classList.toggle("active", e === b));
     };
     $("record-list").append(b);
   }
+  const selected = result.items.find(item => item.identity.record_key === state.record?.identity.record_key) || result.items[0];
+  if(selected && !state.dirty) {state.record = selected;renderRecord();}
+  if(!selected && !state.dirty) {state.record=null;$("record-form").replaceChildren();$("edit-actions").hidden=true;$("editor-title").textContent="Brak treści w tej części strony";$("published-record-preview").replaceChildren();}
+  if (!result.items.length) $("record-list").append(node("p", "Brak wpisów dla wybranej wyspy, kategorii i wyszukiwania. Wybierz inną kategorię lub usuń tekst wyszukiwania.", {class:"empty-state"}));
+  state.recordsLoaded = true;
   $("page").textContent =
     `${result.count ? state.offset + 1 : 0}–${state.offset + result.items.length} / ${result.count}`;
   $("prev").disabled = state.offset === 0;
   $("next").disabled = state.offset + 100 >= state.total;
-  message(`Wczytano treści: ${result.count}.`);
+  message(`Wczytano wpisów: ${result.count}. Wybierz tytuł z listy, aby otworzyć pełną treść.`);
 }
 function field(key, value, readonly = false) {
   const label = node("label", labels[key] || key);
@@ -241,7 +273,10 @@ function renderRecord() {
   $("editor-title").textContent =
     item.draft.name || item.draft.title || "Nowy wpis";
   $("record-status").textContent =
-    `${item.status} · wersja ${item.version}. Zapis roboczy nie zmienia strony.`;
+    `${statusLabel(item)} · wersja ${item.version}. Zapis roboczy nie zmienia strony.`;
+  const preview = $("published-record-preview");
+  preview.replaceChildren(node("h3",item.published?.name || item.published?.title || "Jeszcze nieopublikowane"));
+  const body=node("div");body.innerHTML=renderEditorialText(item.published?.description || item.published?.summary || "");preview.append(body);
   const fields = node("div", undefined, { class: "fields" });
   const advanced = node("details");
   advanced.append(node("summary", "Dodatkowe pola i dane strukturalne"));
@@ -469,28 +504,6 @@ function scopeSettings() {
     copy: {},
   });
 }
-function toggleSelect(kind, key, title, value) {
-  const row = node("div", undefined, { class: "toggle-row" });
-  const label = node("label", title),
-    select = node("select");
-  select.append(
-    new Option(
-      state.scope === "global"
-        ? "Domyślnie widoczna"
-        : "Dziedzicz ustawienie globalne",
-      "inherit",
-    ),
-    new Option("Włączona", "true"),
-    new Option("Wyłączona", "false"),
-  );
-  select.value = value === undefined ? "inherit" : String(value);
-  select.onchange = () => {state.settingsDirty=true;};
-  select.dataset.setting = kind;
-  select.dataset.key = key;
-  label.append(select);
-  row.append(label);
-  return row;
-}
 function collectSettings() {
   if (!state.settings) return;
   const scope = scopeSettings();
@@ -522,37 +535,26 @@ async function loadSettings() {
 function renderSettings() {
   const scope = scopeSettings(),
     root = $("settings-form");
-  root.replaceChildren(node("h3", "Główne sekcje"));
-  for (const [key, title] of Object.entries(state.options.sections))
-    root.append(toggleSelect("sections", key, title, scope.sections[key]));
-  for (const [area, items] of Object.entries(state.options.features)) {
-    const detail = node("details"),
-      body = node("div");
-    detail.append(
-      node("summary", `Podsekcje: ${state.options.sections[area]}`),
-    );
-    for (const key of items)
-      body.append(
-        toggleSelect(
-          "features",
-          `${area}.${key}`,
-          key.replaceAll("-", " "),
-          scope.features[`${area}.${key}`],
-        ),
-      );
-    detail.append(body);
-    root.append(detail);
-  }
-  const texts = node("details"),
-    body = node("div");
-  texts.append(node("summary", "Teksty strony i nazwy sekcji"));
+  root.replaceChildren();
+  const groups = new Map();
+  const textGroup = key => key.startsWith("home.") || key.startsWith("island.") ? "Strona startowa i opis wyspy" : key.startsWith("nav.") ? "Menu główne" : key.startsWith("feature.") ? (state.options.sections[key.split(".")[1]] || "Pozostałe teksty") : (state.options.sections[key.split(".")[0]] || "Pozostałe teksty");
   const keys = { ...state.options.copy_defaults };
   for (const [area, items] of Object.entries(state.options.features))
     for (const key of items) {
       keys[`feature.${area}.${key}.title`] ??= key;
       keys[`feature.${area}.${key}.description`] ??= "";
     }
-  for (const [key, fallback] of Object.entries(keys)) {
+  const {section,resource}=state.target;
+  const inContext = key => section === "home" ? (state.scope === "global" ? key.startsWith("home.") : key === "island.description") : resource ? key.startsWith(`feature.${section}.${resource}.`) : key === `nav.${section}` || key.startsWith(`${section}.`);
+  for (const [key, fallback] of Object.entries(keys).filter(([key]) => inContext(key))) {
+    const groupName = textGroup(key);
+    if(!groups.has(groupName)) {
+      const detail = node("details",undefined,{class:"copy-group"});
+      detail.open = true;
+      detail.append(node("summary",groupName));
+      const body = node("div");detail.append(body);root.append(detail);groups.set(groupName,body);
+    }
+    const body = groups.get(groupName);
     const row = node("div", undefined, { "data-copy": key });
     const label = node("label", copyLabel(key, keys)),
       toggle = node("input", undefined, { type: "checkbox" });
@@ -563,17 +565,21 @@ function renderSettings() {
       placeholder: fallback,
       rows: "2",
     });
-    input.value = scope.copy[key] ?? "";
+    const effectiveDefault = key === "island.description" && state.scope !== "global" ? islandDescriptions[state.scope] || fallback : fallback;
+    input.value = scope.copy[key] ?? state.settings.draft.global.copy[key] ?? effectiveDefault;
+    const published = state.settings.published || {global:{copy:{}},islands:{}};
+    const publishedValue = (state.scope === "global" ? published.global : published.islands?.[state.scope])?.copy?.[key] ?? published.global?.copy?.[key] ?? effectiveDefault;
+    if(input.value !== publishedValue) row.append(node("small", "Obecnie na stronie: " + (publishedValue || "(pusty tekst)"), {class:"published-copy"}));
+    if(key === "island.description" && state.scope === "global") row.append(node("small", "Każda wyspa ma swój opis. Wybierz ją w polu Zakres zmiany, aby zobaczyć i edytować ten tekst.", {class:"muted"}));
     input.oninput = () => { toggle.checked = true; state.settingsDirty = true; };
     toggle.onchange = () => { state.settingsDirty = true; };
     label.append(input);
     row.append(label, check);
     body.append(row);
   }
-  texts.append(body);
-  root.append(texts);
+  renderContextVisibility();
   $("settings-state").textContent =
-    `${state.settings.status} · wersja ${state.settings.version}. Wyspa może nadpisać ustawienie globalne.`;
+    `${statusLabel(state.settings)} · wersja ${state.settings.version}. Wyspa może nadpisać ustawienie globalne.`;
 }
 function copyLabel(key, defaults) {
   const direct = {"home.title":"Nagłówek strony startowej", "home.description":"Opis strony startowej", "island.description":"Opis wyspy", "guide.title":"Nagłówek Guide", "guide.description":"Opis Guide", "datos.title":"Nagłówek Datos", "datos.description":"Opis Datos"};
@@ -597,7 +603,7 @@ async function loadMedia() {
     b.prepend(node("img", undefined, { src: image.url, alt: image.filename }));
     b.onclick = () => {
       if (!state.record) {
-        message("Najpierw wybierz wpis w Treści strony.", true);
+        message("Najpierw otwórz wpis w drzewie strony.", true);
         return;
       }
       state.record.draft = state.record ? recordPayload() : {};
@@ -611,22 +617,89 @@ async function loadMedia() {
   }
 }
 function view(name) {
-  document
-    .querySelectorAll("[data-view]")
-    .forEach((b) => b.classList.toggle("active", b.dataset.view === name));
-  for (const id of ["content", "settings", "media"])
-    $(`${id}-view`).hidden = id !== name;
+  $("content-view").hidden = name !== "content";
+  $("settings-view").hidden = name === "media";
+  $("context-settings").hidden = name === "media";
+  $("context-settings").open = name === "settings";
+  $("media-view").hidden = name !== "media";
+  $("save-settings").parentElement.hidden = name === "media";
+}
+function contextSetting() {
+  const {section,resource}=state.target;
+  return section === "home" || section === "media" ? null : {kind:resource?"features":"sections",key:resource?`${section}.${resource}`:section};
+}
+function renderContextVisibility() {
+  const root=$("context-visibility");root.replaceChildren();
+  const setting=contextSetting();if(!setting)return;
+  const scope=scopeSettings(), values=scope[setting.kind] ||= {};
+  const inherited=state.settings.draft.global[setting.kind]?.[setting.key] ?? true;
+  const enabled=values[setting.key] ?? inherited;
+  const toggle=node("button", enabled?"Widoczna na stronie":"Ukryta na stronie",{role:"switch","aria-checked":String(enabled),class:"visibility-switch",type:"button"});
+  toggle.onclick=()=>{collectSettings();values[setting.key]=!enabled;state.settingsDirty=true;renderContextVisibility();renderTree();};
+  root.append(toggle);
+  if(setting.kind === "features") {
+    const parentKey=state.target.section;
+    if((scope.sections[parentKey] ?? state.settings.draft.global.sections[parentKey] ?? true) === false) root.append(node("small",`Cała sekcja ${state.options.sections[parentKey]} jest ukryta. Włącz ją w drzewie, aby pokazać tę podsekcję.`,{class:"parent-visibility-note"}));
+  }
+  if(state.scope!=="global" && Object.hasOwn(values,setting.key)){
+    const reset=node("button","Jak na całej stronie",{class:"inherit-reset",type:"button"});
+    reset.onclick=()=>{delete values[setting.key];state.settingsDirty=true;renderContextVisibility();renderTree();};root.append(reset);
+  }
+}
+function renderTree(){
+ const root=$("site-tree");root.replaceChildren();
+ function add(section,resource,label,child=false){
+  const active=state.target.section===section && state.target.resource===(resource||null);
+  const b=node("button",label,{type:"button",class:child?"tree-child":"tree-section","aria-current":active?"page":"false"});
+  b.onclick=()=>task(()=>navigate(section,resource||null));root.append(b);
+ }
+ add("home",null,state.scope==="global"?"Strona startowa":"Opis wyspy");
+ for(const [section,label] of Object.entries(state.options.sections)){
+  add(section,null,label);
+  if(state.target.section!==section)continue;
+  const values=section==="guide"?Object.keys(guideLabels).filter(v=>state.options.features.guide.includes(v)):state.options.features[section]||[];
+  for(const resource of values){
+   if(section==="explore" && ["airports","ports","ferries","titsa-stops","titsa-routes","tilp-routes"].includes(resource)) continue;
+   add(section,resource,resourceLabel(resource),true);
+  }
+ }
+ add("media",null,"Zdjęcia");
+}
+async function navigate(section,resource=null,nextScope=state.scope){
+ if(!warnUnsaved()){$("tree-scope").value=state.scope;return;}
+ collectSettings();
+ state.scope=nextScope;
+ state.target={section,resource};
+ const editable=["guide","explore","calendar","news"].includes(section) && (resource || section==="calendar" || section==="news");
+ if(editable && state.scope==="global")state.scope="tenerife";
+ $("scope").value=state.scope;$("tree-scope").value=state.scope;
+ $("context-path").textContent=state.scope==="global"?"Cała strona":islandName(state.scope);
+ $("context-title").textContent=section==="home"?(state.scope==="global"?"Strona startowa":"Opis wyspy"):section==="media"?"Zdjęcia":[state.options.sections[section],resource?resourceLabel(resource):null].filter(Boolean).join(" / ");
+ $("context-help").textContent=editable?"Po lewej wybierz wpis. Otwieramy pierwszy automatycznie; możesz porównać go z opublikowaną wersją poniżej formularza.":["live","datos"].includes(section)?"Tutaj zmieniasz teksty i widoczność tej części. Pomiary i wykresy są aktualizowane przez joby, a nie ręcznie.":"Edytuj teksty widoczne na stronie. Zapis roboczy zachowuje szkic; publikacja udostępnia zmiany odwiedzającym.";
+ renderTree();renderSettings();
+ $("island").value=state.scope==="global"?"tenerife":state.scope;
+ if(section==="media"){view("media");await loadMedia();return;}
+ if(editable){
+  $("kind").value=section;resources();$("island").value=state.scope;
+  if(resource)$("resource").value=resource;
+  $("calendar-month-control").hidden=section!=="calendar";
+  $("month").hidden=section!=="calendar";
+  $("resource-label").hidden=true;
+  if(section==="calendar")$("calendar-month-control").append($("month"));
+  state.offset=0;state.record=null;state.dirty=false;$("search").value="";
+  view("content");await loadRecords();
+ }else {view("settings");message("Wczytano wybraną część strony. Zmiany czekają na zapis i publikację.");}
 }
 async function init() {
   state.options = await api("/options");
   $("workspace").hidden = false;
   $("logout").hidden = false;
   $("island").replaceChildren(
-    ...state.options.islands.map((v) => new Option(islandName(v), v)),
+    ...islandOrder.filter(v => state.options.islands.includes(v)).map((v) => new Option(islandName(v), v)),
   );
   $("scope").replaceChildren(
     new Option("Cała strona", "global"),
-    ...state.options.islands.map((v) => new Option(islandName(v), v)),
+    ...islandOrder.filter(v => state.options.islands.includes(v)).map((v) => new Option(islandName(v), v)),
   );
   const requested = new URLSearchParams(location.search);
   if (["guide", "explore", "calendar", "news"].includes(requested.get("kind")))
@@ -636,6 +709,7 @@ async function init() {
   )
     ? requested.get("resource")
     : new Date().toISOString().slice(0, 7);
+  $("island").value = "tenerife";
   resources();
   if ([...$("island").options].some((v) => v.value === requested.get("island")))
     $("island").value = requested.get("island");
@@ -645,7 +719,12 @@ async function init() {
     )
   )
     $("resource").value = requested.get("resource");
-  await loadRecords();
+  $("tree-scope").replaceChildren(new Option("Cała strona","global"),...islandOrder.filter(v=>state.options.islands.includes(v)).map(v=>new Option(islandName(v),v)));
+  $("tree-scope").onchange=()=>task(()=>navigate(state.target.section,state.target.resource,$("tree-scope").value));
+  await loadSettings();
+  if(requested.has("kind")) {const p=params();await navigate(p.kind,p.resource,p.island);}
+  else await navigate("home");
+  parent.postMessage({type:"cc-editor-ready"},location.origin);
 }
 for (const key of ["island", "kind", "resource", "month"]) {
   $(key).onchange = () =>
@@ -763,6 +842,7 @@ document.querySelectorAll("[data-view]").forEach(
       task(async () => {
         if (b.dataset.view === "settings" && !state.settings)
           await loadSettings();
+        if (b.dataset.view === "content" && !state.recordsLoaded) await loadRecords();
         if (b.dataset.view === "media") await loadMedia();
         view(b.dataset.view);
       })),

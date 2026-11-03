@@ -11,11 +11,16 @@ Local Docker binds only to loopback and still requires login.
 
 ## Workflows
 
-- Choose an island and open a Guide article, Explore item, calendar event or news.
-- Save a private draft, inspect changes, then explicitly publish.
-- Restore a historical version into a draft before publishing it again.
-- In section settings, choose global or island scope, set a section/subsection to
-  Disabled, save the draft and publish settings. The content stays in SQL.
+- Start with the actual welcome text; use the left-hand site tree to choose an
+  island, section or subsection using the same names as the public website.
+- The selected part shows its text controls and one visibility switch together.
+  Island-specific overrides have an explicit reset to the global setting.
+- Guide/Explore entries open automatically when a category is selected. The
+  published article is shown below the editing form for comparison.
+- Save section text/visibility and article drafts explicitly. Publish remains a
+  separate, version-checked action; browsing does not publish or overwrite data.
+- For Live/Datos, edit explanatory copy and visibility. Measurements remain
+  managed by the website's source jobs.
 - Select an existing Guide article and choose **Popraw artykuł z AI**. Its content
   opens in the existing LangGraph workflow. Review the outline, approve generation
   and send the result to a private article draft. Publication remains separate.

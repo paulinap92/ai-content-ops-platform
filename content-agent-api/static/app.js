@@ -102,8 +102,12 @@ async function apiFetch(url, options = {}) {
 async function checkHealth() {
   const badge = $("api-status");
   try {
-    const health = await apiFetch("/health");
-    badge.textContent = `API · ${health.status}`;
+    await apiFetch("/health/ready");
+    badge.textContent = "Edytor · połączony";
+    badge.className = "status-dot status-ready";
+    let health;
+    try {health=await apiFetch("/health");} catch (_) {return;}
+    badge.textContent = "Edytor · połączony";
     badge.className = "status-dot status-ready";
     state.contentLanguages = Array.isArray(health.content_languages) && health.content_languages.length
       ? health.content_languages
@@ -119,8 +123,8 @@ async function checkHealth() {
     renderCanariasLanguageOptions();
     updatePublishAvailability();
   } catch (_) {
-    badge.textContent = "API · offline";
-    badge.className = "status-dot status-error";
+    badge.textContent = state.siteConnected ? "Edytor · połączony" : "Edytor · łączenie…";
+    badge.className = state.siteConnected ? "status-dot status-ready" : "status-dot status-neutral";
   }
 }
 
@@ -1201,7 +1205,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 $("logout-editor").onclick=async()=>{await apiFetch("/auth/logout",{method:"POST"});location.replace("/login");};
 window.addEventListener("message",(event)=>{
  const frame=$("site-editor-frame");
- if(event.origin!==location.origin || event.source!==frame.contentWindow || event.data?.type!=="cc-editor-ai")return;
+ if(event.origin!==location.origin || event.source!==frame.contentWindow)return;
+ if(event.data?.type==="cc-editor-ready"){state.siteConnected=true;$("api-status").textContent="Edytor · połączony";$("api-status").className="status-dot status-ready";return;}
+ if(event.data?.type!=="cc-editor-ai")return;
  const record=event.data.record;
  if(!record || record.identity?.kind!=="guide")return;
  state.siteTarget={identity:record.identity,version:record.version,base_fingerprint:record.base_fingerprint,payload:record.draft};
