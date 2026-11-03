@@ -71,11 +71,13 @@ try{
  assert.match(await page.locator('[data-copy="island.description"] textarea').inputValue(),/^Hola, soy El Hierro/);
  await page.locator('#tree-scope').selectOption('tenerife');await idle();
  await page.getByRole('button',{name:'Guía',exact:true}).click();await idle();
+ await page.locator('[data-copy="nav.guide"] textarea').fill('Guía editada');
  const visibility=page.getByRole('switch');await visibility.click();
  assert.equal(await visibility.getAttribute('aria-checked'),'false');
  await page.getByRole('button',{name:'Zapisz teksty i widoczność',exact:true}).click();
  await page.waitForFunction(()=>document.querySelector('#status').textContent.startsWith('Zapisano'));await idle();
  assert.equal(writes[1].body.payload.islands.tenerife.sections.guide,false);
+ assert.equal(writes[1].body.payload.islands.tenerife.copy['nav.guide'],'Guía editada','toggling visibility must preserve text entered immediately before it');
  assert.equal(Object.hasOwn(writes[1].body.payload.islands,'el-hierro'),false,'visiting an island must not add settings to the draft');
  assert.deepEqual(writes[1].body.payload.global,config.global,'island edits must preserve global text');
  await page.locator('#site-tree').getByRole('button',{name:'Historia',exact:true}).click();

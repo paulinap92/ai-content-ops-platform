@@ -643,7 +643,7 @@ function renderContextVisibility() {
   const parentHidden=setting.kind === "features" && (scope.sections[state.target.section] ?? state.settings.draft.global.sections[state.target.section] ?? true) === false;
   const switchText=enabled?(parentHidden?"Podsekcja włączona, sekcja ukryta":"Widoczna na stronie"):"Ukryta na stronie";
   const toggle=node("button", switchText,{role:"switch","aria-checked":String(enabled),class:"visibility-switch",type:"button"});
-  toggle.onclick=()=>{collectSettings();values[setting.key]=!enabled;retainScope(scope);markSettingsDirty();renderContextVisibility();renderTree();};
+  toggle.onclick=()=>{collectSettings();const current=scopeSettings();current[setting.kind][setting.key]=!enabled;retainScope(current);markSettingsDirty();renderContextVisibility();renderTree();};
   root.append(toggle);
   if(setting.kind === "features") {
     const parentKey=state.target.section;
@@ -651,7 +651,7 @@ function renderContextVisibility() {
   }
   if(state.scope!=="global" && Object.hasOwn(values,setting.key)){
     const reset=node("button","Jak na całej stronie",{class:"inherit-reset",type:"button"});
-    reset.onclick=()=>{delete values[setting.key];markSettingsDirty();renderContextVisibility();renderTree();};root.append(reset);
+    reset.onclick=()=>{collectSettings();const current=scopeSettings();delete current[setting.kind][setting.key];retainScope(current);markSettingsDirty();renderContextVisibility();renderTree();};root.append(reset);
   }
 }
 function renderTree(){
