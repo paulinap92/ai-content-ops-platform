@@ -263,10 +263,13 @@ try{
  await page.getByRole('button',{name:'Zapisz szkic',exact:true}).click();await page.getByText('Szkic zapisany. Materiał nie został opublikowany.',{exact:true}).waitFor();
  assert.equal(socialDrafts[0].caption.length,3000);assert.notEqual(socialDrafts[0].caption,socialDrafts[0].history[0].caption,'publication history preserves its original text');
  await page.locator('[data-social-preview="instagram"]').click();assert.equal(await page.locator('#social-preview-caption').innerText(),'Versión breve para Instagram.');
- await page.screenshot({path:'test-results/site-editor/social-workspace.png',fullPage:true});
+ await page.getByLabel('Treść wspólna',{exact:true}).fill('Mañana en Canarias: consulta el tiempo y prepara tu ruta.');
+ await page.locator('.social-variants summary').click();await page.getByRole('button',{name:'Zatwierdź do publikacji',exact:true}).click();await page.getByText('Post zatwierdzony. Wybierz kanał w podglądzie i przejdź do publikacji.',{exact:true}).waitFor();
+ await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'test-results/site-editor/social-workspace.png',fullPage:true});
  await page.setViewportSize({width:390,height:844});
  assert.ok(await page.locator('#view-social').evaluate(e=>e.scrollWidth<=e.clientWidth+1),'social workspace fits phone width');
- await page.locator('#view-social').screenshot({path:'test-results/site-editor/social-phone.png'});
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'social header and navigation fit phone width');
+ await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:'test-results/site-editor/social-phone.png',fullPage:true});
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
  assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)||r.path.startsWith('/api/studio/social/drafts')),'UI test never publishes');
  console.log('EDITOR UI PASS: site tree, real text, automatic article selection, contextual switches, inheritance, draft preservation, empty state and direct links.');
