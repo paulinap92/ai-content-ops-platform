@@ -15,6 +15,8 @@ const state = {
   canariasPublishEnabled: false,
   currentPackage: null,
   previewLanguage: null,
+  photoSource: null,
+  driveScanStatus: "unverified",
 };
 
 const $ = (id) => document.getElementById(id);
@@ -99,21 +101,30 @@ async function apiFetch(url, options = {}) {
   return response.json();
 }
 
-async function checkHealth() {
+let healthCheckPromise = null;
+function checkHealth() {
+  if (!healthCheckPromise) {
+    healthCheckPromise = loadEditorHealth().finally(() => { healthCheckPromise = null; renderPhotoStorageStatus(); });
+  }
+  return healthCheckPromise;
+}
+
+async function loadEditorHealth() {
   const badge = $("api-status");
-  try {
-    await apiFetch("/health/ready");
-    badge.textContent = "Edytor · połączony";
-    badge.className = "status-dot status-ready";
-    let health;
-    try {health=await apiFetch("/health");} catch (_) {return;}
-    badge.textContent = "Edytor · połączony";
-    badge.className = "status-dot status-ready";
+  // Readiness and configuration answer different questions. A temporary database
+  // readiness failure must not hide the configured photo source.
+  const [readiness, configuration] = await Promise.allSettled([
+    apiFetch("/health/ready"), apiFetch("/health"),
+  ]);
+  const ready = readiness.status === "fulfilled" || state.siteConnected;
+  badge.textContent = ready ? "Edytor · połączony" : "Edytor · łączenie…";
+  badge.className = ready ? "status-dot status-ready" : "status-dot status-neutral";
+  if (configuration.status === "fulfilled") {
+    const health = configuration.value;
+    state.photoSource = health.photo_source || null;
     state.contentLanguages = Array.isArray(health.content_languages) && health.content_languages.length
-      ? health.content_languages
-      : ["es", "en", "pl"];
+      ? health.content_languages : ["es", "en", "pl"];
     state.canariasPublishEnabled = Boolean(health.canarias_publish_enabled);
-    state.driveConnected=health.photo_source==="drive";
     $("create-button").disabled = !health.ai_configured;
     $("editor-configuration").textContent = !health.ai_configured ? "AI jest niedostępne: brakuje klucza dostawcy w konfiguracji serwera. Artykuły i wydarzenia możesz dodawać ręcznie; import odczytuje jawne daty i tytuły ze źródeł." : "";
     const languageBadge = $("language-status");
@@ -123,10 +134,32 @@ async function checkHealth() {
     }
     renderCanariasLanguageOptions();
     updatePublishAvailability();
-  } catch (_) {
-    badge.textContent = state.siteConnected ? "Edytor · połączony" : "Edytor · łączenie…";
-    badge.className = state.siteConnected ? "status-dot status-ready" : "status-dot status-neutral";
+  } else {
+    state.photoSource = null;
   }
+  renderPhotoStorageStatus();
+}
+
+function renderPhotoStorageStatus() {
+  const status = $("photo-storage-status");
+  if (!status) return;
+  let drive;
+  if (state.photoSource === "drive") {
+    drive = state.driveScanStatus === "verified"
+      ? "Google Drive: dostęp potwierdzony ostatnim skanem."
+      : state.driveScanStatus === "scanning"
+        ? "Google Drive: trwa odczyt katalogu…"
+        : state.driveScanStatus === "error"
+          ? "Google Drive: skonfigurowany, ale ostatni skan nie powiódł się."
+          : "Google Drive: skonfigurowany. Odśwież katalog, aby potwierdzić dostęp i wczytać zdjęcia.";
+  } else if (state.photoSource === "local") {
+    drive = "Google Drive: nie jest skonfigurowany w tym wdrożeniu. Katalog zapisanych opisów pozostaje dostępny.";
+  } else {
+    drive = healthCheckPromise
+      ? "Google Drive: sprawdzam konfigurację…"
+      : "Google Drive: nie udało się odczytać konfiguracji. Otwórz ponownie bibliotekę, aby spróbować jeszcze raz.";
+  }
+  status.textContent = drive + " Pliki przesłane: " + (state.photoStorage || "biblioteka strony") + ".";
 }
 
 function renderCanariasLanguageOptions() {
@@ -535,12 +568,19 @@ function photoQuery(extra = {}) {
 async function scanPhotos() {
   const button = $("scan-photos");
   button.disabled = true;
-  button.textContent = "Scanning…";
+  button.textContent = "Wczytuję katalog…";
+  state.driveScanStatus = "scanning";
+  renderPhotoStorageStatus();
   try {
     const result = await apiFetch(`${PHOTO_API}/scan`, { method: "POST" });
-    toast(`${result.source}: found ${result.found}, new ${result.created}, known ${result.existing}`);
+    state.photoSource = result.source;
+    state.driveScanStatus = result.source === "drive" ? "verified" : "unverified";
+    renderPhotoStorageStatus();
+    toast(`Katalog: ${result.found} zdjęć, nowych: ${result.created}, wcześniej zapisanych: ${result.existing}.`);
     await loadPhotoLibrary();
   } catch (error) {
+    state.driveScanStatus = "error";
+    renderPhotoStorageStatus();
     toast(error.message, true);
   } finally {
     button.disabled = false;
@@ -550,9 +590,12 @@ async function scanPhotos() {
 
 function sitePhoto(image){const id='site:'+image.media_id;const islandLabel=CANARY_ISLAND_ORDER.find(n=>n.toLowerCase().replaceAll(' ','-')===image.island)||image.island;const folder=[islandLabel,image.site_area||'Biblioteka strony',image.site_section,image.municipality,image.place].filter(Boolean).join('/');return {...image,photo_id:id,source:'site',status:'ready',current_name:image.filename,folder_path:folder,alt_texts:{es:image.alt||''},suggested_filename:image.filename,public_url:image.url};}
 async function loadPhotoLibrary() {
+  const configuration = checkHealth();
+  renderPhotoStorageStatus();
   try{const data=await apiFetch('/site/api/media?island=global');state.photoAssets=(data.items||[]).map(sitePhoto);state.photoStorage=data.storage||'trwała biblioteka strony';}
   catch(error){state.photoAssets=[];$("photo-upload-status").textContent=error.message;}
-  $("photo-storage-status").textContent=(state.driveConnected?'Google Drive: połączony.':'Google Drive: niepołączony w tym wdrożeniu. Katalog zapisanych opisów pozostaje dostępny.')+' Pliki przesłane: '+(state.photoStorage||'biblioteka strony')+'.';
+  await configuration;
+  renderPhotoStorageStatus();
   await Promise.all([loadPhotoFolders(), loadPhotos()]);
 }
 

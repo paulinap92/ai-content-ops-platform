@@ -12,13 +12,13 @@ const defaults=JSON.parse(await readFile(resolve(assets,'default_copy.json'),'ut
 const config={global:{sections:{},features:{},copy:{'home.title':'Hola, somos las Islas Canarias.'}},islands:{}};
 const identity={kind:'settings',island:'global',resource:'site',record_key:'site'};
 const settings={id:'settings-fixture',identity,version:1,status:'published',draft:config,published:config,base_fingerprint:'0'.repeat(64)};
-const requests=[],writes=[];const uploaded=[];let optionalHealthFailure=true;
+const requests=[],writes=[];const uploaded=[];let optionalHealthFailure=true;let readinessFailure=false;let healthDelay=0;let scanFailure=false;
 const options={islands:['el-hierro','la-palma','la-gomera','tenerife','gran-canaria','fuerteventura','lanzarote','la-graciosa'],sections:{explore:'Explore',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos',guide:'Guía'},features:{guide:['crafts','culture','history','food','geology','nature'],explore:['places','beaches','food-producers','diving-spots','routes','fauna','flora','airports','ports','ferries','titsa-stops','titsa-routes','tilp-routes'],live:['weather','air-quality','marine','tides','alerts','seismic','volcanic','webcams','live-beaches'],datos:['climate','tourism','geology','economy']},copy_defaults:{'home.title':'Hola, somos las Islas Canarias.','home.description':'Ocho islas, miles de lugares por descubrir.','island.description':'','nav.guide':'Guía',...defaults}};
 const coverageFixture={islands:options.islands,explore:{'food-producers':{total:9,islands:{'gran-canaria':3,fuerteventura:6}},'diving-spots':{total:1,islands:{'el-hierro':1}},places:{total:8,islands:{tenerife:1}}},guide:{history:{total:8,islands:Object.fromEntries(options.islands.map(i=>[i,1]))},explore:{total:48,islands:Object.fromEntries(options.islands.map(i=>[i,6]))}},calendar:[{island:'tenerife',month:'2026-11',count:3}],live:[{resource:'weather',island:'tenerife',available:true,status:'ok',updated_at:'2026-11-03T06:00:00Z'}],climate:[{resource:'weather',island:'tenerife',count:24,first:'2026-11-02T06:00:00Z',last:'2026-11-03T06:00:00Z'}],statistics:[],notes:'Synthetic fixture, no hosted database.'};
 const server=createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');const path=url.pathname;
- if(path==='/health/ready'){res.setHeader('Content-Type','application/json');res.end('{"status":"ok"}');return;}
- if(path==='/health'){res.writeHead(optionalHealthFailure?500:200,{'Content-Type':'application/json'});res.end(JSON.stringify(optionalHealthFailure?{detail:'optional configuration unavailable'}:{photo_source:'drive',ai_configured:false,content_languages:['es','en','pl']}));return;}
+ if(path==='/health/ready'){res.setHeader('Content-Type','application/json');res.statusCode=readinessFailure?503:200;res.end(JSON.stringify({status:readinessFailure?"not_ready":"ok"}));return;}
+ if(path==='/health'){if(healthDelay)await new Promise(r=>setTimeout(r,healthDelay));res.writeHead(optionalHealthFailure?500:200,{'Content-Type':'application/json'});res.end(JSON.stringify(optionalHealthFailure?{detail:'optional configuration unavailable'}:{photo_source:'drive',ai_configured:false,content_languages:['es','en','pl']}));return;}
  if(path==='/api/v1/content'){res.setHeader('Content-Type','application/json');res.end('[]');return;}
  if(path==='/' || path.startsWith('/static/')){
   const name=path==='/'?'index.html':path.slice('/static/'.length);
@@ -26,6 +26,7 @@ const server=createServer(async(req,res)=>{
   res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);res.end(await readFile(resolve(staticAssets,name)));return;
  }
  if(path==='/api/v1/events/sources'){res.setHeader('Content-Type','application/json');res.end('[]');return;}
+ if(path==='/api/v1/photos/scan'){res.writeHead(scanFailure?503:200,{'Content-Type':'application/json'});res.end(JSON.stringify(scanFailure?{detail:'Drive scan fixture unavailable'}:{source:'drive',found:1,created:1,existing:0}));return;}
  if(path==='/api/v1/photos/folders'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify([{path:'',total_count:1},{path:'Tenerife',total_count:1},{path:'Tenerife/Explore',total_count:1},{path:'Tenerife/Explore/volcanoes',total_count:1}]));return;}
  if(path==='/api/v1/photos' || path==='/api/v1/photos/drive-1'){res.setHeader('Content-Type','application/json');const photo={photo_id:'drive-1',current_name:'Teide.jpg',source:'drive',status:'approved',folder_path:'Tenerife/Explore/volcanoes',island:'Tenerife',site_area:'Explore',site_section:'volcanoes',alt_texts:{es:'Teide'},tags:[],web_view_link:'https://drive.google.com/file/d/fixture'};res.end(JSON.stringify(path.endsWith('drive-1')?photo:[photo]));return;}
  if(path==='/api/v1/photos/drive-1/preview'){res.setHeader('Content-Type','image/png');res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64'));return;}
@@ -190,6 +191,25 @@ try{
  await page.locator('#photo-upload-file').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')});await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='own.jpg');assert.equal(uploaded.length,1);assert.equal(await page.locator('#photo-folder-tree').getByRole('button',{name:/Tenerife/}).count(),1,'Drive and uploaded pictures share the same island folder');assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is JPEG before durable upload');
  await page.locator('#view-photos').screenshot({path:'test-results/site-editor/unified-photo-library.png'});await page.locator('#photo-use').click();await page.waitForFunction(()=>document.querySelector('#site-editor-frame').contentDocument?.querySelector('[data-key="image_url"]')?.value==='https://public.example/own.jpg');assert.equal(await page.frameLocator('#site-editor-frame').locator('[data-key="image_url"]').inputValue(),'https://public.example/own.jpg');
  await page.frameLocator('#site-editor-frame').locator('#improve-ai').click();await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');
+ // Deep links open the library before the configuration request completes.
+ healthDelay=800;readinessFailure=true;
+ await page.goto(origin+'/?library=photos');
+ await page.getByText('Google Drive: sprawdzam konfigurację…',{exact:false}).waitFor();
+ assert.doesNotMatch(await page.locator('#photo-storage-status').innerText(),/niepołączony|nie jest skonfigurowany/);
+ await page.getByText('Google Drive: skonfigurowany.',{exact:false}).waitFor();
+ assert.doesNotMatch(await page.locator('#photo-storage-status').innerText(),/dostęp potwierdzony/,'configuration alone is not an API access check');
+ await page.locator('#scan-photos').click();
+ await page.getByText('Google Drive: dostęp potwierdzony ostatnim skanem.',{exact:false}).waitFor();
+ scanFailure=true;await page.locator('#scan-photos').click();
+ await page.getByText('Google Drive: skonfigurowany, ale ostatni skan nie powiódł się.',{exact:false}).waitFor();
+ optionalHealthFailure=true;healthDelay=0;readinessFailure=false;
+ await page.goto(origin+'/?library=photos');
+ await page.getByText('Google Drive: nie udało się odczytać konfiguracji.',{exact:false}).waitFor();
+ assert.doesNotMatch(await page.locator('#photo-storage-status').innerText(),/niepołączony|nie jest skonfigurowany/,'failed configuration request is unknown, not disconnected');
+ optionalHealthFailure=false;
+ await page.getByRole('button',{name:'Podgląd strony',exact:true}).click();
+ await page.getByRole('button',{name:'Zdjęcia',exact:true}).click();
+ await page.getByText('Google Drive: skonfigurowany.',{exact:false}).waitFor();
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
  assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)),'UI test never publishes');
  console.log('EDITOR UI PASS: site tree, real text, automatic article selection, contextual switches, inheritance, draft preservation, empty state and direct links.');
