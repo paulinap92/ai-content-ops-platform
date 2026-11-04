@@ -53,7 +53,7 @@ def test_social_draft_persistence_conflict_approval_and_history():
     from app import app
     with TestClient(app, base_url="https://editor.test") as client:
         assert client.post("/auth/login", json={"token": TOKEN}).status_code == 200
-        payload = {"title": "Tiempo test", "caption": "Contenido " * 300,
+        payload = {"title": "Tiempo test", "caption": "Contenido " * 299 + "final",
                    "platforms": ["instagram", "facebook", "whatsapp"], "captions": {"instagram": "En Canarias"}}
         created = client.post("/api/studio/social/drafts", json=payload)
         assert created.status_code == 201, created.text
