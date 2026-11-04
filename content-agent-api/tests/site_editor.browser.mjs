@@ -12,6 +12,7 @@ const defaults=JSON.parse(await readFile(resolve(assets,'default_copy.json'),'ut
 const config={global:{sections:{},features:{},copy:{'home.title':'Hola, somos las Islas Canarias.'}},islands:{}};
 const identity={kind:'settings',island:'global',resource:'site',record_key:'site'};
 const settings={id:'settings-fixture',identity,version:1,status:'published',draft:config,published:config,base_fingerprint:'0'.repeat(64)};
+const socialDrafts=[];
 const requests=[],writes=[];const uploaded=[];let optionalHealthFailure=true;let readinessFailure=false;let healthDelay=0;let scanFailure=false;
 const options={islands:['el-hierro','la-palma','la-gomera','tenerife','gran-canaria','fuerteventura','lanzarote','la-graciosa'],sections:{explore:'Explore',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos',guide:'Guía'},features:{guide:['crafts','culture','history','food','geology','nature'],explore:['places','beaches','food-producers','diving-spots','routes','fauna','flora','airports','ports','ferries','titsa-stops','titsa-routes','tilp-routes'],live:['weather','air-quality','marine','tides','alerts','seismic','volcanic','webcams','live-beaches'],datos:['climate','tourism','geology','economy']},copy_defaults:{'home.title':'Hola, somos las Islas Canarias.','home.description':'Ocho islas, miles de lugares por descubrir.','island.description':'','nav.guide':'Guía',...defaults}};
 const coverageFixture={islands:options.islands,explore:{'food-producers':{total:9,islands:{'gran-canaria':3,fuerteventura:6}},'diving-spots':{total:1,islands:{'el-hierro':1}},places:{total:8,islands:{tenerife:1}}},guide:{history:{total:8,islands:Object.fromEntries(options.islands.map(i=>[i,1]))},explore:{total:48,islands:Object.fromEntries(options.islands.map(i=>[i,6]))}},calendar:[{island:'tenerife',month:'2026-11',count:3}],live:[{resource:'weather',island:'tenerife',available:true,status:'ok',updated_at:'2026-11-03T06:00:00Z'}],climate:[{resource:'weather',island:'tenerife',count:24,first:'2026-11-02T06:00:00Z',last:'2026-11-03T06:00:00Z'}],statistics:[],notes:'Synthetic fixture, no hosted database.'};
@@ -19,6 +20,20 @@ const server=createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');const path=url.pathname;
  if(path==='/health/ready'){res.setHeader('Content-Type','application/json');res.statusCode=readinessFailure?503:200;res.end(JSON.stringify({status:readinessFailure?"not_ready":"ok"}));return;}
  if(path==='/health'){if(healthDelay)await new Promise(r=>setTimeout(r,healthDelay));res.writeHead(optionalHealthFailure?500:200,{'Content-Type':'application/json'});res.end(JSON.stringify(optionalHealthFailure?{detail:'optional configuration unavailable'}:{photo_source:'drive',ai_configured:false,content_languages:['es','en','pl']}));return;}
+ if(path==='/api/studio/social/drafts' || path.startsWith('/api/studio/social/drafts/')){
+  res.setHeader('Content-Type','application/json');
+  if(req.method==='GET'){res.end(JSON.stringify({drafts:socialDrafts,publishing_connected:false}));return;}
+  let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw);writes.push({path,method:req.method,body});
+  if(req.method==='POST'&&path==='/api/studio/social/drafts'){const row={...body,id:String(socialDrafts.length+1).padStart(24,'0'),version:1,status:'draft',history:[],created_at:new Date().toISOString()};socialDrafts.unshift(row);res.statusCode=201;res.end(JSON.stringify(row));return;}
+  const row=socialDrafts.find(d=>d.id===path.split('/')[5]);
+  if(!row){res.statusCode=404;res.end('{"detail":"Nie znaleziono posta."}');return;}
+  if(body.version!==row.version){res.statusCode=409;res.end('{"detail":"Konflikt wersji"}');return;}
+  if(req.method==='PUT'){Object.assign(row,body,{status:'draft',version:row.version+1});res.end(JSON.stringify(row));return;}
+  if(body.action==='ready'&&row.platforms.includes('instagram')&&!row.image_url){res.statusCode=422;res.end('{"detail":"Instagram wymaga zdjęcia. Wybierz je z biblioteki."}');return;}
+  if(body.action==='confirm-published')row.history.push({platform:body.platform,caption:row.captions[body.platform]||row.caption,image_url:row.image_url,published_at:new Date().toISOString(),confirmation:'owner'});
+  else row.status=body.action==='archive'?'archived':body.action==='restore'?'draft':body.action;
+  row.version++;res.end(JSON.stringify(row));return;
+ }
  if(path==='/api/v1/content'){res.setHeader('Content-Type','application/json');res.end('[]');return;}
  if(path==='/' || path.startsWith('/static/')){
   const name=path==='/'?'index.html':path.slice('/static/'.length);
@@ -30,6 +45,7 @@ const server=createServer(async(req,res)=>{
  if(path==='/api/v1/photos/folders'){res.setHeader('Content-Type','application/json');res.end(JSON.stringify([{path:'',total_count:1},{path:'Tenerife',total_count:1},{path:'Tenerife/Explore',total_count:1},{path:'Tenerife/Explore/volcanoes',total_count:1}]));return;}
  if(path==='/api/v1/photos' || path==='/api/v1/photos/drive-1'){res.setHeader('Content-Type','application/json');const photo={photo_id:'drive-1',current_name:'Teide.jpg',source:'drive',status:'approved',folder_path:'Tenerife/Explore/volcanoes',island:'Tenerife',site_area:'Explore',site_section:'volcanoes',alt_texts:{es:'Teide'},tags:[],web_view_link:'https://drive.google.com/file/d/fixture'};res.end(JSON.stringify(path.endsWith('drive-1')?photo:[photo]));return;}
  if(path==='/api/v1/photos/drive-1/preview'){res.setHeader('Content-Type','image/png');res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64'));return;}
+ if(path==='/site/api/media/file'){res.setHeader('Content-Type','image/png');res.end(Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64'));return;}
  if(path.startsWith('/site/api/')){
   res.setHeader('Content-Type','application/json');
   if(req.method!=='GET'){
@@ -210,7 +226,48 @@ try{
  await page.getByRole('button',{name:'Podgląd strony',exact:true}).click();
  await page.getByRole('button',{name:'Zdjęcia',exact:true}).click();
  await page.getByText('Google Drive: skonfigurowany.',{exact:false}).waitFor();
+ // Social drafts use the same library and never claim an external publication automatically.
+ await page.goto(origin);await page.getByRole('button',{name:'Social Media',exact:true}).click();
+ await page.getByText('Brak materiałów w tym widoku.',{exact:true}).waitFor();
+ await page.getByLabel('Nazwa robocza',{exact:true}).fill('Tiempo en Canarias');
+ await page.getByLabel('Treść wspólna',{exact:true}).fill('Mañana en Canarias: consulta el tiempo y prepara tu ruta.');
+ await page.getByRole('checkbox',{name:'WhatsApp',exact:true}).check();
+ await page.getByRole('button',{name:'Zapisz szkic',exact:true}).click();
+ await page.getByText('Szkic zapisany. Materiał nie został opublikowany.',{exact:true}).waitFor();
+ assert.equal(socialDrafts.length,1);assert.equal(socialDrafts[0].platforms.length,3);
+ await page.getByRole('button',{name:'Zatwierdź do publikacji',exact:true}).click();
+ await page.getByText('Instagram wymaga zdjęcia. Wybierz je z biblioteki.',{exact:true}).waitFor();
+ assert.equal(socialDrafts[0].status,'draft');
+ await page.locator('#social-choose-photo').click();
+ await page.locator('#photo-gallery').getByRole('button',{name:/own.jpg/}).click();
+ await page.locator('#photo-use').click();
+ await page.getByText('Zdjęcie przypisane do posta. Zapisz szkic, aby zachować zmianę.',{exact:true}).waitFor();
+ assert.equal(await page.getByLabel('Treść wspólna',{exact:true}).inputValue(),'Mañana en Canarias: consulta el tiempo y prepara tu ruta.','photo selection preserves entered social text');
+ assert.equal(await page.locator('#studio-social-image').inputValue(),'https://public.example/own.jpg');
+ const downloadEvent=page.waitForEvent('download');await page.locator('#social-download').click();const downloaded=await downloadEvent;assert.equal(downloaded.suggestedFilename(),'canarias-cerca.png');await page.getByText('Zdjęcie przygotowane do pobrania.',{exact:true}).waitFor();
+ await page.getByRole('button',{name:'Zatwierdź do publikacji',exact:true}).click();
+ await page.getByText('Post zatwierdzony. Wybierz kanał w podglądzie i przejdź do publikacji.',{exact:true}).waitFor();
+ await page.locator('[data-social-preview="whatsapp"]').click();
+ const whatsapp=new URL(await page.locator('#social-open-channel').getAttribute('href'));
+ assert.equal(whatsapp.hostname,'wa.me');assert.equal(whatsapp.searchParams.get('text'),socialDrafts[0].caption);assert.equal(socialDrafts[0].history.length,0,'opening or preparing delivery does not record a publication');
+ await page.locator('#social-confirm-published').click();
+ await page.getByText('Zapisano Twoje potwierdzenie publikacji. Tekst i zdjęcie pozostają w historii.',{exact:true}).waitFor();
+ assert.equal(socialDrafts[0].history[0].platform,'whatsapp');assert.equal(socialDrafts[0].history[0].caption,socialDrafts[0].caption);assert.equal(await page.locator('#social-confirm-published').isDisabled(),true);
+ await page.getByRole('button',{name:'Archiwizuj',exact:true}).click();
+ await page.getByText('Przeniesiono do archiwum. Historia została zachowana.',{exact:true}).waitFor();
+ assert.equal(socialDrafts[0].history.length,1);assert.equal(await page.getByLabel('Treść wspólna',{exact:true}).isDisabled(),true);
+ await page.getByRole('button',{name:'Przywróć szkic',exact:true}).click();
+ await page.getByText('Przywrócono szkic.',{exact:true}).waitFor();
+ await page.getByLabel('Treść wspólna',{exact:true}).fill('A'.repeat(3000));
+ await page.locator('.social-variants summary').click();await page.locator('#social-caption-instagram').fill('Versión breve para Instagram.');
+ await page.getByRole('button',{name:'Zapisz szkic',exact:true}).click();await page.getByText('Szkic zapisany. Materiał nie został opublikowany.',{exact:true}).waitFor();
+ assert.equal(socialDrafts[0].caption.length,3000);assert.notEqual(socialDrafts[0].caption,socialDrafts[0].history[0].caption,'publication history preserves its original text');
+ await page.locator('[data-social-preview="instagram"]').click();assert.equal(await page.locator('#social-preview-caption').innerText(),'Versión breve para Instagram.');
+ await page.screenshot({path:'test-results/site-editor/social-workspace.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ assert.ok(await page.locator('#view-social').evaluate(e=>e.scrollWidth<=e.clientWidth+1),'social workspace fits phone width');
+ await page.locator('#view-social').screenshot({path:'test-results/site-editor/social-phone.png'});
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
- assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)),'UI test never publishes');
+ assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)||r.path.startsWith('/api/studio/social/drafts')),'UI test never publishes');
  console.log('EDITOR UI PASS: site tree, real text, automatic article selection, contextual switches, inheritance, draft preservation, empty state and direct links.');
 }finally{await browser.close();server.close();}

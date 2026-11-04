@@ -212,6 +212,12 @@ async def test_uploaded_photo_persists_in_sql_without_r2_and_deduplicates(sessio
     assert '/api/media/' in image['url'] and image['alt']=='My landscape'
     digest=image['url'].rsplit('/',1)[1]
     assert (await session.get(StudioAsset,digest)).data==data
+    downloaded,mime=await studio_media.download(session,image['url'])
+    assert downloaded==data and mime=='image/jpeg'
+    from fastapi import HTTPException
+    with pytest.raises(HTTPException) as missing:
+        await studio_media.download(session,'https://external.example/not-in-library.jpg')
+    assert missing.value.status_code==404
     again=await studio_media.upload(session,'tenerife','duplicate.jpg',base64.b64encode(data).decode())
     assert again['url']==image['url']
 

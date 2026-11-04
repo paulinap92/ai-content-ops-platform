@@ -207,3 +207,25 @@ async def save_social(document):
     async with pool().connection() as conn:
         await conn.execute("INSERT INTO cc_editor_private.documents(collection,id,payload) VALUES ('social_drafts',%s,%s)", (item_id, Jsonb(document)))
     return item_id
+
+
+def social_row(row):
+    return {**row["payload"], "id": row["id"], "version": row["version"]}
+
+
+async def list_social():
+    async with pool().connection() as conn:
+        rows = await (await conn.execute("SELECT id,payload,version FROM cc_editor_private.documents WHERE collection='social_drafts' ORDER BY updated_at DESC LIMIT 100")).fetchall()
+    return [social_row(row) for row in rows]
+
+
+async def read_social(identifier):
+    async with pool().connection() as conn:
+        row = await (await conn.execute("SELECT id,payload,version FROM cc_editor_private.documents WHERE collection='social_drafts' AND id=%s", (identifier,))).fetchone()
+    return social_row(row) if row else None
+
+
+async def update_social(identifier, version, document):
+    async with pool().connection() as conn:
+        cursor = await conn.execute("UPDATE cc_editor_private.documents SET payload=%s,version=version+1,updated_at=now() WHERE collection='social_drafts' AND id=%s AND version=%s", (Jsonb(document), identifier, version))
+    return cursor.rowcount == 1

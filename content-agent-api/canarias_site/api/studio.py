@@ -144,6 +144,12 @@ async def rebase(document_id: str, payload: Version, session: Session):
         translate_error(exc)
 
 
+@router.get("/site/api/media/file", include_in_schema=False)
+async def download_media(session: Session, media_url: str = Query(max_length=2048, alias="url")):
+    data, mime = await studio_media.download(session, media_url)
+    return Response(content=data, media_type=mime, headers={"Cache-Control": "private, no-store"})
+
+
 @router.post("/site/api/media", include_in_schema=False)
 async def upload(payload: Upload, session: Session):
     try:

@@ -91,3 +91,27 @@ async def upload(session, island, filename, encoded, alt="", credit=""):
     session.add(row)
     await session.commit()
     return {**payload,"media_id":str(row.id),"island":row.island}
+
+
+async def download(session, media_url):
+    """Only read an existing library image; never fetch an arbitrary browser URL."""
+    row = await session.scalar(select(StudioDocument).where(
+        StudioDocument.kind == "media", StudioDocument.published["url"].as_string() == media_url))
+    if not row or not row.published:
+        raise HTTPException(404, "Zdjęcie nie znajduje się w bibliotece strony.")
+    asset = await session.get(StudioAsset, row.record_key)
+    if asset:
+        return asset.data, asset.mime_type
+    public_base = os.getenv("R2_PUBLIC_BASE_URL", "").rstrip("/")
+    if not r2_enabled() or not media_url.startswith(public_base + "/"):
+        raise HTTPException(404, "Nie znaleziono pliku zdjęcia.")
+    data = bytearray()
+    async with httpx.AsyncClient(timeout=40, follow_redirects=False) as client:
+        async with client.stream("GET", media_url) as response:
+            if response.status_code != 200:
+                raise HTTPException(502, "Nie udało się pobrać zdjęcia z biblioteki.")
+            async for chunk in response.aiter_bytes():
+                data.extend(chunk)
+                if len(data) > 5_000_000:
+                    raise HTTPException(413, "Zdjęcie przekracza limit pobierania 5 MB.")
+    return bytes(data), row.published["mime_type"]

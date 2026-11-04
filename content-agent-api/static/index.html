@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Canarias Cerca · Content Editor</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="/static/styles.css?v=social-workspace-20261104-1" />
 </head>
 <body>
   <header class="topbar">
@@ -415,26 +415,37 @@
     </section>
     <section id="view-database" class="view"><iframe id="canonical-db-frame" src="/site/?view=database" loading="lazy" title="Baza danych strony — PostgreSQL" style="display:block;width:100%;height:calc(100dvh - 160px);min-height:600px;border:0"></iframe></section>
     <section id="view-social" class="view">
-      <div class="panel" style="padding:24px">
-        <div class="panel-heading"><div><p class="eyebrow">FACEBOOK · INSTAGRAM</p><h2>Social Media Queue</h2></div><span class="status-pill status-neutral">Drafts only · not connected</span></div>
-        <p class="muted">Przygotuj treści do zatwierdzenia. Żadne materiały nie są publikowane bez integracji i autoryzacji kont.</p>
-        <form id="studio-social-form" class="form-grid">
-          <label class="field field-wide"><span>Post title</span><input id="studio-social-title" required maxlength="180"></label>
-          <label class="field field-wide"><span>Caption / hashtags</span><textarea id="studio-social-caption" required maxlength="4000" rows="5"></textarea></label>
-          <label class="field field-wide"><span>Image URL (optional)</span><input type="url" id="studio-social-image" placeholder="https://..."></label>
-          <label class="field"><span><input id="studio-social-instagram" type="checkbox" checked> Instagram</span></label>
-          <label class="field"><span><input id="studio-social-facebook" type="checkbox" checked> Facebook</span></label>
-          <div class="field-wide"><button type="submit" class="primary-button">Save draft</button></div>
-        </form>
-        <p id="studio-social-status" class="muted"></p>
-        <h3>Draft queue</h3><div id="studio-social-list" class="draft-list"></div>
+      <div class="social-heading"><div><p class="eyebrow">CANARIAS CERCA</p><h2>Posty i wiadomości</h2><p>Przygotuj treść i zdjęcie, zatwierdź materiał, a potem wybierz kanał.</p></div><button id="social-new" class="primary-button" type="button">Nowy post</button></div>
+      <p class="panel social-delivery-note">Instagram i Facebook publikujesz w <a href="https://app.metricool.com/" target="_blank" rel="noopener noreferrer">Metricool</a>. WhatsApp otworzysz z gotową treścią. Zapisanie lub zatwierdzenie szkicu nie publikuje go.</p>
+      <div class="social-layout">
+        <aside class="panel social-sidebar"><div class="panel-heading"><h2>Twoje materiały</h2><button id="social-refresh" class="icon-button" aria-label="Odśwież posty" type="button">↻</button></div>
+          <div class="social-filters" role="group" aria-label="Status postów"><button type="button" data-social-filter="draft" aria-pressed="true">Szkice</button><button type="button" data-social-filter="ready" aria-pressed="false">Gotowe</button><button type="button" data-social-filter="history" aria-pressed="false">Historia</button><button type="button" data-social-filter="archived" aria-pressed="false">Archiwum</button></div>
+          <label class="social-search">Szukaj posta<input id="social-search" type="search" placeholder="Tytuł lub treść"></label><div id="studio-social-list" class="draft-list"></div>
+        </aside>
+        <div class="panel social-composer"><div class="panel-heading"><h2 id="social-form-heading">Nowy post</h2><span id="social-record-status" class="status-pill status-neutral">Szkic</span></div>
+          <form id="studio-social-form" class="form-grid">
+            <label class="field field-wide"><span>Nazwa robocza</span><input id="studio-social-title" required maxlength="180" placeholder="Np. Pogoda na jutro"></label>
+            <label class="field field-wide"><span>Treść wspólna</span><textarea id="studio-social-caption" required maxlength="4000" rows="7" placeholder="Tutaj wpisz tekst po hiszpańsku…"></textarea></label>
+            <fieldset class="field-wide social-channel-choices"><legend>Kanały</legend><label><input id="studio-social-instagram" type="checkbox" checked> Instagram</label><label><input id="studio-social-facebook" type="checkbox" checked> Facebook</label><label><input id="studio-social-whatsapp" type="checkbox"> WhatsApp</label></fieldset>
+            <div class="field-wide social-image-choice"><button id="social-choose-photo" type="button" class="secondary-button">Wybierz zdjęcie z biblioteki</button><button id="social-remove-photo" type="button" class="ghost-link hidden">Usuń zdjęcie z posta</button><span id="social-image-label" class="muted">Bez zdjęcia — Instagram wymaga zdjęcia.</span></div>
+            <input id="studio-social-image" type="hidden"><input id="social-image-alt" type="hidden">
+            <details class="field-wide social-variants"><summary>Osobna treść dla wybranych kanałów</summary><p class="muted">Puste pole korzysta z treści wspólnej.</p><label>Instagram<textarea id="social-caption-instagram" maxlength="2200" rows="4"></textarea></label><label>Facebook<textarea id="social-caption-facebook" maxlength="4000" rows="4"></textarea></label><label>WhatsApp<textarea id="social-caption-whatsapp" maxlength="4000" rows="4"></textarea></label></details>
+            <div class="field-wide social-actions"><button id="social-save" type="submit" class="primary-button">Zapisz szkic</button><button id="social-ready" type="button" class="secondary-button">Zatwierdź do publikacji</button><button id="social-archive" type="button" class="ghost-link">Archiwizuj</button></div>
+          </form>
+          <p id="studio-social-status" role="status" class="social-feedback"></p>
+        </div>
+        <aside class="panel social-preview-panel"><div class="panel-heading"><h2>Podgląd treści</h2></div><div class="social-preview-tabs" role="group" aria-label="Podgląd kanału"><button type="button" data-social-preview="instagram" aria-pressed="true">Instagram</button><button type="button" data-social-preview="facebook" aria-pressed="false">Facebook</button><button type="button" data-social-preview="whatsapp" aria-pressed="false">WhatsApp</button></div>
+          <div class="social-post-preview"><strong>Canarias Cerca</strong><img id="social-preview-image" alt="" hidden><div id="social-preview-placeholder">Wybierz zdjęcie z biblioteki</div><p id="social-preview-caption">Wpisz treść posta.</p><small id="social-character-count"></small></div>
+          <div class="social-delivery-actions"><button id="social-copy" type="button" class="secondary-button">Kopiuj tekst</button><button id="social-copy-image" type="button" class="secondary-button">Kopiuj adres zdjęcia</button><button id="social-download" type="button" class="secondary-button">Pobierz zdjęcie</button><a id="social-open-channel" class="primary-button" target="_blank" rel="noopener noreferrer">Otwórz Metricool</a><button id="social-share" type="button" class="secondary-button">Udostępnij tekst i zdjęcie</button><p id="social-delivery-hint" class="muted"></p><button id="social-confirm-published" type="button" class="secondary-button">Potwierdź opublikowanie</button></div>
+          <div class="social-history"><h3>Historia tego posta</h3><div id="social-record-history">Brak potwierdzonych publikacji.</div></div>
+        </aside>
       </div>
     </section>
   </main>
 
   <div id="toast" class="toast hidden" role="status"></div>
-  <script src="/static/app.js?v=drive-status-20261104-1" defer></script>
-  <script src="/static/studio-extras.js" defer></script>
+  <script src="/static/app.js?v=social-library-20261104-1" defer></script>
+  <script src="/static/studio-extras.js?v=social-workspace-20261104-1" defer></script>
 </body>
 </html>
 

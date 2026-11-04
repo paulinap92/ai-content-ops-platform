@@ -1,29 +1,25 @@
-# Database & Social Studio (first iteration)
+# Social workspace and private database browser
 
-Branch: `feature/database-social-studio`
+The standalone Content Editor runs on Render behind its existing login. Public website services are separate.
 
-## What works
-- Two new tabs in Content Studio: **Database** and **Social Media**.
-- MongoDB collection picker, bounded 25-row pagination, refresh, table view and panel Show/Hide.
-- Read-only database endpoints with sensitive field name redaction, 100-row maximum and no query editor.
-- Social drafts saved in the existing Content Studio MongoDB with selected Instagram/Facebook channels, caption, title and optional image URL.
-- All `/api/studio/*` routes are deliberately **localhost-only**. The UI must run on `http://127.0.0.1:8000`. Do not deploy this router as an externally reachable admin console without proper user auth.
+## Social workflow
 
-## Still to build
-- Canarias Cerca production PostgreSQL adapter (only after database connection/auth configuration is confirmed).
-- Per-record Published/Hidden status **in Canarias public API**; the current Show/Hide only collapses the database panel and does not hide production content.
-- Metricool integration and account authorization. No post publishing or scheduling exists in this iteration.
-- End-to-end runtime/integration tests against a local MongoDB instance.
+- Create and edit a post for Instagram, Facebook and/or WhatsApp.
+- Shared Spanish copy can have a separate version for each channel.
+- Choose an image from the existing unified Drive/upload library. A chosen Drive image is copied into the durable website media library; its original remains on Drive.
+- Save drafts, approve a material, and view per-channel content previews.
+- Instagram approval requires an image and a caption no longer than 2200 characters.
+- Copy text, download the image, and open Metricool for Instagram/Facebook. The editor does not transfer a post to Metricool automatically.
+- WhatsApp opens a pre-filled message. Device sharing can include text and an image when the browser supports file sharing. The owner selects the recipient and sends it. WhatsApp Channel publication remains a manual action in WhatsApp.
+- Opening a destination or sharing a file never marks a post published. The owner explicitly confirms each channel after publication. History retains that channel's original copy and image.
+- Archived drafts can be restored. Edits return approval to draft. Concurrent writes are rejected using a version check.
 
-## Run
-```powershell
-cd content-agent-api
-uv sync
-uv run python -m uvicorn app:app --host 127.0.0.1 --port 8000
-```
+## Storage and delivery
 
-Open http://127.0.0.1:8000. Use the new tabs.
+All social drafts and history stay in the editor's private `social_drafts` collection (PostgreSQL in hosted deployment, MongoDB for existing installations). Existing drafts remain readable, with stable IDs and complete saved text. No public canonical content or provider posts are modified by this workflow.
 
-## Next steps for Instagram/Facebook
-Connect the user's Meta accounts through Metricool. Configure an authenticated server-side connector and implement a second, explicit approval-to-schedule step. Never store social access tokens in the browser or commit them to Git.
+Metricool currently has the brand `canarias.cerca` with Instagram and Facebook connected (verified 4 November 2026 through the connected account). The editor uses manual handoff; its API reports `publishing_connected=false`. An independent server integration would require owner-provided server credentials and a Metricool plan with API access. No social secrets are stored in browser assets, and this change adds no paid service.
 
+## Validation
+
+CI runs the workflow against disposable PostgreSQL and MongoDB stores, checks authentication, conflicting edits, image requirements, archival and retained publication snapshots. Browser tests cover choosing a library image without losing the draft, channel previews, WhatsApp pre-filled text, manual confirmation, and phone layout. These tests never send or schedule an external message.
