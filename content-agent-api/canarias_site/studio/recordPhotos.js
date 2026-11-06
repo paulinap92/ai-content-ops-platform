@@ -88,7 +88,7 @@ export function recordPhotoControls({item, node, field, api, payload, apply, mes
     try {
       const prepared = await preparePhoto(file), draft = payload();
       const saved = await api('/media', {method: 'POST', body: JSON.stringify({island: item.identity.island, ...prepared, alt: draft.image_alt || '', credit: draft.image_credit || ''})});
-      apply({...saved, source_url: ''}, identity);
+      apply({...saved, alt: draft.image_alt || '', credit: draft.image_credit || '', source_url: ''}, identity);
       message('Zdjęcie dodano do szkicu i biblioteki strony. Teraz: Zapisz treść roboczą → Podgląd i zmiany → Opublikuj treść.');
     } catch (error) { feedback.textContent = error.message; message(error.message, true); }
     finally { dialog.close(); dialog.remove(); upload.value = ''; }
@@ -172,7 +172,7 @@ async function openPicker({item, node, api, payload, apply, message}) {
         const alt = value.alt_texts?.es || value.alt_texts?.pl || payload().image_alt || '';
         saved = await api('/media', {method: 'POST', body: JSON.stringify({island: item.identity.island, ...prepared, alt, credit: credit.value})});
         // Source links identify the private original; do not publish Drive IDs.
-        saved.source_url = '';
+        saved = {...saved, alt, credit: credit.value, source_url: ''};
       }
       apply(saved, identity);
       dialog.close();

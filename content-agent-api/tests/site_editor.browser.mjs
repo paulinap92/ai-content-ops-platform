@@ -221,7 +221,7 @@ try{
  assert.equal(uploaded.length,photosBefore+1);assert.equal(writes.at(-1).path,'/site/api/media');
  assert.equal(writes.at(-1).body.alt,'Vista del Teide');assert.equal(writes.at(-1).body.credit,'Paulina');
  assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.','upload keeps entered article text');
- assert.equal(await page.locator('[data-key="image_credit"]').inputValue(),'Owner','returned metadata is used, including deduplicated files');
+ assert.equal(await page.locator('[data-key="image_credit"]').inputValue(),'Paulina','entered credit survives reuse of a deduplicated library file');
  await page.locator('[data-key="image_credit"]').fill('Paulina');
  await page.locator('#preview').click();await page.locator('#preview-dialog[open]').waitFor();
  assert.match(await page.locator('#preview-content').innerText(),/Mi texto sin guardar/);assert.match(await page.locator('#preview-content').innerText(),/Paulina/);
@@ -238,7 +238,7 @@ try{
  await page.getByRole('button',{name:'Użyj wybranego zdjęcia',exact:true}).click();
  await page.waitForFunction(()=>!document.querySelector('.photo-picker'));
  assert.equal(uploaded.length,photosBefore+2,'explicit Drive use copies only the selected image');
- assert.equal(writes.at(-1).body.credit,'Autora Drive');assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.');
+ assert.equal(writes.at(-1).body.credit,'Autora Drive');assert.equal(await page.locator('[data-key="image_credit"]').inputValue(),'Autora Drive');assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.');
  assert.ok(writes.slice(writesBefore).every(r=>r.path==='/site/api/media'),'photo flow never saves or publishes an article implicitly');
  await page.setViewportSize({width:1280,height:900});
  await page.locator('.record-photo').screenshot({path:'test-results/site-editor/article-photo-desktop.png'});
