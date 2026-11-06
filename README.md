@@ -77,8 +77,9 @@ Their visibility and editorial descriptions can be changed from this editor.
 
 ## Photos and social drafts
 
-Existing public photo URLs work without extra infrastructure. Uploading images
-requires the R2 configuration described in [site editing](docs/site-editor.md).
+Articles, places and events have inline photo upload, library selection and
+preview. Uploads persist in the existing Neon database by default; R2 is optional.
+See the step-by-step [site editing guide](docs/site-editor.md).
 Local-folder and Drive photo organization from the original project remains
 available. An online service cannot read folders on a user's computer.
 

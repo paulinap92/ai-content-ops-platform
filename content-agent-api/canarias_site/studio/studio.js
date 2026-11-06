@@ -1,5 +1,6 @@
 import {createInspector,renderMonth} from "./inspector.js";
 import {renderEditorialText} from "./editorialText.js";
+import {recordPhotoControls, imageKeys} from "./recordPhotos.js";
 const $ = (id) => document.getElementById(id);
 const base = location.pathname.replace(/\/$/, "");
 const state = {
@@ -314,7 +315,7 @@ function renderRecord() {
     "editor_notes",
   ]);
   for (const key of keys) {
-    if (key.startsWith("_") || protectedKeys.has(key)) continue;
+    if (key.startsWith("_") || protectedKeys.has(key) || imageKeys.has(key)) continue;
     const value = Object.hasOwn(item.draft, key) ? item.draft[key] : (key === "hidden" ? false : key === "editor_notes" ? [] : "");
     (Object.hasOwn(labels, key) ? fields : advanced).append(
       field(
@@ -324,11 +325,21 @@ function renderRecord() {
       ),
     );
   }
-  if(item.identity.kind!=="live-point"){const choose=node('button','Wybierz zdjęcie z biblioteki',{type:'button',class:'wide'});choose.onclick=()=>task(async()=>{
-    if(parent!==window)parent.postMessage({type:'cc-editor-open-photos',island:item.identity.island,title:item.draft.name||item.draft.title},location.origin);
-    else {if(state.dirty||!state.record.id)await save('record');sessionStorage.setItem('cc-editor-photo-target',JSON.stringify(state.record.identity));location.assign('/?library=photos');}
-  });fields.append(choose);}
+  let photoControls;
+  if (item.identity.kind !== "live-point") {
+    photoControls = recordPhotoControls({item, node, field, api, payload: recordPayload, apply: applyRecordImage, message,
+      openFullLibrary: () => task(async () => {
+        if (parent !== window) parent.postMessage({type: 'cc-editor-open-photos', island: item.identity.island, title: recordPayload().name || recordPayload().title}, location.origin);
+        else {
+          if (state.dirty || !state.record.id) await save('record');
+          sessionStorage.setItem('cc-editor-photo-target', JSON.stringify(state.record.identity));
+          location.assign('/?library=photos');
+        }
+      })});
+    fields.append(photoControls.panel);
+  }
   $("record-form").replaceChildren(fields, advanced);
+  photoControls?.updatePreview();
   $("edit-actions").hidden = false;
   $("save").textContent=item.identity.kind==="live-point"?"Zapisz i włącz punkt":"Zapisz treść roboczą";
   $("publish").hidden=item.identity.kind==="live-point";
@@ -447,9 +458,10 @@ function preview(which) {
       root.append(
         node("img", undefined, {
           src: draft.image_url,
-          alt: draft.name || draft.title || "",
+          alt: draft.image_alt || draft.name || draft.title || "",
         }),
       );
+    if (draft.image_credit) root.append(node("p", draft.image_credit, {class: "photo-credit"}));
     const body=node("div");body.innerHTML=renderEditorialText(draft.description || "");root.append(body);
     if (draft.hidden)
       root.append(node("strong", "Ten wpis będzie ukryty na stronie."));
@@ -983,7 +995,19 @@ for(const [id,delta] of [["calendar-prev",-1],["calendar-next",1],["calendar-tod
  $("month").value=value.toISOString().slice(0,7);state.offset=0;await loadRecords();
 });
 
-window.addEventListener('message',event=>{if(event.origin!==location.origin||event.source!==parent||event.data?.type!=='cc-editor-use-image')return;const image=event.data.image;if(!state.record){message('Najpierw wybierz artykuł, wydarzenie lub miejsce. Potem wybierz zdjęcie w bibliotece.',true);return;}state.record.draft={...recordPayload(),image_url:image.url,image_alt:image.alt||image.filename,image_credit:image.credit||''};renderRecord();state.dirty=true;view('content');message('Zdjęcie przypisano do formularza. Zapisz szkic, aby zachować wybór.');});
+function applyRecordImage(image, expectedIdentity) {
+  if (!state.record || expectedIdentity && JSON.stringify(state.record.identity) !== expectedIdentity)
+    throw new Error('Wybrany wpis zmienił się. Zdjęcie pozostało w bibliotece; wybierz je ponownie do właściwego wpisu.');
+  state.record.draft = {...recordPayload(), image_url: image.url, image_alt: image.alt || '', image_credit: image.credit || '', image_source_url: image.source_url || ''};
+  renderRecord(); state.dirty = true;
+  $("record-status").textContent = 'Niezapisane zmiany · zdjęcie jest przypisane do szkicu';
+}
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'cc-editor-use-image') return;
+  if (!state.record) { message('Najpierw wybierz artykuł, wydarzenie lub miejsce. Potem wybierz zdjęcie w bibliotece.', true); return; }
+  applyRecordImage(event.data.image);
+  view('content'); message('Zdjęcie przypisano do formularza. Zapisz szkic, aby zachować wybór.');
+});
 
 async function manageLivePoints(resource,island,create){
  const scope=island==='global'?'global':island,mode=['marine','tides'].includes(resource)?'coastal':resource;

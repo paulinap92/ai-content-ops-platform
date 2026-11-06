@@ -77,7 +77,7 @@ const server=createServer(async(req,res)=>{
   res.writeHead(404);res.end('{}');return;
  }
  const name=path==='/site/'?'index.html':path.startsWith('/site/assets/')?path.slice('/site/assets/'.length):null;
- if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js','charts.js'].includes(name)){res.writeHead(404);res.end();return;}
+ if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js','charts.js','recordPhotos.js'].includes(name)){res.writeHead(404);res.end();return;}
  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);
  res.end(await readFile(resolve(assets,name)));
 });
@@ -202,8 +202,53 @@ try{
  optionalHealthFailure=false;await page.goto(origin);await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
  await page.getByRole('button',{name:'Wydarzenia',exact:true}).click();await page.locator('#new-manual-event').click();
  const editor=page.frameLocator('#site-editor-frame');await editor.getByRole('heading',{name:'Nowe wydarzenie',exact:true}).waitFor();assert.equal(await editor.locator('#island').inputValue(),'tenerife');assert.equal(await editor.locator('#kind').inputValue(),'calendar');
+ // Photo upload and selection stay in the article and preserve unsaved text.
+ await page.goto(origin+'/site/?section=guide&resource=history&island=tenerife');await idle();
+ await page.locator('[data-key="description"]').fill('Mi texto sin guardar.');
+ await page.locator('[data-key="image_alt"]').fill('Vista del Teide');
+ await page.locator('[data-key="image_credit"]').fill('Paulina');
+ const photosBefore=uploaded.length,writesBefore=writes.length;
+ await page.getByRole('button',{name:'Wybierz zdjęcie z biblioteki',exact:true}).click();
+ await page.getByRole('dialog',{name:'Wybierz zdjęcie do wpisu'}).waitFor();
+ await page.locator('.photo-picker-item').filter({hasText:'Teide.jpg'}).click();
+ await page.getByRole('button',{name:'Użyj wybranego zdjęcia',exact:true}).waitFor();
+ await page.waitForFunction(()=>!document.querySelector('.photo-picker>button').disabled);
+ assert.equal(uploaded.length,photosBefore,'browsing Drive never copies or publishes');
+ await page.getByRole('button',{name:'Zamknij wybór zdjęcia',exact:true}).click();
+ assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.');
+ await page.locator('.record-photo input[type="file"]').setInputFiles({name:'inline.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')});
+ await page.waitForFunction(()=>document.querySelector('.record-photo img')?.getAttribute('src')==='https://public.example/own.jpg');
+ assert.equal(uploaded.length,photosBefore+1);assert.equal(writes.at(-1).path,'/site/api/media');
+ assert.equal(writes.at(-1).body.alt,'Vista del Teide');assert.equal(writes.at(-1).body.credit,'Paulina');
+ assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.','upload keeps entered article text');
+ assert.equal(await page.locator('[data-key="image_credit"]').inputValue(),'Owner','returned metadata is used, including deduplicated files');
+ await page.locator('[data-key="image_credit"]').fill('Paulina');
+ await page.locator('#preview').click();await page.locator('#preview-dialog[open]').waitFor();
+ assert.match(await page.locator('#preview-content').innerText(),/Mi texto sin guardar/);assert.match(await page.locator('#preview-content').innerText(),/Paulina/);
+ await page.locator('#close-preview').click();
+ await page.setViewportSize({width:390,height:844});
+ await page.locator('.record-photo').screenshot({path:'test-results/site-editor/article-photo-phone.png'});
+ assert.ok(await page.locator('.record-photo').evaluate(e=>e.scrollWidth<=e.clientWidth+1),'article photo controls fit a phone');
+ await page.getByRole('button',{name:'Usuń zdjęcie z wpisu',exact:true}).click();
+ assert.equal(await page.locator('[data-key="image_url"]').inputValue(),'');assert.equal(uploaded.length,photosBefore+1,'removing reference retains library file');
+ await page.getByRole('button',{name:'Wybierz zdjęcie z biblioteki',exact:true}).click();
+ await page.locator('.photo-picker-item').filter({hasText:'Teide.jpg'}).click();
+ await page.waitForFunction(()=>!document.querySelector('.photo-picker>button').disabled);
+ await page.getByLabel('Autor / prawa wybranego zdjęcia',{exact:true}).fill('Autora Drive');
+ await page.getByRole('button',{name:'Użyj wybranego zdjęcia',exact:true}).click();
+ await page.waitForFunction(()=>!document.querySelector('.photo-picker'));
+ assert.equal(uploaded.length,photosBefore+2,'explicit Drive use copies only the selected image');
+ assert.equal(writes.at(-1).body.credit,'Autora Drive');assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.');
+ assert.ok(writes.slice(writesBefore).every(r=>r.path==='/site/api/media'),'photo flow never saves or publishes an article implicitly');
+ await page.setViewportSize({width:1280,height:900});
+ await page.locator('.record-photo').screenshot({path:'test-results/site-editor/article-photo-desktop.png'});
+ // Invalid uploads explain the error and retain the existing image and text.
+ await page.locator('.record-photo input[type="file"]').setInputFiles({name:'bad.jpg',mimeType:'image/jpeg',buffer:Buffer.from('not an image')});
+ await page.getByText('Nie można odczytać tego zdjęcia. Wybierz inny plik JPEG, PNG lub WebP.',{exact:true}).first().waitFor();
+ assert.equal(uploaded.length,photosBefore+2);assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.');
+ uploaded.splice(0,uploaded.length); // Independent existing full-library and social fixtures.
  await page.goto(origin);await page.frameLocator('#site-editor-frame').locator('#tree-scope').selectOption('tenerife');await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Guía',exact:true}).click();await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Historia',exact:true}).click();await page.frameLocator('#site-editor-frame').locator('[data-key="description"]').waitFor();
- await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Wybierz zdjęcie z biblioteki',exact:true}).click();await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).waitFor();assert.match(await page.locator('#photo-folder-tree').innerText(),/volcanoes/);assert.equal(await page.locator('#photo-library-frame').count(),0,'one photo library, no duplicate iframe');await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).click();await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='Teide.jpg');assert.equal(await page.locator('#photo-use').isEnabled(),true,'approved Drive photos remain usable even when their metadata is locked');
+ await page.frameLocator('#site-editor-frame').locator('.record-photo details summary').click();await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Otwórz pełną bibliotekę zdjęć',exact:true}).click();await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).waitFor();assert.match(await page.locator('#photo-folder-tree').innerText(),/volcanoes/);assert.equal(await page.locator('#photo-library-frame').count(),0,'one photo library, no duplicate iframe');await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).click();await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='Teide.jpg');assert.equal(await page.locator('#photo-use').isEnabled(),true,'approved Drive photos remain usable even when their metadata is locked');
  await page.locator('#photo-upload-file').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')});await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='own.jpg');assert.equal(uploaded.length,1);assert.equal(await page.locator('#photo-folder-tree').getByRole('button',{name:/Tenerife/}).count(),1,'Drive and uploaded pictures share the same island folder');assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is JPEG before durable upload');
  await page.locator('#view-photos').screenshot({path:'test-results/site-editor/unified-photo-library.png'});await page.locator('#photo-use').click();await page.waitForFunction(()=>document.querySelector('#site-editor-frame').contentDocument?.querySelector('[data-key="image_url"]')?.value==='https://public.example/own.jpg');assert.equal(await page.frameLocator('#site-editor-frame').locator('[data-key="image_url"]').inputValue(),'https://public.example/own.jpg');
  await page.frameLocator('#site-editor-frame').locator('#improve-ai').click();await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');

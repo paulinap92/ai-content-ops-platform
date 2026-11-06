@@ -37,12 +37,32 @@ publication uses the existing canonical model and versioned draft/history tables
 The canonical model was extracted from backend commit
 `17e6050c98a25edcef4691b0215a869d9bc47b07`; see `canarias_site/PROVENANCE.json`.
 
-## Photos
+## Dodawanie zdjęcia do artykułu, miejsca lub wydarzenia
 
-File uploads accept JPEG, PNG and WebP up to 5 MB. They require
-`R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` and
-`R2_PUBLIC_BASE_URL` in the editor environment. Public image URLs can be edited
-without R2. No photo or export depends on Render's ephemeral filesystem.
+1. Otwórz **Edycja strony**, wybierz wyspę, sekcję i wpis (lub **+ Dodaj**).
+2. W formularzu znajdź **Zdjęcie wpisu**. Wpisz opis alternatywny i autora/prawa.
+3. Kliknij **Wgraj zdjęcie z komputera** albo **Wybierz zdjęcie z biblioteki**.
+   Wybór z biblioteki otwiera miniatury bez opuszczania wpisu. Możesz wyszukać
+   nazwę, miejsce lub folder i przełączyć wybraną wyspę na wszystkie wyspy.
+4. Sprawdź zdjęcie w formularzu. Następnie **Zapisz treść roboczą** →
+   **Podgląd i zmiany** → **Opublikuj treść** (dla kalendarza: **Opublikuj wydarzenie**).
+
+Wybór lub wgranie nie zapisuje i nie publikuje wpisu automatycznie. Zachowuje
+wprowadzony tekst. Podgląd roboczy pokazuje zdjęcie i podpis. **Usuń zdjęcie z wpisu**
+usuwa przypisanie w szkicu; plik pozostaje w bibliotece i inne wpisy go zachowują.
+
+Plik wgrany z komputera trafia do trwałej publicznej biblioteki strony. Przy braku
+R2 jest to istniejący Neon PostgreSQL (łączny limit plików 100 MB). Opcjonalnie
+można skonfigurować R2. Nie są to pliki przechowywane wyłącznie na dysku Rendera.
+JPEG/PNG/WebP do 20 MB są przygotowywane w przeglądarce do JPEG, maksymalnie
+1920 px, z limitem wyniku 5 MB. Nie zmienia to rozmiarów zdjęć w układzie strony.
+
+Google Drive pozostaje osobnym źródłem oryginałów. Samo przeglądanie katalogu
+nie kopiuje plików. Dopiero **Użyj wybranego zdjęcia** kopiuje wybrany oryginał do
+publicznej biblioteki i przypisuje go do szkicu; oryginał pozostaje na Drive.
+Przy niedostępnym źródle edytor pokazuje błąd i zachowuje dotychczasowy wybór.
+Zakładka **Zdjęcia** służy do organizacji wspólnej biblioteki i odświeżania
+katalogu Drive, nie jest drugim obowiązkowym etapem dodawania zdjęcia do wpisu.
 
 ## Reading source data and inspecting the database
 
