@@ -122,3 +122,14 @@ async def test_event_discovery_draft_edit_and_publication_stays_in_same_studio(s
     assert live['published']['description']=='Editor reviewed event'
     assert live['identity']['kind']=='calendar'
     assert [x['action'] for x in (await studio.history(session,live['id']))['items']]==['publish','save_draft','save_draft']
+
+
+@pytest.mark.asyncio
+async def test_withheld_catalog_is_read_from_membership_not_guessed_from_name(session):
+    key='20628b0f-406c-4be4-a340-b66831f538ae'  # Museo Guanche actually belongs to explore_places.
+    await place(session,key)
+    await session.execute(text("DELETE FROM design.entity_catalog_memberships WHERE entity_id=:id AND catalog_code<>'explore_places'"),{'id':key})
+    await session.execute(text("DELETE FROM design.entity_source_properties WHERE entity_id=:id AND provider='canarias-cerca-editorial'"),{'id':key})
+    catalog=await visual.release_catalog(session,q=key)
+    assert catalog['items'][0]['resource']=='places'
+    assert catalog['items'][0]['state']=='blocked'

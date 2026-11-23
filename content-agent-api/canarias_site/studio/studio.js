@@ -1044,8 +1044,8 @@ async function openVisualRecord(identity) {
  let record;
  try{record=await api('/open-record?'+new URLSearchParams(identity));}
  catch(error){
-  if(identity.kind!=='explore'||identity.resource!=='places')throw error;
-  for(const resource of ['museums-visits','leisure-centers']){
+  if(identity.kind!=='explore'||!['places','museums-visits','leisure-centers'].includes(identity.resource))throw error;
+  for(const resource of ['places','museums-visits','leisure-centers'].filter(r=>r!==identity.resource)){
    try{record=await api('/open-record?'+new URLSearchParams({...identity,resource}));break;}catch{}
   }if(!record)throw error;
  }
