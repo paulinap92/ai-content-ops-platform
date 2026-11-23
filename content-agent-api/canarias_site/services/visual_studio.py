@@ -176,15 +176,22 @@ async def release_catalog(session, q='', island='', state=''):
     live={}
     for row in rows:
         live.setdefault(row['id'],[]).append(row)
+    memberships=(await session.execute(text("""SELECT entity_id::text AS id,catalog_code
+        FROM design.entity_catalog_memberships WHERE is_active
+        AND entity_id=ANY(CAST(:ids AS uuid[]))
+        AND catalog_code IN ('explore_places','explore_museums_visits','explore_leisure_centers')"""),{'ids':list(WITHHELD)})).mappings().all()
+    blocked_catalogs={}
+    for m in memberships:blocked_catalogs.setdefault(m['id'],[]).append(m['catalog_code'])
     items=[]
     for key,record in {**SELECTED,**WITHHELD}.items():
         blocked=key in WITHHELD
         source=live.get(key,[])
         props=source[0]['props'] if source else {}
-        resource=source[0]['dataset_code'].removeprefix('explore_').replace('_','-') if source else 'museums-visits' if key!='0fe3867a-abf4-45e0-9d20-9ac61b032a3a' else 'places'
+        catalogs=[s['dataset_code'] for s in source] or sorted(blocked_catalogs.get(key,[]))
+        resource=(catalogs[0] if catalogs else 'explore_places').removeprefix('explore_').replace('_','-')
         item={'canonical_id':key,'name':props.get('name') or record['name'],'island':record['island'],
               'resource':resource,'state':'blocked' if blocked else 'published' if source else 'missing',
-              'blocked_reason':record.get('reason'),'catalogs':[s['dataset_code'] for s in source],
+              'blocked_reason':record.get('reason'),'catalogs':catalogs,
               'short_description':props.get('short_description') or record['short_description']}
         if (not island or item['island']==island) and (not state or item['state']==state) and q.casefold() in (item['name']+' '+key).casefold():items.append(item)
     items.sort(key=lambda i:i['name'].casefold())
