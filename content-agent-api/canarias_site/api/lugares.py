@@ -2,7 +2,7 @@
 from typing import Annotated, Literal
 from uuid import UUID
 from fastapi import APIRouter, Depends, Query, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from canarias_site.services.studio_auth import studio_session
@@ -41,7 +41,7 @@ class Action(Version):
 
 @router.get('/site/lugares', include_in_schema=False)
 async def page():
-    return FileResponse(ASSETS / 'lugares.html', headers={'Cache-Control': 'no-store'})
+    return RedirectResponse('/site/?view=lugares', status_code=307)
 
 
 @router.get('/site/api/lugares')

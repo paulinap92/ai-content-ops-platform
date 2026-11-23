@@ -1,0 +1,3079 @@
+{
+  "release_id": "lugares-372-20261118",
+  "selected": [
+    {
+      "canonical_id": "f30117f3-42e6-56cc-bfc6-cae3e3fdcdb9",
+      "name": "Centro de Interpretación de la Reserva de la Biosfera",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "fbe165fadc566c53657f4a631b39f48f5e10efff08f79953bdc50eed5c08ab96",
+      "short_description": "Centro de Isora instalado en el antiguo casino que explica los volcanes, los ecosistemas y la vida tradicional de El Hierro."
+    },
+    {
+      "canonical_id": "844db766-eba6-5b2e-aa41-347dacae14b2",
+      "name": "Centro de Interpretación del Geoparque El Hierro",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "63484b1db5d9e585be3240cdfd84c16a19baa7eaaabaa46f7b4ec73be1a945e2",
+      "short_description": "Centro del sur de El Hierro dedicado a los volcanes de la isla y a la erupción submarina de 2011."
+    },
+    {
+      "canonical_id": "30d5335d-1d6b-5e95-ad99-75f02bc6fc48",
+      "name": "Centro de Recuperación del Lagarto Gigante de El Hierro",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "244471c2b64dada5b35723c8eb8f8e612f433a44b9771fc3c51459cf35aa9a15",
+      "short_description": "Centro de cría del lagarto gigante de El Hierro, dentro del conjunto de Guinea, dedicado a conservar esta especie amenazada."
+    },
+    {
+      "canonical_id": "a04ce971-2dac-56de-b827-ef11c6e47487",
+      "name": "Centro etnográfico Casa de Las Quinteras",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "db707c65d5b4abc194b104abc98734935cc82122dcd91fd18277b97f77bd72d6",
+      "short_description": "Casa tradicional de Valverde convertida en centro de oficios herreños, con herramientas y piezas de madera, barro y tejidos."
+    },
+    {
+      "canonical_id": "7b8fc95c-eba3-5af0-8841-126654204ddc",
+      "name": "Ecomuseo de Guinea",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "ea6a3967129f65c9d503ad8e0bf0bc1ec7dc02158e6a0d14c6c7f3298bd05f4a",
+      "short_description": "Poblado histórico de Frontera con casas de piedra ambientadas para mostrar cómo era la vida doméstica en distintas épocas de El Hierro."
+    },
+    {
+      "canonical_id": "cf07ceb0-2861-550c-9812-b50a1e59f9fb",
+      "name": "El mero Pancho",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "32bbf33dba0e62f9b3945eecbdea321980134eab746456c6bdbc57f6a961133c",
+      "short_description": "La escultura del mero Pancho recuerda en La Restinga al pez que se hizo conocido entre los buceadores de El Hierro."
+    },
+    {
+      "canonical_id": "de58a799-43cc-4fd9-b3a8-561d3f506d36",
+      "name": "El Sabinar",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "5d3f8431b80fd30c4634fd9598ec99374b47648acce7ad48e5511c1d3b0d3406",
+      "short_description": "Bosque abierto de sabinas de La Dehesa, con troncos retorcidos y doblados por la fuerza de los vientos alisios."
+    },
+    {
+      "canonical_id": "fced7bfd-712a-449c-aa4a-533e5edd7f4d",
+      "name": "Ermita de Nuestra Señora de los Reyes",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "67b96b6fdbc1577c07509e1e6400f2ef72632a8de7dc06da31aabca87f5acc15",
+      "short_description": "Santuario de la patrona de El Hierro en La Dehesa, ligado al recorrido de la Bajada de la Virgen de los Reyes."
+    },
+    {
+      "canonical_id": "585847f8-5f7d-4181-a67a-07ef8d1983c7",
+      "name": "Faro de Orchilla",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "2ecbeb430d4bbe82584a2285d70ae8727afe5733db5f75fdb448cb69a2bcec00",
+      "short_description": "Faro del oeste de El Hierro rodeado de lava, con horizonte abierto al Atlántico y un entorno de poca luz artificial."
+    },
+    {
+      "canonical_id": "d5f6a986-3079-5e2f-81cc-1f232f8bcdf5",
+      "name": "Frontera",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "e2322dde18d702a03429c69aa97fad450927eb12b84cb07febfb86a124a4ee2e",
+      "short_description": "Localidad del valle de El Golfo, en El Hierro, con la iglesia de la Candelaria y su campanario separado del templo."
+    },
+    {
+      "canonical_id": "d90dda5e-fa0f-47b0-9cc1-0241d0f1cedd",
+      "name": "Iglesia de Nuestra Señora de la Concepción",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "274badf9815a472ecad82d12698de1d5d383e32ec6f4b24df525b630fa1b5e38",
+      "short_description": "La iglesia de la Concepción de Valverde conserva arquitectura barroca y parte del patrimonio religioso de El Hierro."
+    },
+    {
+      "canonical_id": "b331cbb7-099c-5692-9eb7-c5efe12dda42",
+      "name": "Isora",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "289caa72faae7716d3d58772dc72f7eaf5d41a8ffab649d8318931216d05a051",
+      "short_description": "Caserío de medianías del este de El Hierro, con casas de piedra volcánica y un mirador sobre el paisaje de Las Playas."
+    },
+    {
+      "canonical_id": "51ab9402-4b25-5e3c-9269-89866373e739",
+      "name": "La Albarrada",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "a927e65c6c2daa2cebbeabe8635fa83b6285f6a81be270979d8371828844480c",
+      "short_description": "Antiguo caserío de Valverde, hoy despoblado, donde quedan muros de piedra entre el paisaje de Ventejís."
+    },
+    {
+      "canonical_id": "fd77a733-4b08-5e6e-9cfa-1ea981c31638",
+      "name": "La Gorona",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "99d7d307a540e2c56bc9eef310601e593cfc7045daefa4d130db010ba85810a3",
+      "short_description": "Mirador natural del Camino de la Virgen, en las alturas de La Dehesa, desde el que se despide la imagen del pueblo de Sabinosa."
+    },
+    {
+      "canonical_id": "37d9ee12-948c-40bb-9cc9-5dc974361b6d",
+      "name": "La Restinga",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "85676207e089772abb38c206a0dbd9148eff9d14f25b07916d0747bd5a3b66e1",
+      "short_description": "Pueblo pesquero del sur de El Hierro con puerto, playa resguardada por el espigón y centros de buceo hacia el Mar de las Calmas."
+    },
+    {
+      "canonical_id": "55b09840-5a0f-5300-acfe-901ac41a21a1",
+      "name": "Mirador de Bascos",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "d2abdfb43a81aa51131bbd9c7f677f378f0c14546365f9199eb96ca5eec4e344",
+      "short_description": "Mirador sobre el acantilado de El Golfo, con vistas al valle y a La Palma cuando el horizonte está despejado."
+    },
+    {
+      "canonical_id": "677cb348-b545-59ff-a4af-df3217a4e832",
+      "name": "Mirador de El Julan",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "815b0c32e21581828d6d1fab88fa97a0ec579712a2c9fb54da977484bea72d9a",
+      "short_description": "Mirador de la ladera de El Julan, abierta hacia el Mar de las Calmas y el paisaje volcánico del sur de El Hierro."
+    },
+    {
+      "canonical_id": "a236a599-de14-4831-82ce-e9a13e52d58d",
+      "name": "Mirador de La Peña",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "9114d9c1c021135a18d2ebaadcf5a7fc5cc89715e50f8f29dfb7c34d0351d2f6",
+      "short_description": "Mirador diseñado por César Manrique en Guarazoca, con vistas al valle de El Golfo, su costa y los Roques de Salmor."
+    },
+    {
+      "canonical_id": "854aaed3-7c36-5701-bdd3-d2f3db381fdc",
+      "name": "Neptuno",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "e0ac3eaf853583b21327db2d87ef21d7b0542f7fef3ba1569ef1ef812a7a8b3c",
+      "short_description": "Escultura de Neptuno junto a las piscinas de Pozo de las Calcosas, realizada en 2007 con materiales reciclados."
+    },
+    {
+      "canonical_id": "12b951ba-7c1c-588b-8675-e281a415acaf",
+      "name": "Parque Cultural de El Julan",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "9ca7df42c818eb4243cd4c5b4714126a47c8021b1169917c9c8abf88d022a903",
+      "short_description": "Centro de El Julan sobre los bimbaches y sus grabados rupestres, en el paisaje volcánico del suroeste de El Hierro."
+    },
+    {
+      "canonical_id": "cae3c7dd-559e-5754-a8fc-88da4cac8806",
+      "name": "Pozo de la Salud",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "8e3106f27c177b5444b0a95a975be404df2ef7cfa4ba95b6ab4bf53b7affe565",
+      "short_description": "Pozo histórico de la costa de Sabinosa, en La Frontera, ligado al aprovechamiento de aguas minerales en El Hierro."
+    },
+    {
+      "canonical_id": "2141416f-5c71-438e-be4c-23a34b3e33b4",
+      "name": "Pozo de las Calcosas",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "05cee2cf3471565f7357ac12f8e4c3aa10925858427428dda5e48cf891564a5a",
+      "short_description": "Caserío costero del norte de El Hierro con casas de piedra volcánica y tejados de colmo de centeno."
+    },
+    {
+      "canonical_id": "a77780ce-9a22-5990-bd8f-5a70d90d5dc0",
+      "name": "Roque de La Bonanza",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "27403989b4c024d6d17898858aed5cbb8d03db4fe66be0e5ef17bb7ab9791da5",
+      "short_description": "Dique volcánico que sobresale del mar en Las Playas y constituye una de las siluetas más reconocibles de El Hierro."
+    },
+    {
+      "canonical_id": "13290ef9-eb4e-572b-9606-df70374a28b0",
+      "name": "Sabinosa",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "fa059b41873a4781538b916d95c9882f73e40bbf71435213c4edbb3e499dea23",
+      "short_description": "Pueblo del oeste de El Hierro asentado en una ladera volcánica, con calles estrechas, casas tradicionales y vistas a El Golfo."
+    },
+    {
+      "canonical_id": "c61cde8a-32d7-5187-bdde-8ee49ef1ee48",
+      "name": "Taibique",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "52855695f84a1b7dc605349df94da3b57f58710576d00226085e6dedc7f892de",
+      "short_description": "Núcleo de El Pinar donde el antiguo casino alberga un centro dedicado al origen volcánico y a la geología de El Hierro."
+    },
+    {
+      "canonical_id": "7161c413-50e4-549f-b2e8-3b8b795a8be7",
+      "name": "Timijiraque",
+      "island": "el-hierro",
+      "revision": 1,
+      "record_sha256": "03d953602450965c2dee34ed3ace61618c1ae8bf80674d709c9569169211bcac",
+      "short_description": "Núcleo costero cercano al puerto de La Estaca, conocido por su playa de arena negra y el paseo que bordea la orilla."
+    },
+    {
+      "canonical_id": "0e38c2dd-f8e7-5ce2-8739-e6ca3116a08b",
+      "name": "Valverde",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "9cd9d69577562cf1c851e8d7f0274aa304d3d7968f4a0fd6cd9167472c0f514d",
+      "short_description": "Capital de El Hierro, situada en el interior, con un casco que reúne la iglesia de la Concepción, la plaza del ayuntamiento y la Casa de las Quinteras."
+    },
+    {
+      "canonical_id": "803a9ff0-5264-5070-be6a-1841fb7a9a62",
+      "name": "Árbol Garoé",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "56ff548836d4c037082c26c75f5c64d7ed5b0cb79fd5ac4b85e17b2152aeeb2d",
+      "short_description": "Árbol y centro de interpretación cerca de San Andrés, vinculados al agua que los bimbaches recogían de la humedad de las nubes."
+    },
+    {
+      "canonical_id": "2e96e54c-6430-5492-a7e7-4e736458f583",
+      "name": "5) Casa del Médico Blas Curbelo Guerra",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "61db5288ae04d2bd544fff6d2e46ae097206268e35ac867a3f3be6fafce0e48e",
+      "short_description": "Antigua residencia del médico Blas Curbelo Guerra en La Oliva, integrada hoy en el Centro de Arte Canario Casa Mané."
+    },
+    {
+      "canonical_id": "b96d8e77-c5b6-5866-aefc-d84caf533570",
+      "name": "Acua Water Park",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "fb0ba37305cf79999c84242fa8f893233ac188cb069771bdc6265815871e3d73",
+      "short_description": "Acua Water Park reúne toboganes y piscinas de ocio en el núcleo turístico de Corralejo."
+    },
+    {
+      "canonical_id": "f76132d1-6ca9-50d4-addb-cbc57c31742e",
+      "name": "Ajuy",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "723e757c02de3afabd7ebb908d0c54e176b9ffc71b6fbaf965e9601169b29803",
+      "short_description": "Pueblo pesquero de Pájara junto a una playa de arena negra, con un camino costero hacia las cuevas de Ajuy."
+    },
+    {
+      "canonical_id": "b7d8a7b7-8843-5e47-b544-8f115eef7574",
+      "name": "Antigua",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "bf5be6e7eb77eb3a308558c2b25875023618931d39c010a47262dff5d448437a",
+      "short_description": "Pueblo del interior de Fuerteventura con la iglesia de Nuestra Señora de Antigua y el complejo del molino y el Museo del Queso Majorero."
+    },
+    {
+      "canonical_id": "5c668294-a5b3-58e8-bc7a-d4ecd16632e7",
+      "name": "Barranco de los Encantados o de los Enamorados",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "5b7cc1fc5b4d8e086ed137fba79b0afd148f2e39188cdcac1d09a11766b70a1d",
+      "short_description": "El barranco de los Encantados conserva dunas fósiles y paleosuelos en el interior de La Oliva."
+    },
+    {
+      "canonical_id": "a4b0d888-022e-4693-aa51-e99686a6c36e",
+      "name": "Betancuria",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "50fd67f0a8cc2167b1c1aea2d6e828548210fc1cb8abce6f14331500e2efe986",
+      "short_description": "Betancuria conserva el trazado y los edificios de una villa histórica en un valle del interior de Fuerteventura."
+    },
+    {
+      "canonical_id": "daff07c7-f2da-5827-8272-f256cf5519fb",
+      "name": "Caleta de Fuste",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "f0559e57bac87c23b6016c2e2cec13c3358839c4de7e79a866dde9a1664c6777",
+      "short_description": "Localidad costera del municipio de Antigua, en Fuerteventura, con playa de arena dorada, puerto deportivo y avenidas comerciales."
+    },
+    {
+      "canonical_id": "6f0627e6-4e2b-562c-84e6-779fc9ca2ceb",
+      "name": "Casa Alta",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "141e09a91449553d332cd8c4a00c098828dcac62d87e6cc00f353d5602d9340b",
+      "short_description": "La Casa Alta de Tindaya explica los valores arqueológicos, naturales y geológicos de la montaña desde una vivienda tradicional."
+    },
+    {
+      "canonical_id": "9359f2f7-ba4c-4b78-bd2a-8c399e219bf3",
+      "name": "Casa de los Coroneles",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "7da390ce2796269eb0317b8c88948aff510a8d94fd47096ec98fe9d7060c171e",
+      "short_description": "Antigua residencia de los coroneles de Fuerteventura, en La Oliva, construida en el siglo XVIII."
+    },
+    {
+      "canonical_id": "7e36f24f-31c6-570b-b41d-bf537dceacc8",
+      "name": "Casa Museo Unamuno",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "682c095c1b42a7783aff92692a81011082b59fe4f460c3d685901e3b54a95241",
+      "short_description": "La Casa Museo Unamuno recuerda el destierro del escritor en 1924 y su estancia en Puerto del Rosario."
+    },
+    {
+      "canonical_id": "71b66a5a-725a-5b97-878b-ab160b7d120e",
+      "name": "Castillo de El Cotillo",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "7ab57a74c1e89687bcddee004ad52b6e12a54262473f2fb2d6c311765168d782",
+      "short_description": "Torre defensiva circular de El Cotillo, conocida también como Castillo del Tostón, junto al antiguo puerto."
+    },
+    {
+      "canonical_id": "41c58fc3-e0d9-56c8-9103-a6e9b7245f4a",
+      "name": "Centro de interpretación Los Molinos - Tiscamanita",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "11da972e6bafb7714721cfa15544e2fa0bc6db1bb4efcf9fbbe92136a32592fe",
+      "short_description": "Centro de Tiscamanita dedicado a los molinos, al cultivo del cereal y a la elaboración del gofio en Fuerteventura."
+    },
+    {
+      "canonical_id": "adbfc79d-1850-5eb1-919c-d55798103817",
+      "name": "Centro de Interpretación Poblado de La Atalayita",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "0f3138290a8ea1fb43c6260e84bf2be2a906f561a543ac8e88ae01a1a6079736",
+      "short_description": "Poblado arqueológico del valle de Pozo Negro, con pequeñas casas de piedra semienterradas y recintos para el ganado."
+    },
+    {
+      "canonical_id": "d93a436e-26bd-5ec7-9354-d2265f5d517a",
+      "name": "Centro de Recuperación y Conservación Tortugas Marinas",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "66b000302f38ce42ecbc3e3b6ffd6401cbda7e698ddd632b2bd434b61ed89d4b",
+      "short_description": "El centro de Morro Jable atiende tortugas marinas heridas y divulga la conservación de estas especies."
+    },
+    {
+      "canonical_id": "bdb07427-bd27-5e8f-9238-3948e1cecabc",
+      "name": "Cueva del Llano",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "22cfc9bb0e6b9b222e9f2a66221bbf33bc909448291cc2f6a1a8fe5d85e4806a",
+      "short_description": "La Cueva del Llano es un tubo volcánico de Villaverde con interés paleontológico y fauna adaptada a la oscuridad."
+    },
+    {
+      "canonical_id": "d482b9b6-208f-4bd9-b70e-6c400b93a014",
+      "name": "Cuevas de Ajuy",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "af6142484f548a1f8c6ef2b211aa5a8233e1946cd5425f32bd6cf6d6a775d514",
+      "short_description": "Cuevas junto al mar de Ajuy donde afloran rocas y sedimentos formados antes de que emergiera la isla de Fuerteventura."
+    },
+    {
+      "canonical_id": "9447f358-3ba0-59dd-bf6b-550563959315",
+      "name": "Ecomuseo de la Alcogida",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "89f2aaa94a350ba2023819c04841fc5798e96a1533e4d263cfefd1a8aa07d247",
+      "short_description": "Ecomuseo de Tefía formado por siete casas restauradas que muestran la vivienda y los oficios rurales de Fuerteventura."
+    },
+    {
+      "canonical_id": "0a40827f-9d77-52ce-8f20-29ec2b0fa871",
+      "name": "El Cotillo",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "910aa0d0e80d5fadd98c98276ed70c93b3b6f694f4a4af08724ba9175e490666",
+      "short_description": "Pueblo pesquero del noroeste de Fuerteventura con un casco antiguo junto al Muellito y al Muelle de los Pescadores."
+    },
+    {
+      "canonical_id": "3393fc97-3913-5e28-8b06-3876c008493b",
+      "name": "Ermita de Nuestra Señora de la Caridad",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "bc6f7a58d8ae421112ffd7b3e90db95a098e27801d0cc7fa220ecda814c8855d",
+      "short_description": "Ermita de Tindaya dedicada a Nuestra Señora de la Caridad, con una nave y cubierta de madera."
+    },
+    {
+      "canonical_id": "90211067-4470-5fd9-bbda-83bd668bf7cf",
+      "name": "Ermita de Nuestra Señora de La Concepción",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "26bcd6421bf3e4c0b2a862dd82a420ba5e90a1f5f5024f2e3b9322f60528eb1a",
+      "short_description": "Ermita de Llanos de la Concepción, en Puerto del Rosario, con una nave y una pequeña espadaña en la fachada."
+    },
+    {
+      "canonical_id": "6712048e-5878-5259-8e96-8ceb31ee53b5",
+      "name": "Ermita de Nuestra Señora de Regla",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "2489eb98153d317ef8ecdd396e46132eb19c1110379214fd3172d120dd8445d5",
+      "short_description": "Templo de Pájara conocido por su portada de cantería labrada y por las dos naves que forman su interior."
+    },
+    {
+      "canonical_id": "7f582df6-d7f7-5066-a1fd-7b7477b851e4",
+      "name": "Ermita de San Agustín",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "170055d7cc77c778ccbee368e92aefb512ca03e784905a5da24cae8c965be570",
+      "short_description": "Ermita rural de Tefía, financiada por sus vecinos y bendecida en 1714 bajo la advocación de San Agustín."
+    },
+    {
+      "canonical_id": "b479193c-c836-54f8-a2b8-cc742f0ef2a3",
+      "name": "Ermita de San Juan y San Pedro",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "120b6bd422515b693ffb03017a8420f185abcb463a1bc4cce9821d8cefe10408",
+      "short_description": "Ermita de Vallebrón con una portada de cantería decorada y un relieve de dos animales enfrentados sobre el acceso."
+    },
+    {
+      "canonical_id": "1ae17328-4491-5bda-8f23-de2ced46fa2a",
+      "name": "Faro de Jandía",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "81e1ee6967fe56d698c31a05d1d7b3a78508a705a3ef77476ce6835f5071f140",
+      "short_description": "Faro del extremo de Punta de Jandía, dentro del parque natural, que guía la navegación junto a la costa sur de Fuerteventura."
+    },
+    {
+      "canonical_id": "4ff9f62a-3f8d-4992-a311-aa289f75257f",
+      "name": "Faro de La Entallada",
+      "island": "fuerteventura",
+      "revision": 3,
+      "record_sha256": "4ff3fac5641b3adc671363c22695c53b66138abd535464144a13c17371aaf97e",
+      "short_description": "Faro de piedra rojiza sobre un acantilado de Tuineje, con vistas al Atlántico y a las lomas volcánicas de los Cuchillos de Vigán."
+    },
+    {
+      "canonical_id": "4545b9ba-eded-595c-adb9-415cc4b8675e",
+      "name": "Faro de Morro Jable",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "f6884f09a32d3878f8918193292f6da319af236e41a4202033b6d66b89e01b12",
+      "short_description": "Faro de unos 60 metros junto a la playa del Matorral, en Morro Jable, que destaca en el litoral del sur de Fuerteventura."
+    },
+    {
+      "canonical_id": "e42c80aa-0963-5c14-8b6e-415be04fc00d",
+      "name": "Faro del Toston",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "4a39fa228768d86931a5ddd866c6a717ded9bf3d8e653c7134d0fe387d519f15",
+      "short_description": "Faro de El Cotillo con tres torres de distintas épocas, frente al estrecho que separa Fuerteventura de Lanzarote."
+    },
+    {
+      "canonical_id": "ac399102-61de-5a4b-bbed-7c0e5e523ef0",
+      "name": "Iglesia de Nuestra Señora de la Antigua",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "6565cf15fbe3f1ce8793f388237d8cc4d0c29d428b85db9c5d031b753b739301",
+      "short_description": "Iglesia de Antigua con una nave, cubierta de teja y una torre campanario que destaca sobre el casco del pueblo."
+    },
+    {
+      "canonical_id": "d4eb5655-ed24-5018-921d-2389d1529643",
+      "name": "Iglesia de San Miguel Arcángel",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "9946f44db071f0c3439e6d00d858ea026044a143cec1ce70f4fe6e199a869f16",
+      "short_description": "Iglesia de Tuineje con dos naves y un retablo que representa la batalla de Tamasite de 1740."
+    },
+    {
+      "canonical_id": "161147af-6938-4a76-bdf9-027018e2d71a",
+      "name": "Iglesia de Santa María de Betancuria",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "d73e8242c825f8f8a7b7f8fc3bd49f750484d26fbce32ce7015e0d6ceeb7d9a3",
+      "short_description": "Iglesia del casco histórico de Betancuria, con retablos y techos de madera, ligada a la historia de la antigua capital."
+    },
+    {
+      "canonical_id": "3483d567-c6ff-47de-8044-72f668dcb745",
+      "name": "Islote de Lobos",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "72039767abd574fb217419d112b5011abbe5e850bb7a5007fefae5cc1a945a4e",
+      "short_description": "Islote volcánico protegido frente a Corralejo, con senderos hacia La Calera, el Puertito y el faro del islote."
+    },
+    {
+      "canonical_id": "0e3506ce-1849-5156-a531-7b0b58416d67",
+      "name": "La Cilla",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "3ade7d53a3404c77bcb920464cafd9382409f08314ac0e50d2c75b3d4d73d0da",
+      "short_description": "Antiguo granero de La Oliva, hoy museo de la agricultura majorera, con objetos, textos y fotografías sobre la vida rural de Fuerteventura."
+    },
+    {
+      "canonical_id": "bd7d9cb0-bd23-5899-a6ad-0cc7a3a092ad",
+      "name": "La Oliva",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "08578733b0a3ca7850f04becaca489278714149b470b52aac5069f696ec4840d",
+      "short_description": "Pueblo del norte de Fuerteventura marcado por la iglesia de la Candelaria y la Casa de los Coroneles, entre antiguas construcciones agrícolas."
+    },
+    {
+      "canonical_id": "01ea9581-28f4-5345-af92-a9dba423ae3d",
+      "name": "Mirador Astronómico de Sicasumbre",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "a4d7c8bb537f3561942714fb9add79df2f1d713674ef4bd865ce8c725b8dc033",
+      "short_description": "Mirador astronómico de Pájara con paneles para orientarse en el cielo y soportes para telescopios y cámaras."
+    },
+    {
+      "canonical_id": "c1e4942d-89e7-50c7-85a0-2740307a5188",
+      "name": "Molina de la Asomada",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "543c102a9f408781a0d67ef65371ba8145ba0c466a7d3d946ce75bb9537ecae8",
+      "short_description": "La Molina de la Asomada conserva una muestra de la maquinaria con la que se molía el cereal en Fuerteventura."
+    },
+    {
+      "canonical_id": "0357c05b-afdd-50ca-895a-8dd04bfb6eb8",
+      "name": "Molina de Puerto Lajas",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "c7d90d0be04ac4b4957dc6119f09e820578c281ee2a95cf0304d3388cc750fe7",
+      "short_description": "La Molina de Puerto Lajas recuerda la molienda tradicional del cereal en el litoral de Puerto del Rosario."
+    },
+    {
+      "canonical_id": "224c4283-a6f2-5830-9812-9685fe34c2d1",
+      "name": "Molino de Antigua",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "bb72f5c57210817535daa178bdcb6bc864c8aaac061785ce3e35b700f2cbba61",
+      "short_description": "Molino de viento del conjunto cultural de Antigua, junto al Museo del Queso Majorero y sus jardines."
+    },
+    {
+      "canonical_id": "703c78d2-4ae8-59b8-9900-7d1c11f41e27",
+      "name": "Molino de El Roque",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "00c659caa01d521bf8a68d03c42c1be122ab84b08e9fa5e58b3592f56acd44ba",
+      "short_description": "Molino histórico de El Roque, cerca de El Cotillo, que conserva la huella de la molienda de cereal en el norte de Fuerteventura."
+    },
+    {
+      "canonical_id": "2985b5af-48c4-5542-a293-ee2a3320a2e6",
+      "name": "Molino de Tefía",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "6ac8917408f3ec9f176feb7e5f8e23b45be18dda91d6e8865ae75606d7a40098",
+      "short_description": "El Molino de Tefía es una construcción de molienda eólica protegida como parte del patrimonio de Puerto del Rosario."
+    },
+    {
+      "canonical_id": "69f2b087-2267-43d9-8609-5eb5e8b908da",
+      "name": "Montaña de Tindaya",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "9321dcdaf6342556550c490cfe3427f3615e9c7e585db270d877ee1de59855ac",
+      "short_description": "Tindaya conserva grabados indígenas con formas de pies en torno a la cima de una montaña emblemática de Fuerteventura."
+    },
+    {
+      "canonical_id": "7afb529f-10b9-5682-a1d5-88c469ab9983",
+      "name": "Morro Velosa gratis toegang",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "369f20786f44b7f8a5558336bd5ab14c1e05f93c33e4c58bf159ebddcae50479",
+      "short_description": "Mirador sobre el pico de Morro Velosa, en el centro de Fuerteventura, con panorámicas del paisaje de Betancuria."
+    },
+    {
+      "canonical_id": "b209fcb4-6570-5e32-8894-49cd7d3ab342",
+      "name": "Museo Arqueológico de Fuerteventura",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "04a17d337ff33b9a1ac2dfdeebd8c8acb3cbded68dd1c450e3a17feaa891546e",
+      "short_description": "El Museo Arqueológico de Fuerteventura presenta en Betancuria la cultura de los mahos y su adaptación a la isla."
+    },
+    {
+      "canonical_id": "4c4675f3-f7c1-5a7b-b55f-a3e4ee0d711e",
+      "name": "Museo de la Pesca Tradicional",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "1d834af5eaba7f071d49475367ef16c80d53c403f402eee1f1e3bc19721d4337",
+      "short_description": "El Museo de la Pesca Tradicional explica la cultura marinera majorera en las dependencias del faro de El Tostón."
+    },
+    {
+      "canonical_id": "d1006401-afcf-5180-9234-ec3373688657",
+      "name": "Museo de las Salinas del Carmen",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "f91eac8c5bbd10c2ca252f3d7d1df59985e28aa55a6b311df64ac861fb993ceb",
+      "short_description": "Museo y salinas en funcionamiento en la costa de Antigua, con depósitos de evaporación, almacén y casa del salinero."
+    },
+    {
+      "canonical_id": "f89bdd07-7a59-502a-babb-ec173aa81aa6",
+      "name": "Museo del queso Majorero",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "0ac68076e2a9f41c4353175844812b2f8b78c9e4d2d44a530270aec2b7c924b0",
+      "short_description": "Museo de Antigua sobre la cabra majorera y el queso, con contenidos sobre la ganadería y la formación volcánica de Fuerteventura."
+    },
+    {
+      "canonical_id": "8af6bb62-55be-5509-b80a-16fae7b12309",
+      "name": "Oasis Wildlife Fuerteventura",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "843ddadf0d9fe4382ff4e7fd396c3df804a26071a6faaf86bb756b1ad383cc4e",
+      "short_description": "Zoológico de La Lajita con jirafas, hipopótamos y cocodrilos, junto a un jardín botánico de plantas canarias y de zonas secas."
+    },
+    {
+      "canonical_id": "23ec214c-06c9-59f8-97ed-a8f7934f96c0",
+      "name": "Pico de la Zarza",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "07255d3c4387ad3dd5a31a87d39875a7d538e5f10eed5c060289a504d616c184",
+      "short_description": "El Pico de la Zarza es la mayor altura del Parque Natural de Jandía, en el sur de Fuerteventura."
+    },
+    {
+      "canonical_id": "ad379352-4e44-5dda-950e-cc923b98b24b",
+      "name": "Puerto del Rosario",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "9b61828722351caca1fbe9080e6f2f564a42444fb01c1e586a268abc052cdf7b",
+      "short_description": "Ciudad costera de Fuerteventura con paseo marítimo, esculturas al aire libre y la casa donde vivió Miguel de Unamuno durante su destierro."
+    },
+    {
+      "canonical_id": "16f02363-f006-58fc-8617-0b33a0b4b821",
+      "name": "Pájara",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "266553839ec4fc19880c3172a9d8ad8d689115530fae580a7503ba04d7a7da8d",
+      "short_description": "Pueblo del interior de Fuerteventura con la iglesia de Nuestra Señora de Regla, conocida por su gran pórtico."
+    },
+    {
+      "canonical_id": "defd2234-59dd-578d-9dae-4d8cc1943b09",
+      "name": "Torre de San Buenaventura",
+      "island": "fuerteventura",
+      "revision": 1,
+      "record_sha256": "f368bf4afddc8cd33d32562a9aa7f28e35acaf4cbf082dda5fbd386778629a2f",
+      "short_description": "Torre defensiva de planta circular junto al puerto de Caleta de Fuste, levantada para proteger este tramo de la costa majorera."
+    },
+    {
+      "canonical_id": "93de86ac-3bda-51cd-8240-91fd730a5d54",
+      "name": "Villaverde",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "d94b99640e9cd528abe81af79ae05132fb0a3e6116e0e0b1bc35c876f59a41b9",
+      "short_description": "Pueblo del interior de La Oliva con dos molinos históricos y la Cueva del Llano, un tubo volcánico con centro de interpretación."
+    },
+    {
+      "canonical_id": "5be0bfeb-9f71-5397-b534-2f5d8f999b2a",
+      "name": "Acuario Poema del Mar",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "ad3cf0f61a44a7e699c9b70a3e1c9b0e1e0539a90a5fc9afb0cdb2db9c600205",
+      "short_description": "Acuario de Las Palmas de Gran Canaria con ambientes de jungla, arrecife y océano profundo, y una gran ventana curva al tanque principal."
+    },
+    {
+      "canonical_id": "319fb338-2d85-5d1c-9155-4cf9e614b7c7",
+      "name": "Agaete",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "97544bef49a384d507b6b50f78bfd9e9d9934aa61223bc21f9a1a1942dec1bee",
+      "short_description": "Villa del noroeste de Gran Canaria con un casco alrededor de la iglesia de la Concepción y el jardín del Huerto de las Flores."
+    },
+    {
+      "canonical_id": "988013d5-6a6d-5a12-ae69-b0d21c169bdd",
+      "name": "Agüimes",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "6351ab22127bbd8f67730cda3d9989035204d61ed1f47debd0a8923c9ed10879",
+      "short_description": "Casco histórico del sureste de Gran Canaria con la iglesia de San Sebastián, plazas y esculturas repartidas por sus calles."
+    },
+    {
+      "canonical_id": "536e733c-1ac3-53e4-8941-9e42cd02fd90",
+      "name": "Altavista",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "0490abec4c208f15a85b7050cde06d2fd93fa20c311514f7c5204b98e6fc5737",
+      "short_description": "Altavista se alza entre las cuencas de Acusa y Tirma y ofrece amplias vistas de las montañas del oeste de Gran Canaria."
+    },
+    {
+      "canonical_id": "ea20c7a0-4ea8-54b1-a98b-dbd69f0f1980",
+      "name": "Angry Birds Activity Park",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "3c0a4ab0da8a387c38494fe0495a342ca075fac3690ccf6538448969c13122f7",
+      "short_description": "Parque de actividades de Puerto Rico con juegos al aire libre inspirados en Angry Birds, camas elásticas y karts a pedales."
+    },
+    {
+      "canonical_id": "c32b6342-4308-4d10-b636-179b5b62ee92",
+      "name": "Artenara",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "a6dad5c56e0ac32a172033e77bc86c3eb72b79440f977e401519fd77cf21acb2",
+      "short_description": "Artenara permite conocer la vida en cuevas y la arquitectura excavada en las cumbres de Gran Canaria."
+    },
+    {
+      "canonical_id": "5fc124d9-2924-4906-8479-3d3a2070c86e",
+      "name": "Arucas",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "275bfd35b6fd4b516c85f5f238d7c01c82b78d863832c0da2b64ce8ce27b2ae5",
+      "short_description": "Ciudad del norte de Gran Canaria con la iglesia neogótica de San Juan Bautista, cantería local y una histórica fábrica de ron."
+    },
+    {
+      "canonical_id": "6fa06afe-3077-5bc4-a7bc-48f97ccea9f0",
+      "name": "Auditorio Alfredo Kraus",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "c06c20be4e469341f65dd0055eaf69cd1bbd36ded7996b5356b95c4fdae8187f",
+      "short_description": "Auditorio junto a la playa de Las Canteras, con un gran ventanal al Atlántico en su sala sinfónica y un órgano de concierto."
+    },
+    {
+      "canonical_id": "70d17649-a6d3-4162-9bd8-1e0373087dfd",
+      "name": "Barranco de Guayadeque",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "8b2b2944f15e7fbeebffa334ec7d3aca6087e4c6b024a2002266ca64a2ab1223",
+      "short_description": "Guayadeque es un barranco de Gran Canaria conocido por sus viviendas, restaurantes y otros espacios excavados en la roca."
+    },
+    {
+      "canonical_id": "d12ae592-d577-5f49-9d7a-91207324f8a4",
+      "name": "Cactualdea",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "a0413cb8e076c6be5573e2bbe775736ca1aaf312e20be867cdc26da62a21dc14",
+      "short_description": "Cactualdea reúne cactus, aloes y otras plantas de zonas áridas en La Aldea de San Nicolás."
+    },
+    {
+      "canonical_id": "c4b4334d-bb28-560e-b6a3-1acce7d8ac83",
+      "name": "Caldera de Bandama",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "0c03a9b397b221e94b42f92da0bc5e481337e4eff19d62902d1ebd9944787fc1",
+      "short_description": "La caldera de Bandama muestra un gran cráter volcánico rodeado de riscos en el nordeste de Gran Canaria."
+    },
+    {
+      "canonical_id": "de54ffbb-9e17-5880-9cd8-08ef01701fe3",
+      "name": "Caldera de Los Marteles",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "d2ea6076fda2ba7300ee7508e2b157bf80aa9738b33ff8fd38b8bb1cc0c0b3ab",
+      "short_description": "El mirador de Los Marteles se asoma a una caldera volcánica cuyo fondo se ha aprovechado para la agricultura."
+    },
+    {
+      "canonical_id": "8cced2ac-a043-5eaa-8bb3-daa64708fdce",
+      "name": "Calle Mayor de Triana",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "943176f3f10393a505398d1eca9a2aa13e7b1047525fc32441b41afac7d9dd4d",
+      "short_description": "Calle peatonal de Las Palmas de Gran Canaria con comercio tradicional, fachadas modernistas y terrazas entre Guiniguada y San Telmo."
+    },
+    {
+      "canonical_id": "f62efcc0-f5bd-4adf-9022-e15886a0f0af",
+      "name": "Casa de Colón",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "dd6647c24b139c1a37c95ecef5a9db4f899752cc5280b1970b99ed0476b7f9af",
+      "short_description": "Museo de Vegueta dedicado a los viajes atlánticos y a la relación histórica entre Canarias y América."
+    },
+    {
+      "canonical_id": "f9476837-6e21-5b74-ad19-db8c0bac8944",
+      "name": "Casa Museo de los Patronos de la Virgen",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "b2e63e85c7e5acf23aada04982ca412600aec12697904521486fed344f679840",
+      "short_description": "Casa histórica de la plaza del Pino, en Teror, con mobiliario, tapices y porcelanas de la familia Manrique de Lara."
+    },
+    {
+      "canonical_id": "9830378b-d2ec-5aeb-ae9b-d22d20ec2869",
+      "name": "Casa Museo Pérez Galdós",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "0674559a115d4b86babba0afc20092c1c1407210e583899462a354582dfc3d1f",
+      "short_description": "Casa natal de Benito Pérez Galdós en Triana, con muebles, fotografías y objetos personales del escritor."
+    },
+    {
+      "canonical_id": "73463531-c9ff-586e-8e50-767966939ada",
+      "name": "Casa-Museo Antonio Padrón",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "9053256491c1e89e129c8a49a3bada46f1364432734d5fcdd2e8519daa5c4810",
+      "short_description": "Museo de Gáldar dedicado a Antonio Padrón y al indigenismo canario, una corriente artística ligada a la identidad de las islas."
+    },
+    {
+      "canonical_id": "0b25d86d-d9c1-5395-a6aa-e2120e33d8c7",
+      "name": "Casa-Museo León y Castillo",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "29b1c04845284528d2180b5b890e1715dbb8bbfc01363635d0d801bda9721538",
+      "short_description": "Casa museo de Telde sobre los hermanos León y Castillo, con cartas, muebles, pinturas y planos del Puerto de la Luz."
+    },
+    {
+      "canonical_id": "df3ba2de-0410-53a0-be7b-013395eef6f4",
+      "name": "Castillo de Mata",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "c7cd7cba51f7f6aa0083041a7479be305bc3e422a294467d379a2a852a721dcd",
+      "short_description": "Antigua fortificación de Las Palmas de Gran Canaria que alberga el Museo de la Ciudad y el Mar."
+    },
+    {
+      "canonical_id": "af972dde-16a7-5fd9-9b5e-ac4edc86ab3f",
+      "name": "Catedral de Santa Ana",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "ae1fe32d4d96d65fcd543c263bb68c1f39883ad5342e606814bef28b1fabf9cf",
+      "short_description": "Catedral de Vegueta con siglos de arquitectura y obras de Luján Pérez y Juan de Miranda en sus capillas."
+    },
+    {
+      "canonical_id": "d26bf42d-de60-41d6-8392-0a72a0fc988d",
+      "name": "Cenobio de Valerón",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "f5e0fc3c02e4b41ebcff7cdd192f87e0d04b091249d41ee30fbd0243ece9c56b",
+      "short_description": "El Cenobio de Valerón es un granero colectivo indígena con numerosos silos abiertos en una pared de roca volcánica."
+    },
+    {
+      "canonical_id": "bca52c05-d289-5c18-8934-01926cdcc1ee",
+      "name": "Centro de Arte La Regenta",
+      "island": "gran-canaria",
+      "revision": 3,
+      "record_sha256": "6a771d6aff6c4ec2e41fbd3ce9a3fec68d76e57dc8de15e14f2cd5b5c52e8ab3",
+      "short_description": "Centro público de arte contemporáneo en Las Palmas, instalado en una antigua fábrica de tabaco de la calle León y Castillo."
+    },
+    {
+      "canonical_id": "e79a08f3-7aa1-5b78-a42a-853fe99ca240",
+      "name": "Centro de Interpretación del Roque Bentayga",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "7394051ccba15046fa5e14c7169f9de0310eb48986be8fb013189c1ef84e0e70",
+      "short_description": "Centro junto al Roque Bentayga que explica la cultura prehispánica y los lugares de culto de este paisaje de Gran Canaria."
+    },
+    {
+      "canonical_id": "042fb058-421c-5352-9e20-820f5725fe8c",
+      "name": "Centro de Interpretación del Sitio Etnológico Salinas Punta de Tenefé",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "2d7a66f54b952e586e8bdedb5f41e39b6f55cec8666f3bf2dcddd666fc1034ed",
+      "short_description": "El centro de las Salinas de Tenefé explica la producción y los usos de la sal desde la antigua casa del salinero."
+    },
+    {
+      "canonical_id": "143bddd5-6db5-5c5c-9230-095d99b6d338",
+      "name": "Cima Pedro Gonzalez",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "85a048a3d49861a79d5dd9c9d934424e79b57b18eee90ff09cdc7a032023b694",
+      "short_description": "Mirador de montaña sobre el valle de Ayagaures, con panorámicas de sus embalses y del relieve rocoso del sur de Gran Canaria."
+    },
+    {
+      "canonical_id": "97fb85e4-b368-5bbd-a28c-c87c8e81b742",
+      "name": "Cocodrilo Park Zoo",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "ead94e2ab0599f6b930d7067fd67890aed64c4eed865756d26f03f903eb92143",
+      "short_description": "Centro zoológico y de rescate de Agüimes que acoge cocodrilos y otros animales exóticos procedentes del abandono y del tráfico ilegal."
+    },
+    {
+      "canonical_id": "78dfa08d-db41-500d-aae7-956cb67362f4",
+      "name": "Cuatro Puertas",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "a0de1e0bfeac6aebd1bfaca718498a8b783d27e64eb976e3efdd6faeeefc274f",
+      "short_description": "Yacimiento de Telde con una gran cueva artificial de cuatro entradas y otros espacios excavados por los antiguos canarios."
+    },
+    {
+      "canonical_id": "05f8f5db-88f4-4692-aedc-7043f309d72f",
+      "name": "Cueva Pintada de Gáldar",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "0faf58327fef9576bc9a7686e946d6f73adcd3102e7aa69f4b5f8332f4c41b80",
+      "short_description": "Museo y parque arqueológico de Gáldar que conserva un poblado indígena y una cueva con pinturas geométricas."
+    },
+    {
+      "canonical_id": "530eed3c-6d10-5a48-9c8a-075070e98e61",
+      "name": "Dedo de Dios",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "81db7d749d04c6dd7583f4b24bd2e22f0cee3f96ec85f81d5ee1f62957c8cb93",
+      "short_description": "El Dedo de Dios es el roque costero de Agaete que perdió su pináculo durante el temporal Delta de 2005."
+    },
+    {
+      "canonical_id": "a6ee9931-2850-4c85-b04f-a800e6d829a2",
+      "name": "Dunas de Maspalomas",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "c622ff77f8df4354f52c9eb0305c538bf0473b845695ef7fddf023e75b809ed3",
+      "short_description": "Reserva natural del sur de Gran Canaria que reúne dunas móviles, un palmeral y la laguna salobre de La Charca."
+    },
+    {
+      "canonical_id": "0e5a3714-4d9b-5e51-b95f-d4309e4f66ae",
+      "name": "Faro de La Isleta",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "fde74d9fc0ab90e8e5b308e6bf25a81622eb6d23dfc1bad0fb8d68357d7d3297",
+      "short_description": "Faro de la Montaña del Faro, en la península de La Isleta, dentro del paisaje protegido del noreste de Gran Canaria."
+    },
+    {
+      "canonical_id": "d3c7c0da-358e-5479-9af4-8051813f6322",
+      "name": "Faro de Punta Sardina",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "de185b0ab2a3190d9990f3afb1c8fe74881a59a96fe16e3308ca84de3c684138",
+      "short_description": "Faro de la costa de Gáldar, en Punta Sardina, rodeado de un litoral rocoso y charcos modelados por el mar."
+    },
+    {
+      "canonical_id": "6e5e3c6e-c378-5f4f-ac54-a53f63268cdc",
+      "name": "Fontanales",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "0f6883e725d4d3921ba758abc3ec061ba47eb0fd60ab085682e03517fff3d0c6",
+      "short_description": "Pueblo de medianías de Moya conocido por sus queserías y la iglesia de San Bartolomé, en un entorno de caminos rurales."
+    },
+    {
+      "canonical_id": "5670639e-17af-52aa-9101-da577def8d5a",
+      "name": "Gáldar",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "bbf9c91c8edaaf138a73c3a6b8bf795cc4ccbfba0ed6226cd38ece77dbf84442",
+      "short_description": "Ciudad del norte de Gran Canaria con la plaza de Santiago, su templo neoclásico y el yacimiento de Cueva Pintada en pleno casco."
+    },
+    {
+      "canonical_id": "92660011-4028-5e2b-8b8f-7d9b0865bb74",
+      "name": "Holiday World",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "79cb5cc48ded23dd935c6758f1edaf2ac5b6498265f3adf5dff4c9697a5c686d",
+      "short_description": "Centro de ocio de Maspalomas con parque de atracciones, bolera, salas de karaoke, juegos y una zona de restauración."
+    },
+    {
+      "canonical_id": "ca9a381a-4cbc-5549-986f-a1833c72352f",
+      "name": "Ingenio",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "dd3bd1020951716d859206d5324b2fde2cf0ab042984c7ede956c6456e1a0eda",
+      "short_description": "Pueblo del sureste de Gran Canaria cuyo casco histórico culmina en la plaza y la iglesia de Nuestra Señora de la Candelaria."
+    },
+    {
+      "canonical_id": "6e391417-44d0-5892-9200-7a58c3cde2d8",
+      "name": "Jardín botánico Viera y Clavijo",
+      "island": "gran-canaria",
+      "revision": 3,
+      "record_sha256": "5cb4689345a1168ff890e1c5b0e856b808f585509c08edb8e0594e438ee67b18",
+      "short_description": "Jardín botánico de Tafira, junto al barranco de Guiniguada, con flora canaria, laurisilva, palmeras y plantas de zonas áridas."
+    },
+    {
+      "canonical_id": "c1d43fa1-9ed6-5a36-951e-3a617ad30901",
+      "name": "Lago Taurito",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "ed7f667e4935516c5cdae8b1e635837423beb04cacd1e4f708f9e69c10e8daa0",
+      "short_description": "Lago Taurito es un parque acuático de agua salada situado junto a la playa de Taurito, en Mogán."
+    },
+    {
+      "canonical_id": "55c4b118-6a71-5b4f-ab72-380d3944acba",
+      "name": "Maspalomas",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "feeb40ee086315985ccfb7e29d67a236a97c7719877af4548448d1773de6d1b4",
+      "short_description": "Localidad turística del sur de Gran Canaria donde el paseo del faro enlaza la playa con el paisaje de dunas."
+    },
+    {
+      "canonical_id": "5e6093f8-23d8-5914-9ea9-e96a5a34222d",
+      "name": "Mirador de la Cruz",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "ace6ed1d96893c03e5e117d8eff140b2aa81b73696958022f72002a5f9cf67c0",
+      "short_description": "Mirador en lo alto de El Confital desde el que se contempla el istmo y la ciudad de Las Palmas de Gran Canaria."
+    },
+    {
+      "canonical_id": "066a5fac-63b5-449d-a05e-b76368d19d96",
+      "name": "Mirador del Balcón",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "7e0b4f08ec2c87a47b5e42f8c3d662d348795ef852a672d526a28ec54ac2b533",
+      "short_description": "El mirador del Balcón se abre al Atlántico y a los acantilados de la llamada cola de dragón, en el oeste de Gran Canaria."
+    },
+    {
+      "canonical_id": "1bc687c5-c1f0-518c-87b3-1a72eb5d70d0",
+      "name": "Mogán",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "4ede0618ee58b4e60603462685104785b248a7a41e8e130ad317429567235151",
+      "short_description": "Pueblo del interior de Gran Canaria organizado alrededor de la plaza Sarmiento y Coto y la iglesia de San Antonio de Padua."
+    },
+    {
+      "canonical_id": "a5b34789-c2a6-5a8c-a8f6-ad2579999fe0",
+      "name": "Monumento Atis Tirma",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "fd291cc6c2b6a6a54f716be0b32724dd3f7390993ce8c6e5511603befb60abeb",
+      "short_description": "Conjunto escultórico de bronce y piedra de Manuel Bethencourt, situado en el parque Doramas de Las Palmas de Gran Canaria."
+    },
+    {
+      "canonical_id": "3b11e8f8-3b5a-5c0e-9ef1-9a1135a200e4",
+      "name": "Moya",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "5456c3f573d01f3f0f330aaddf2c59d12e10cc1fab1e456f398d06d15426b19c",
+      "short_description": "Villa del norte de Gran Canaria con la iglesia de la Candelaria sobre el barranco de Moya y la casa natal del poeta Tomás Morales."
+    },
+    {
+      "canonical_id": "ab98fecb-4455-5f82-afe2-a1b431790846",
+      "name": "Mundo Aborigen",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "3a8e48aa95d8c62d93309ac0529c55824ecb61f9992bf8804338aa8cce282295",
+      "short_description": "Mundo Aborigen recrea la vida de los antiguos habitantes de Canarias en un parque temático del barranco de Fataga."
+    },
+    {
+      "canonical_id": "c71e2514-4b6c-5678-9450-1e946e9cbfee",
+      "name": "Museo de la Zafra",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "dfd6d42fcb77b3a4588f5af14845c90df6ec9b0431adee31ba47b106aa46e918",
+      "short_description": "El Museo de la Zafra explica cómo el cultivo del tomate transformó el trabajo y la vida cotidiana de Santa Lucía."
+    },
+    {
+      "canonical_id": "87db173f-d624-512b-93da-52d3ee1431d9",
+      "name": "Museo Elder de la Ciencia y la Tecnología",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "35a223cc78ffd2a1a08068853cf0f99c87c2d39ada6f56d7a20b7b8c885ca200",
+      "short_description": "Museo de ciencia de Las Palmas donde se pueden comparar esqueletos de animales y ver mobiliario de la antigua naviera Elder."
+    },
+    {
+      "canonical_id": "5ec4a09f-f16a-546b-a3d1-97d168d15a6f",
+      "name": "Museo Etnográfico Casas Cuevas",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "5a715799d61ca2c57a1a401bd0489baea82f323fcedaad9084c8aa8808694790",
+      "short_description": "Tres antiguas casas cueva de Artenara muestran el mobiliario y los espacios de la vida doméstica tradicional de la cumbre."
+    },
+    {
+      "canonical_id": "3eb57ab1-242d-5dec-89f1-9b5157c48e4f",
+      "name": "Museo Municipal de Arucas",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "901b6e3c89c4a4b421955480b47ee406fa5cbee04b96c00aed688a70366e03d7",
+      "short_description": "El Museo Municipal de Arucas ocupa la Casa Gourié, una antigua residencia vinculada al mayorazgo de la localidad."
+    },
+    {
+      "canonical_id": "3c882c8d-23a0-5456-9a1d-3f330405cf7b",
+      "name": "Museo Néstor",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "8b991c84c7a5d796041d6249a9b605bb3d28ccfe03c0119a69826719c1fed636",
+      "short_description": "Colección de Néstor Martín-Fernández de la Torre, en el Pueblo Canario, con las series Poema del Mar y Poema de la Tierra."
+    },
+    {
+      "canonical_id": "aaac3426-9a37-5070-b9b1-8d40b0571023",
+      "name": "Necrópolis Montaña del Gallego",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "f2b9893431153b73967c57519fcf5d8f399cf94125d82bd7b6227107b84cdd8b",
+      "short_description": "La necrópolis de Montaña del Gallego, en Jinámar, conserva enterramientos indígenas sobre antiguas coladas de lava."
+    },
+    {
+      "canonical_id": "66004403-df68-5325-aa98-038ac806031c",
+      "name": "Palmitos Park",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "16e5ddaa796535ee849edbd0a732c165babc52025d795778d9150ce73a8ea46d",
+      "short_description": "Zoológico del barranco de los Palmitos, con aves, mamíferos, mariposas y un jardín botánico de palmeras, cactus y orquídeas."
+    },
+    {
+      "canonical_id": "8742876e-5b20-5497-9c7c-eb419c7293c3",
+      "name": "Parque Natural de Tamadaba",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "0fbb78d096ec087d9509983c53351e577ac1d9aad0881f9a1dbd9f294c4130e0",
+      "short_description": "Tamadaba combina pinares de cumbre, barrancos y acantilados marinos en el oeste de Gran Canaria."
+    },
+    {
+      "canonical_id": "02babd4d-1f38-5620-a6ab-c7b85e66c517",
+      "name": "Puerto de las Nieves",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "141c16117e857afabc4786a94d1b24001e894b5de813e5c85fead7915b1fccde",
+      "short_description": "Puerto de las Nieves es el núcleo marinero de Agaete, con un paseo junto al mar y vistas a los riscos de la costa."
+    },
+    {
+      "canonical_id": "e469d614-1395-44d6-a927-5f209517bcd6",
+      "name": "Puerto de Mogán",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "db42deb6eaa364e11ac5b67421a3f82702476eb7eb00fdc3cbadbe6210c61916",
+      "short_description": "Barrio marinero del sur de Gran Canaria con canales, pequeños puentes y una playa junto al puerto."
+    },
+    {
+      "canonical_id": "33dd1b2f-adbc-502e-af2e-fa59f5a2f467",
+      "name": "Risco Caído",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "e6e24bd52c1f52a93a611f33ab004723967f366dcd1e4d24ebaa5b7e48869430",
+      "short_description": "Conjunto de cuevas prehispánicas en Barranco Hondo, con espacios de habitación, uso agrario y carácter ceremonial."
+    },
+    {
+      "canonical_id": "bc22213e-09e5-4ddc-ac44-1db98916eaf7",
+      "name": "Roque Bentayga",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "840a881ac1dccb65ff51d46990d8dae23af9dbe882a8bf48c55e1bb9f53e5cb5",
+      "short_description": "El Roque Bentayga destaca en la cuenca de Tejeda y conserva un almogarén vinculado al culto de los antiguos canarios."
+    },
+    {
+      "canonical_id": "fbd705b1-f863-4ec4-abec-a1a9371bb3d9",
+      "name": "Roque Nublo",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "0f3bb449dadfa5472062dcc9a815a746a36585ccd3336912b2f303bdf35dd20e",
+      "short_description": "Gran monolito volcánico sobre las cumbres de Tejeda, con vistas a la caldera y a los pinares del centro de Gran Canaria."
+    },
+    {
+      "canonical_id": "2147c261-e8f5-537a-accc-c31e2431e2c8",
+      "name": "San Francisco de Asís",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "808d4936f4c3ded2ed43b70012da47f9b0cccab93c16d9e62debd28c9895f0c1",
+      "short_description": "Iglesia de San Francisco de Asís junto a la Alameda de Colón, con retablos, pinturas y esculturas en el casco de Las Palmas."
+    },
+    {
+      "canonical_id": "86271560-1cb8-5963-ab20-01aec3a726ae",
+      "name": "Santa Brígida",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "bf90699685b0a985ce25fae7ba3c85e2bf747a350bf2ca14f57ec593308504e8",
+      "short_description": "Villa de medianías de Gran Canaria con casas tradicionales en las calles Real y de En Medio, alrededor de la plaza de la iglesia."
+    },
+    {
+      "canonical_id": "5ba7785b-fa29-5e8d-b561-f6e7e15f9c4b",
+      "name": "Sioux City Park",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "4b4900545ded1b9ad5dc14c29704a078c209c7b75c40d8911b95f88209b79ac0",
+      "short_description": "Parque temático del oeste americano en el sur de Gran Canaria, con espectáculos en vivo, ambientación de pueblo del Oeste y animales."
+    },
+    {
+      "canonical_id": "d025c4bb-3896-5d1f-8213-083c1fa238b1",
+      "name": "Tagoror del Gallego",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "1cfc5f68f3728f4b5d67f3f7d02af0b7640ac45890adc99fa9c4ee90745246b2",
+      "short_description": "El Tagoror del Gallego conserva asientos tallados en roca asociados a las antiguas asambleas indígenas de Gran Canaria."
+    },
+    {
+      "canonical_id": "2f449840-1744-5b03-8c34-d26b564e7751",
+      "name": "Tasarte",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "149884826a54505f531fc8267d4b68baa3527783cea440ccb0c7bcba5feccd4c",
+      "short_description": "Pueblo del suroeste de Gran Canaria situado en un valle entre montañas que desciende hacia la playa de Tasarte."
+    },
+    {
+      "canonical_id": "ff741bf3-72d7-5608-955a-7b4a10cd3fa6",
+      "name": "Teatro Pérez Galdós",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "8465227c7dff9c8e483bd65c2b9c94d82763c82748d4289fe5190c5188610feb",
+      "short_description": "Teatro de Las Palmas de Gran Canaria con programación de música, ópera, teatro y danza, junto al barrio de Triana."
+    },
+    {
+      "canonical_id": "37ccea8e-bf46-42a5-a42e-3528f4d1c632",
+      "name": "Tejeda",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "0e664c239b84a8996e77e6e8745e1d410450abd49d077feabfbb86ed3af9dd3c",
+      "short_description": "Pueblo de las cumbres de Gran Canaria con casas blancas de teja y calles que se agrupan alrededor de su iglesia."
+    },
+    {
+      "canonical_id": "6922700e-67ae-4048-bf4b-151b7c1fec16",
+      "name": "Teror",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "bfb85303876090f93d1ff5e3248690513018b551ae9343f8bbe2f2b88945685d",
+      "short_description": "Pueblo del interior de Gran Canaria cuyo casco se organiza alrededor de la basílica del Pino, entre plazas y casas con balcones de madera."
+    },
+    {
+      "canonical_id": "35dda3d8-8c28-502a-b841-15396750f07a",
+      "name": "Valsequillo",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "0d4951662e90b1f7df40b1f0b6fdcabc0fc5ffaa6f7ecab1235a5fc16b83456a",
+      "short_description": "Pueblo de medianías de Gran Canaria con la iglesia de San Miguel Arcángel y un mirador sobre el barranco del mismo nombre."
+    },
+    {
+      "canonical_id": "e8bac2e4-3928-4736-a1c9-799094d96985",
+      "name": "Vegueta",
+      "island": "gran-canaria",
+      "revision": 1,
+      "record_sha256": "3deb5bab8eda20350793b0f49fa54e35d12de3bea23bfb78df17e739ad15f510",
+      "short_description": "Vegueta conserva el núcleo histórico de Las Palmas, con plazas, calles de piedra y edificios ligados al origen de la ciudad."
+    },
+    {
+      "canonical_id": "c9bb9052-19d9-541b-a00e-84f32c349639",
+      "name": "Zona Arqueológica Lomo Galeón",
+      "island": "gran-canaria",
+      "revision": 2,
+      "record_sha256": "3ea8586c6894086052fbdcc24bdea79144a9e66dc091421e6ba1690ae7ac01e2",
+      "short_description": "Lomo Galeón es una zona arqueológica de San Bartolomé de Tirajana con vestigios funerarios y de poblamiento indígena."
+    },
+    {
+      "canonical_id": "cb055227-eec6-5733-aa88-a6b876f29a15",
+      "name": "Acardece",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "9de3c0134fefcb354a1cd321170351b1d4dd1f8b4a6cbd5a516dbf9c9404db1c",
+      "short_description": "Pequeño caserío de Valle Gran Rey, entre Arure y Las Hayas, en la transición de los bancales agrícolas al monteverde."
+    },
+    {
+      "canonical_id": "f4f73301-c1a1-5b3f-925a-54d09bcdbbbf",
+      "name": "Agalán",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "1a430b52f8583b45b7284ddfde7969afbfeaf4eb3227da34a9768a2db9a37a07",
+      "short_description": "Agalán es un pequeño caserío de Alajeró cuyo nombre conserva la huella de la toponimia indígena gomera."
+    },
+    {
+      "canonical_id": "a81a47a7-3fdb-44db-84c1-24cdf6ab6ef3",
+      "name": "Agulo",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "7d4c6465aa75f933f9679d7736143165da7407b336a882c7e6db05b175f4474c",
+      "short_description": "Pueblo del norte de La Gomera con calles empedradas, casas de teja y cultivos en terrazas frente al Atlántico."
+    },
+    {
+      "canonical_id": "4556e21d-4620-5532-a180-5de6ccdff3d8",
+      "name": "Alojera",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "76651a2c724e8a972da7e010abccbe40334991a2d8427f47a12c6a4b4166e9bd",
+      "short_description": "Pueblo de Vallehermoso ligado a la miel de palma, con la Casa de la Miel como lugar para conocer su elaboración."
+    },
+    {
+      "canonical_id": "9c88f6b2-bcda-5c9c-88a7-579d9faffa7b",
+      "name": "Alto de Garajonay",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "c4b34dd274fb0ca4409c22044302f51450e1d44cc84bbde8724912fa1632083d",
+      "short_description": "Cumbre de La Gomera desde la que se divisan las islas occidentales en días despejados y se observa el cielo nocturno."
+    },
+    {
+      "canonical_id": "f0644e34-4e15-5407-8881-b1cdbe68f6a5",
+      "name": "Botanical Garden",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "0083ec205005bbf4a7a7731d0b678d828deb2329dd1d5ae6fc2c057efc256e66",
+      "short_description": "Jardín Botánico del Descubrimiento, en Vallehermoso, con plantas del bosque termófilo, frutales y muestras de agricultura gomera."
+    },
+    {
+      "canonical_id": "251de724-beb5-5998-a429-5482e1faf630",
+      "name": "Casa Bencomo",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "3f1161cf5e12a00b0474e6c8c813ba62d71f58548536f24d50e8abb99582d340",
+      "short_description": "La Casa Bencomo conserva la distribución de una vivienda tradicional en el centro de San Sebastián de La Gomera."
+    },
+    {
+      "canonical_id": "5066d9ed-2b66-47b2-b312-2888f1b7de66",
+      "name": "Casa de Colón",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "b601fc971f0db4dca0c85940d09aa4374c135429521326cbd0261e9b808774a2",
+      "short_description": "Casa tradicional de San Sebastián de La Gomera con una exposición de cerámica precolombina de las culturas Chimú y Mochica."
+    },
+    {
+      "canonical_id": "bbad7ba4-14bd-59cf-841a-0c5e17c4234c",
+      "name": "Casa de la Aduana o Pozo de la Aguada",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "3bfc2ca2709d137243fefbe477ff46292677f9655b037925e421be8bcb528698",
+      "short_description": "La Casa de la Aduana recuerda la relación de San Sebastián de La Gomera con el puerto y el abastecimiento de los barcos."
+    },
+    {
+      "canonical_id": "80f4cbd6-3cfe-5061-8abe-5b1bfbc031c1",
+      "name": "Casa de la Miel de Palma",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "62c1e7d39430298e2621e57c7f3c7f59fb352f51179c4883ebaeadcc24b58660",
+      "short_description": "Centro de Alojera donde se explica cómo se extrae el guarapo de la palmera canaria y se convierte en miel de palma."
+    },
+    {
+      "canonical_id": "fa8faa48-8fd6-5c82-827b-c1737721b939",
+      "name": "Casa del Manco",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "3e65c8c72bb669294c67932fe50e2b525ea42fd1bee6d3b20506839ba994983e",
+      "short_description": "Antigua casa forestal abandonada al pie del conjunto de Los Roques, en el límite del Parque Nacional de Garajonay."
+    },
+    {
+      "canonical_id": "956c72d9-c18a-5ea0-a56d-0f1fbccbaf16",
+      "name": "Casa Ruiz de Padrón",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "3d09d8e19148ff815ac5cc5c6d606e63375027f89dafc8fd31d9fbe8ad25bf53",
+      "short_description": "La Casa Ruiz de Padrón recuerda al sacerdote y diputado nacido en esta vivienda de la Calle Real de San Sebastián."
+    },
+    {
+      "canonical_id": "f0c2d3e7-6eb4-59e5-8407-881d16f5db42",
+      "name": "Castillo del Mar",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "e552f9e6f5d34796272ee5ba3ced3439e40f712b62167b4399219aa62e62c560",
+      "short_description": "Antiguo embarcadero de fruta de Vallehermoso, conocido como Castillo del Mar, junto a la costa norte de La Gomera."
+    },
+    {
+      "canonical_id": "c33038a7-b3b4-5ee2-bcb9-38454a5773a1",
+      "name": "Centro de Interpretación de Las Loceras",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "b344127c6ff794983e0edfb7e295337481895f0e8f051633616b8f62fe737439",
+      "short_description": "Centro de El Cercado dedicado a las loceras, las artesanas que mantienen la tradición de la cerámica gomera."
+    },
+    {
+      "canonical_id": "e4ba9bd2-2063-59c8-943d-c028a10984bc",
+      "name": "Centro de Interpretación del Queso y el Pastoreo de la Gomera",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "509ca0a005ea358e4261d955e8c619210a55da8942a1d37b10879548ca50a27c",
+      "short_description": "Centro de Alajeró dedicado al queso y al pastoreo, con contenidos sobre la ganadería y su relación con el paisaje gomero."
+    },
+    {
+      "canonical_id": "34678f36-c8e1-5e2a-b564-ba45e107c40a",
+      "name": "Centro de Visitantes del P.N. de Garajonay",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "a2ccc0de42fcf72f83464b0f7b7a964a1db5123853f3f7746c7740a1794902c5",
+      "short_description": "Centro de visitantes de Garajonay en La Palmita, con salas sobre el parque, jardines de flora canaria y la Casa de la Memoria."
+    },
+    {
+      "canonical_id": "18ca314f-af38-56ca-a24d-6e4ee48b5b8e",
+      "name": "Delfines y ballenas de La Gomera: Biodiversidad en Cambio",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "56907d6deb1b39ea5ae10887ea6de1e81b995520a777b87e74fabff016a18971",
+      "short_description": "Exposición de MEER sobre los delfines y las ballenas de La Gomera, sus amenazas y la protección del medio marino."
+    },
+    {
+      "canonical_id": "9a6afb67-c6fc-54bd-80d3-6bbd00bd9755",
+      "name": "Faro de San Cristóbal",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "2718ef80f4c5adad7f5fa90319d2d38a2dfc526e289b69bae7426b39a5c04c82",
+      "short_description": "En la punta de San Cristóbal, sobre el puerto de San Sebastián de La Gomera, se conservan el faro antiguo y la torre actual."
+    },
+    {
+      "canonical_id": "daab37b8-8d78-5d01-a1a9-bd92c8b4f4eb",
+      "name": "Hautacuperche",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "2987e6122939afc1a974f41a4d848d8290b4acfc18b15b4e0f9af32ccb156635",
+      "short_description": "Estatua de Hautacuperche junto a la playa de La Puntilla, en Valle Gran Rey, dedicada al dirigente de la rebelión gomera de 1488."
+    },
+    {
+      "canonical_id": "259fb180-d0a8-5f03-8906-f108165a4ce6",
+      "name": "Hermigua",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "f633e7cde44aba5e29e092191b54311e7d3d9e5463e75ddaecec881fb6dff738",
+      "short_description": "Pueblo del noreste de La Gomera extendido por un valle de plataneras y bancales, entre las cumbres de Garajonay y la costa."
+    },
+    {
+      "canonical_id": "1ce5fb03-d43e-44a1-9519-39b988fb2815",
+      "name": "Iglesia de la Asunción",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "f0b3ce6404546fe7332aced48c56aa17ea547fe468b93debf3581825e6cc1c07",
+      "short_description": "Iglesia histórica de San Sebastián de La Gomera, junto a la calle Real, con elementos de distintas épocas de construcción."
+    },
+    {
+      "canonical_id": "3736117e-453f-501b-9df1-a4ef700c128f",
+      "name": "La Calera",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "3b4b2fcf8bfa5a581802ee6e1e378a1f214f20dda436c7cf055e73069d12105d",
+      "short_description": "Barrio de Valle Gran Rey con calles empedradas y bancales de plataneras, desde el que parte el camino hacia El Cercado y Laguna Grande."
+    },
+    {
+      "canonical_id": "de4f112c-fb6a-5f7d-af15-fa88c6b1e5b5",
+      "name": "La Dama",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "7c164c99aea16c98513b2ab5dbe0e0fee53c30655fca95205811c17963658554",
+      "short_description": "Núcleo agrícola del suroeste de Vallehermoso, asentado sobre una lomada con cultivos de plátano."
+    },
+    {
+      "canonical_id": "40c8a280-48d4-5bec-993b-ff6ac69efbe0",
+      "name": "Las Nieves",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "c0de5ad6476d4467181ce3f938eb9c1f1abb2e2069968546ead03f0e5f2ece5b",
+      "short_description": "Las Nieves combina un mirador, una ermita y un área recreativa junto al entorno de Garajonay."
+    },
+    {
+      "canonical_id": "ce3e93a5-3cbe-5e6d-9f25-6c8e902b063c",
+      "name": "Lomo del Dinero",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "a39ef99c8f731dca1eeac09fdc018a7e3143def9185d10609f0c0b50c9ebf2d4",
+      "short_description": "Lomo del Dinero ofrece una panorámica de los valles y las cumbres del norte de La Gomera cubiertos de laurisilva."
+    },
+    {
+      "canonical_id": "0c2598e2-01dc-56fd-b606-d5fe5bb37036",
+      "name": "Los Barranquillos",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "0b4cc7870e36408332df888d60e74dfdebe8cde1f9d71dceab06209838517ada",
+      "short_description": "Los Barranquillos se asoma a la costa oeste de La Gomera desde el borde de la meseta de Garajonay."
+    },
+    {
+      "canonical_id": "59f1b2e7-df1b-436a-9162-531364ced68a",
+      "name": "Los Órganos",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "88d1a6837e9b8f85412c39cfa53c390d8da987767d31a25df783a03a54265d0e",
+      "short_description": "Acantilado del noroeste de La Gomera formado por columnas de basalto que recuerdan los tubos de un órgano."
+    },
+    {
+      "canonical_id": "7bfed8d9-8338-53ad-a81c-11ac331390d4",
+      "name": "Mirador Cherelepín",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "abab8300bda3637f7236261913b58c53675f604dbf3685cf9d37d1515553df55",
+      "short_description": "Pequeño mirador entre los brezales de Garajonay, al que llega un ramal del sendero de La Laguna Grande."
+    },
+    {
+      "canonical_id": "04cb1cc0-754d-5854-b604-d7e560a43833",
+      "name": "Mirador Colgado",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "1f3bbf9d8e0a9435e70de4cd1eb04636ded8bf9c82f338c81bea7a2b0784bf5a",
+      "short_description": "Mirador elevado entre Los Roques de La Gomera, abierto hacia la cabecera del barranco de La Villa."
+    },
+    {
+      "canonical_id": "15addf95-2e8b-4ee3-8a66-6fc0f5a9707e",
+      "name": "Mirador de Abrante",
+      "island": "la-gomera",
+      "revision": 3,
+      "record_sha256": "6c9f80ede14295c54f28bcb23c5ed876f13b91e3c0100a80187e6e8f4e7eddc2",
+      "short_description": "Pasarela con suelo de cristal sobre el valle de Agulo, con vistas a sus casas y terrazas agrícolas y, si está despejado, a Tenerife."
+    },
+    {
+      "canonical_id": "6d364d3a-3ddb-53ce-bc18-aa37aedcaba2",
+      "name": "Museo Arqueológico de la Gomera",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "f42a1e54b4aa9d9e44aa5bf6073065b606cc210e9295b76ad5da95d0989dba5e",
+      "short_description": "Museo de San Sebastián sobre los antiguos gomeros, con piezas arqueológicas y una recreación a tamaño real de un altar de sacrificios."
+    },
+    {
+      "canonical_id": "c9aa8497-648a-4436-8bb3-0bdbc6cf6f03",
+      "name": "Parque Nacional de Garajonay",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "87fc22ad12f5c3f75493040c5b93a6999b6d5b0975aebecc22a07f1fdbf9e745",
+      "short_description": "Bosque de laurisilva en las cumbres de La Gomera, donde la humedad de las nubes mantiene un paisaje de hojas perennes, musgos y helechos."
+    },
+    {
+      "canonical_id": "2759eec2-961a-5931-9cd3-d4c592c4c3f6",
+      "name": "PEG Los Telares, El Parque Etnográfico de La Gomera",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "6a157b5f4b8b164011a0e4d8680f90a0bf3cd4252d8d940ef2207eb88ea7303b",
+      "short_description": "Parque etnográfico de Hermigua con una finca tradicional, una colección de útiles rurales y un molino de gofio movido por agua."
+    },
+    {
+      "canonical_id": "81db89b5-9047-5ee2-92fa-7265482da32b",
+      "name": "Pescante de Agulo",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "e31123291653542926d36c031e9e4973c169f1541b9e28c952fc76634a9d7240",
+      "short_description": "Restos del pescante de Agulo, una instalación de 1908 que servía para embarcar fruta y personas desde la costa."
+    },
+    {
+      "canonical_id": "eab969e3-4086-5562-aa67-6ec8568ef49e",
+      "name": "Sagrado Corazón",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "e1892b66aab16530206821f1cf1e469a129e9ec5639cb217bed2c1365a1eaa68",
+      "short_description": "La imagen del Sagrado Corazón se alza en El Machal, sobre la bahía de San Sebastián de La Gomera."
+    },
+    {
+      "canonical_id": "a0fe6619-fc9c-4f00-97ff-ef085ee8dd53",
+      "name": "San Sebastián de La Gomera",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "a36bf9891542c8482643b31bdf1f2022a6719ad5a67cd8c9371f66f423dae7ee",
+      "short_description": "Capital de La Gomera con la Torre del Conde, la iglesia de la Asunción y casas canarias vinculadas a la historia atlántica."
+    },
+    {
+      "canonical_id": "f87ae8a7-1b2b-56cb-bbcc-06a162716b52",
+      "name": "Tienda Museo La Alameda",
+      "island": "la-gomera",
+      "revision": 1,
+      "record_sha256": "2bccd7ece97c332cdf8c3aae75997ef300c8a06dda721b3c1535e6e5727db289",
+      "short_description": "Antigua tienda de barrio de La Calera, en Valle Gran Rey, convertida en un pequeño museo etnográfico."
+    },
+    {
+      "canonical_id": "b5e1a9d8-dd62-4ef4-b8ff-b0c01c50aee2",
+      "name": "Torre del Conde",
+      "island": "la-gomera",
+      "revision": 3,
+      "record_sha256": "1d2078ed1948d9445ef24751a38053532e24e28a8eb621769f62c8dbb799cf21",
+      "short_description": "Torre defensiva del siglo XV en un parque de San Sebastián de La Gomera, ligada al poder de los señores de la isla."
+    },
+    {
+      "canonical_id": "742be1d6-d52f-4227-bcbc-b4998f8543fb",
+      "name": "Arco de los Caletones",
+      "island": "la-graciosa",
+      "revision": 2,
+      "record_sha256": "ce223f83b4292c460ea30685e2d73f05636e0fef2fd5d583fb4c2e167837a40f",
+      "short_description": "Arcos de roca volcánica en la costa norte de La Graciosa, abiertos por el oleaje entre la lava negra y la arena clara."
+    },
+    {
+      "canonical_id": "c8ecc62c-1f01-418a-8fd0-b3b8017bd575",
+      "name": "Caleta de Sebo",
+      "island": "la-graciosa",
+      "revision": 2,
+      "record_sha256": "f09d32c51177f1e6142d617df21684353aeac521b32c7188dcb3c66884c3a4a2",
+      "short_description": "Pueblo marinero de casas blancas y calles de arena frente a los riscos de Famara, con el puerto de llegada desde Órzola."
+    },
+    {
+      "canonical_id": "6ada7c99-8d86-498f-85ef-05a551901f60",
+      "name": "Montaña Amarilla y La Cocina",
+      "island": "la-graciosa",
+      "revision": 2,
+      "record_sha256": "357798a2a1b062fddc2e0d382ffee5f559c99419632423db5b173febd2e1c9a8",
+      "short_description": "Montaña volcánica de tonos amarillos junto a la cala de La Cocina, en el sur de La Graciosa."
+    },
+    {
+      "canonical_id": "63add298-b03f-4aaa-96f3-5b32c66fa0b3",
+      "name": "Pedro Barba",
+      "island": "la-graciosa",
+      "revision": 2,
+      "record_sha256": "55c708652848720f54e279f22e635e3b2968bcc6f16a28f40ac53b203cfcc199",
+      "short_description": "Pequeño núcleo de casas blancas en la costa oriental de La Graciosa, junto a una playa y frente a los riscos de Famara."
+    },
+    {
+      "canonical_id": "5784fa82-aaa8-5831-8d5b-6c262051a55f",
+      "name": "Punta del Pobre",
+      "island": "la-graciosa",
+      "revision": 3,
+      "record_sha256": "86db8a42191b44779be938a430b947f0fc4382ce215b1a5acd6547f8501840d3",
+      "short_description": "Punto de observación de la costa occidental de La Graciosa, con vistas hacia Montaña Amarilla y la cala de La Cocina."
+    },
+    {
+      "canonical_id": "7d653c37-6070-4897-92ed-290d52224554",
+      "name": "Balcones de la Avenida Marítima",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "92b94ddc0855fe32c7d46ab38d9d90c434e0fcf3ed91f67bc47bbaf9a9ed7ca8",
+      "short_description": "Conjunto de balcones de madera de las casas de la Avenida Marítima, frente al mar de Santa Cruz de La Palma."
+    },
+    {
+      "canonical_id": "fd0cb2fe-82a1-56d0-9d37-865823ac1415",
+      "name": "Benehauno - Centro de interpretación de petroglifos",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "f3d514cbc1197ae86a5054c87042724f957a3d355a54d1003b21d69cd2aa9193",
+      "short_description": "Centro de El Paso dedicado a los petroglifos prehispánicos del municipio, con piezas originales y recursos audiovisuales."
+    },
+    {
+      "canonical_id": "1fd09946-49d2-40e1-a6ed-43f137e33c71",
+      "name": "Bosque de Los Tilos",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "59f713bf9c2bb6b2260e756183080aaee49e43fa2ab9a43fac1d42fee3e2eb9e",
+      "short_description": "Los Tilos conserva un bosque húmedo de laurisilva en el nordeste de La Palma, cerca de Los Sauces."
+    },
+    {
+      "canonical_id": "bed51294-a27c-460d-9868-fc52fcd553b2",
+      "name": "Caldera de Taburiente",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "e44b38f6b4d39fa94265ef31795dc3a9c0d66b66f9cd5bd4b4df95a3fbe6d56f",
+      "short_description": "Parque nacional del interior de La Palma, con grandes paredes rocosas, bosques de pino canario y barrancos por los que corre el agua."
+    },
+    {
+      "canonical_id": "56dfb176-80d4-4fcf-82c6-eadc258a963a",
+      "name": "Castillo de Santa Catalina",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "3978bba4b5e0289c40c1800f0df15e693987f7375b47c0f9d3eaa838eb0a6a54",
+      "short_description": "Fortaleza de la Avenida Marítima de Santa Cruz de La Palma, levantada para defender la ciudad de los ataques por mar."
+    },
+    {
+      "canonical_id": "f61aeb7a-02d6-5219-a206-7881b7447d2d",
+      "name": "Centro de Interpretación de la Caña de Azúcar y el Ron",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "730251fbb6982a7930edb1cccfc05987af6af08cf16c7109df6f384aa63638d2",
+      "short_description": "El Trapiche El Melonar, en San Andrés y Sauces, explica la historia de la caña de azúcar y la elaboración del ron de Destilerías Aldea."
+    },
+    {
+      "canonical_id": "e008cf11-1a7e-520e-b7d4-e31aef1aa182",
+      "name": "Centro de Interpretación del tubo volcánico Cueva de Las Palomas",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "79e235f656d72bf13e6f37cec654e1882d78d4aa28ef4383cd5c34b04e3864e7",
+      "short_description": "Caños de Fuego explica los tubos volcánicos de Las Manchas y su relación con las lavas de la erupción de San Juan de 1949."
+    },
+    {
+      "canonical_id": "e7c4b711-b37a-55b5-9402-e3b6ef8611d3",
+      "name": "Centro de Visitantes de La Caldera de Taburiente",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "3c2aa624c98a071ebf70d90aab3de91deedef664ddd78170c73309d8f0db550d",
+      "short_description": "El centro de visitantes de la Caldera de Taburiente ofrece información sobre el parque y una exposición de su naturaleza."
+    },
+    {
+      "canonical_id": "0cf471ad-897c-5060-b5a8-169d3ed1b6a8",
+      "name": "Centro de Visitantes del Parque Arqueológico de El Tendal",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "e3681ba293d67f9baafc939e982af5c38292afd38b4205516390c85018fed467",
+      "short_description": "Centro de San Andrés y Sauces con piezas arqueológicas procedentes de las cuevas del barranco de San Juan."
+    },
+    {
+      "canonical_id": "2d0a761d-1a02-5402-bc92-d5187da8820f",
+      "name": "Centro de Visitantes del Parque natural de Cumbre Vieja",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "66c611bc24448d84ad00148c0ab3787aae8d48a976acef58e251e816e16cc38f",
+      "short_description": "El centro de Cumbre Vieja explica la historia volcánica de La Palma junto al área del Refugio del Pilar."
+    },
+    {
+      "canonical_id": "45a9406c-fd34-5c8c-8c9c-65ac1cba6359",
+      "name": "Centro de Visitantes del Volcán de San Antonio",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "cd00f8e196cb9f3477434cba64abad3747daa479b0ef6f5e21a28495e23fc497",
+      "short_description": "El centro de visitantes del volcán de San Antonio presenta en Fuencaliente la historia de las erupciones de La Palma."
+    },
+    {
+      "canonical_id": "af94572c-4304-5d3c-8732-d36e67fe8a73",
+      "name": "Circo de Marte",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "7351f97926ce835a9fc074334636f0aefc38062b5e6443d66f5326e960421aac",
+      "short_description": "Teatro histórico de Santa Cruz de La Palma cuyo edificio conserva integrado el volumen del antiguo circo."
+    },
+    {
+      "canonical_id": "82ffa339-8ade-528d-88f8-4c94834d0f62",
+      "name": "Dragos Gemelos",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "6f1e4789c24ddf66f3c9a569f44804c4c6f48165416089ccd9934d49ac3110e3",
+      "short_description": "Dos dragos de Breña Alta cuyos troncos y ramas entrelazados están ligados a una leyenda de amor y rivalidad."
+    },
+    {
+      "canonical_id": "b6febe84-72eb-5b84-8b96-037a89ded8ad",
+      "name": "El Tablado",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "480c9d56b8409d594f53d2e2b71c7f74605b1d5b160c3b2f259bb0b40fd28bce",
+      "short_description": "Caserío de Garafía entre los barrancos de Los Hombres y Fagundo, con casas rurales y huertas en terrazas sobre la costa."
+    },
+    {
+      "canonical_id": "920bd098-1941-5752-a33c-dce210e4d4bc",
+      "name": "Ermita del Buen Jesús",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "da089ba1c0e6d2e8af97524631325532452689bc2ed6cf671c365b9c77ef29be",
+      "short_description": "Pequeña ermita del siglo XVI junto al barranco del Jurado, en Tijarafe, que da nombre al barrio de El Jesús."
+    },
+    {
+      "canonical_id": "3a082a3e-7557-526a-8408-01a7c58b2497",
+      "name": "Faro de Arenas Blancas",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "30a59234291b52a6c2ab7aa6aa0183904c25af27a5ad4fac306eb64b2e21e0bb",
+      "short_description": "Faro de la costa oriental de La Palma, situado en la zona de Las Salineras."
+    },
+    {
+      "canonical_id": "aa5c1bff-07fe-58c0-a7c3-2b761c175ae1",
+      "name": "Faro de Fuencaliente Centro de Interpretación de la Reserva Marina",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "669c7dc9025793bf5412b7c4471d1240832f121a9ee36113ebb85104c7beff4c",
+      "short_description": "Centro dedicado al mar de La Palma dentro del faro antiguo de Fuencaliente, con paneles sobre especies y conservación de la reserva marina."
+    },
+    {
+      "canonical_id": "da98a337-d286-5b54-a8a2-95b8469ba184",
+      "name": "Faro de Punta Cumplida",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "34b3633250cdb7e7e168107c39748af39e4350edb49a10b200d10467fb8ef213",
+      "short_description": "Faro del noreste de La Palma con una torre de piedra oscura sobre el promontorio de Punta Cumplida, en Barlovento."
+    },
+    {
+      "canonical_id": "aab22e15-3399-597c-95b5-5311a9c7bdfe",
+      "name": "Faro Punta de la Lava",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "3a33969657634250b2e63fb89b93e7ae8695cb65d9680d1469869a7eba35ecd2",
+      "short_description": "Faro de Punta Lava, en la costa de La Palma, que entró en servicio en 1996."
+    },
+    {
+      "canonical_id": "83aeb815-7da7-54dc-bec9-e9df31a4fa9f",
+      "name": "Franceses",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "121bfd70d0f07a3163e06f881524387e5c7bc9f1e89b3380dc03fd541c049f85",
+      "short_description": "Caserío de Garafía extendido por laderas entre los barrancos de Franceses y Los Hombres, con antiguas viviendas rurales."
+    },
+    {
+      "canonical_id": "891369d9-935a-5e5a-bc1e-4b3742b30137",
+      "name": "Fuente Santa",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "536bc1e3146f6afde609a4e873ba6b4ca03219b9d4c79aefcf2b941c654036f1",
+      "short_description": "Manantial termal de Fuencaliente, recuperado bajo las lavas junto a Echentive tras varios siglos enterrado."
+    },
+    {
+      "canonical_id": "a1cfc639-c1e8-5559-a253-49974c6751a8",
+      "name": "Gallegos",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "ca865b33787abbd3f691a4fba3576dca653a8b9b804959a7105442ac4e9b07fd",
+      "short_description": "Caserío de Barlovento junto al profundo barranco de Gallegos, en el recorrido del GR 130 por el norte de La Palma."
+    },
+    {
+      "canonical_id": "279d2bd5-a2cf-5198-a7fd-d4d10cd6c5f4",
+      "name": "Iglesia de San Nicolás de Bari",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "90baf203d7fffabd2953075971e3f7df0b3c862749a1e2aa7e764a8896990e8d",
+      "short_description": "Iglesia de Las Manchas que sobrevivió a las lavas del volcán de San Juan en 1949, cuando la colada se dividió antes de alcanzarla."
+    },
+    {
+      "canonical_id": "12e15b1c-1bc3-5cb1-a6a0-2ccdbe18d28f",
+      "name": "Iglesia de Santo Domingo",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "6b2b5064911c6441ee63530265bd57a59cd0c2675c0afa0f58619f750ddeaffe",
+      "short_description": "La iglesia de Santo Domingo conserva un destacado patrimonio de pintura, retablos y escultura en Santa Cruz de La Palma."
+    },
+    {
+      "canonical_id": "fb0e30f1-12c5-5b50-9ff2-6db883f5c083",
+      "name": "Iglesia Nuestra Senora de la Candelaria",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "71e198264b3bd4ba9105b1d3be0cba62279d2a2d8a51ce294d3013876dc47d74",
+      "short_description": "Iglesia del casco de Tijarafe, nacida de una ermita del siglo XVI y ampliada durante los siglos siguientes."
+    },
+    {
+      "canonical_id": "e08c0acc-b2ba-5b42-98c9-882612c5a3f8",
+      "name": "La Erita",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "61a6015feac73182823516c31dafa0a3050245ba62315542faf15ebe1fb71ecc",
+      "short_description": "La Erita conserva grabados geométricos sobre un dique de basalto junto al borde de la Caldera de Taburiente."
+    },
+    {
+      "canonical_id": "199cdeb8-4018-53a1-aedf-397127382157",
+      "name": "La Galga",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "977f6607b95d934422dee93c967d1193b50fc89051a3a46266c461150a5dd69d",
+      "short_description": "Barrio de Puntallana que da acceso a la laurisilva del Cubo de La Galga y al mirador de San Bartolomé."
+    },
+    {
+      "canonical_id": "1d4c6a77-556b-5975-8fe3-98263fd14f4e",
+      "name": "La Laguna",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "8d592d4241eac04553f2938a2796da896f5fb577d79204ead5a793ddb011d986",
+      "short_description": "La Laguna es un barrio de Los Llanos de Aridane cuya historia cultural está ligada a la sociedad Velia."
+    },
+    {
+      "canonical_id": "586fb946-d833-5153-8c49-18ae52692669",
+      "name": "La Tosca",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "147c977879c4a9a044bd0f66a3a92a53c821a5b88d572ea0317777b7c4efb6b4",
+      "short_description": "Caserío de Barlovento conocido por su conjunto de dragos y por el antiguo camino que enlaza con Gallegos."
+    },
+    {
+      "canonical_id": "da626310-2517-5b77-909f-7d3ed0a67efa",
+      "name": "Los Llanos de Aridane",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "c3667872297bfd99d5ff8b4d29fbe9a1b5418d290f80dc41cdb0ad3a19506eed",
+      "short_description": "Ciudad del oeste de La Palma con un centro de calles peatonales alrededor de la plaza de España y la iglesia de los Remedios."
+    },
+    {
+      "canonical_id": "95fc49bc-0329-5e6e-87ea-c7712ffaf6fc",
+      "name": "Maroparque",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "810566f703b2baafb255b28506c30a28f36f8a84c7220e07d0aa8de2144066fb",
+      "short_description": "Parque zoológico y centro de rescate de Breña Alta con animales exóticos y aviarios que se recorren a pie."
+    },
+    {
+      "canonical_id": "a30676fa-e9dc-53d3-bc4b-e326aa91f63a",
+      "name": "Mirador Barranco de los Gomeros",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "4f7b90b4cf81f8faa6afefbe42e355ddcc311270d997669af4801917f3121da8",
+      "short_description": "Mirador de la salida norte de Santa Cruz de La Palma con vistas hacia la ciudad, las Breñas y el aeropuerto."
+    },
+    {
+      "canonical_id": "634d91cf-df89-5c7a-a806-87681c39d398",
+      "name": "Mirador Barranco del Carmen",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "ec2e7992fa6695e53c827e0b49d73f7e4c60567e2091882616aa703a5113c32a",
+      "short_description": "Mirador astronómico de Santa Cruz de La Palma dedicado al cielo del este y del sur y a las antiguas imágenes del mar entre las estrellas."
+    },
+    {
+      "canonical_id": "b2f44e01-7006-5bf8-9bfe-0105da3f6309",
+      "name": "Mirador de la Concepción",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "db02ec479030e4e929e12da2e1422f69c4ad7449803a0c0dd575cf1a125c91ff",
+      "short_description": "Mirador de Breña Alta sobre el borde de un antiguo cráter, desde el que se ven Santa Cruz de La Palma, su puerto y la costa oriental."
+    },
+    {
+      "canonical_id": "8ce2a662-cead-5587-af47-48633d8b5501",
+      "name": "Mirador de la Cumbrecita",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "15bbcd9013b46b017191ec4fd774bb263928148c6d8740776149dbc838266093",
+      "short_description": "Mirador de El Paso abierto al interior de la Caldera de Taburiente, con vistas a sus paredes rocosas, barrancos y pinares."
+    },
+    {
+      "canonical_id": "e0f26117-b833-596b-abfe-ec6b58d4d3a1",
+      "name": "Mirador de la paz",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "bfe4408893df4c97eecb2f701390420463151d60f50858362bce01eb2de39645",
+      "short_description": "El mirador de la Paz combina vistas de la costa de Garafía con una escultura de una esfera terrestre y una paloma."
+    },
+    {
+      "canonical_id": "df6cfb55-96bf-5edf-accb-86503b43c744",
+      "name": "Mirador de La Tosca",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "985ee92e0bafcceadcfd5c8b0e8dd31a7a8415d057f14169ab811b18d2c62ca1",
+      "short_description": "Mirador junto a la carretera del norte de La Palma, sobre el caserío de La Tosca y sus dragos."
+    },
+    {
+      "canonical_id": "e07811c0-377d-5db9-99c5-07a52133f86c",
+      "name": "Mirador del Aeropuerto",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "e42c4731935393bfad2a88f6c3facc36cbfc6e5746845c5fd137cc5d3b899bdd",
+      "short_description": "El mirador del Aeropuerto muestra la terminal de La Palma, los cultivos de plátano y el barrio costero de La Bajita."
+    },
+    {
+      "canonical_id": "de545743-9389-576a-9a3d-634236a8e468",
+      "name": "Mirador del Lomo del Piojo (Tajogaite)",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "09f98a87510e18c76f264c1da237581f0707950fd85e76851310732dc25fe4c2",
+      "short_description": "El mirador del Lomo del Piojo permite observar en Tacande el paisaje transformado por la erupción del Tajogaite."
+    },
+    {
+      "canonical_id": "38b5e633-1735-5757-b719-d0489cc1ef9f",
+      "name": "Mirador Jardín de las Hespérides",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "056e549b21f50f19f41c610226faf6ca4d5dc08cb5ff24b7bff8cbd05ff1e032",
+      "short_description": "Mirador de San Andrés y Sauces con esculturas inspiradas en el Jardín de las Hespérides y vistas al relieve del nordeste de La Palma."
+    },
+    {
+      "canonical_id": "4d703087-b4dd-5c92-9111-aac958a2de4a",
+      "name": "Mirador Tanausú",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "c2e2734a9dac1e9a6f0decd22eb815144d8f35467a11377253abbdfe4c752da4",
+      "short_description": "El mirador Tanausú ofrece una vista del casco de Santo Domingo de Garafía que se prolonga hasta la costa."
+    },
+    {
+      "canonical_id": "1531b50a-1ed1-51c8-8188-916712e37626",
+      "name": "Museo Arqueológico Benahorita",
+      "island": "la-palma",
+      "revision": 3,
+      "record_sha256": "b355439487135479c4e000177900e09159d74fc5d0e78c0f4a24fa9d4e7b999e",
+      "short_description": "El Museo Arqueológico Benahoarita, en Los Llanos, reúne cerámica, herramientas y recreaciones de la vida anterior a la conquista."
+    },
+    {
+      "canonical_id": "73ed5f29-47c1-5d07-93ca-0f5b972e0081",
+      "name": "Museo Casa Roja",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "910b94dc3e60b2aa895cdf63ef4bb19786df29777abdbd76cce269f079d4c84a",
+      "short_description": "Casa museo de Villa de Mazo dedicada a las fiestas del Corpus y al bordado palmero, con fotografías, documentos y piezas textiles."
+    },
+    {
+      "canonical_id": "b3aea500-575c-5034-84ec-4701a33c90c1",
+      "name": "Museo de Interpretación del Gofio (MIGO)",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "c1e91bc6955480f5cf50faddbad543faba83c85ba483e1e436f5bedc97a03ee9",
+      "short_description": "El MIGO explica la elaboración del gofio en el antiguo molino de Las Tricias, en Garafía."
+    },
+    {
+      "canonical_id": "c15f5416-b201-52d5-90d8-85cc32029cde",
+      "name": "Museo de la Fiesta de las Cruces",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "3dc918c3681f1eaad1019741bc4e9fe9bc7f2894cbaad32309a3d1ce7a9736da",
+      "short_description": "Museo de Breña Alta dedicado a la Fiesta de las Cruces y al trabajo artesanal con el que se adornan cada mes de mayo."
+    },
+    {
+      "canonical_id": "a7f7fbfe-3574-566d-b332-784a118110fa",
+      "name": "Museo de la seda Las Hilanderas",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "193bb2b7f2a608c603e75db952fccd1f36d931f37c4af089568610c90939d1b8",
+      "short_description": "Museo y taller de El Paso donde las artesanas elaboran prendas de seda con utensilios y métodos tradicionales."
+    },
+    {
+      "canonical_id": "698ff7be-6eb2-5a2f-9e80-838ce29447a0",
+      "name": "Museo del Plátano",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "bd6d3c667302db44cb4099bf285b2c5925dc576c7e7b5b55c3a9c6ab6df16538",
+      "short_description": "El Museo del Plátano explica la historia, el cultivo y la exportación de esta fruta desde una casa canaria de Tazacorte."
+    },
+    {
+      "canonical_id": "7a8221b2-7ee5-554d-b189-0b3c267881a5",
+      "name": "Museo del Puro Palmero",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "90510170f386aeadba1b517fcd3daff24e48c4fb4fd6f72e3e8d0e52c95b52f7",
+      "short_description": "Museo de Breña Alta sobre el cultivo del tabaco y la elaboración artesanal de los puros de La Palma."
+    },
+    {
+      "canonical_id": "780f0dc4-07a6-5dc6-a7e2-3ffcf1643485",
+      "name": "Museo Insular de La Palma",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "937e4414c5178752f73f7ea8cf1b96e18ad686ba912b1c0767dc24d1a1bd2542",
+      "short_description": "El Museo Insular de La Palma reúne arte, etnografía e historia natural en un antiguo convento de Santa Cruz de La Palma."
+    },
+    {
+      "canonical_id": "669376e3-9be4-5a50-84a2-ba6fbe586780",
+      "name": "Museo Naval",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "b994f2c1fb5f6fe1dfbedfba345b946e2d21eeb1f651e6ee811c52429c62b3ed",
+      "short_description": "Museo del Barco de la Virgen, en Santa Cruz de La Palma, con instrumentos de navegación, maquetas y documentación marinera."
+    },
+    {
+      "canonical_id": "3c9cc5d0-708e-5b46-8cf8-49814cdbbabb",
+      "name": "Parque Arqueológico de Belmaco",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "fb09972396d744532782159e4eedb46cb36031fd2151588c956554fdb77d55be",
+      "short_description": "Belmaco reúne cuevas naturales y grabados rupestres que ayudan a conocer el pasado indígena de La Palma."
+    },
+    {
+      "canonical_id": "ac749179-5ea5-5b9a-81ce-1ef20af8aa15",
+      "name": "Parque Cultural La Zarza y La Zarcita",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "6ccc5b5995b4b9c1302911e5d73e8efc65787112e026709db3b7285d0e81a25c",
+      "short_description": "Conjunto arqueológico de Garafía con grabados geométricos de los antiguos habitantes de La Palma sobre paredes de roca."
+    },
+    {
+      "canonical_id": "f826b549-5cfb-55aa-a878-11b9a9c05c43",
+      "name": "Plaza de la Glorieta",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "bd9abd0b89ed9242393b5f7c15017aa20f8ac7f7645f28876b3ce4192cd9e462",
+      "short_description": "Plaza de Las Manchas diseñada por Luis Morera, con mosaicos de cerámica, pérgolas y plantas de la flora canaria."
+    },
+    {
+      "canonical_id": "467cc498-d73a-472c-bc94-9b9e6411358d",
+      "name": "Porís de Candelaria",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "c2962e8605c3ed94db16c1135d99f2924c8a640dfd69753c1f222bace585c2b6",
+      "short_description": "Porís de Candelaria es un pequeño conjunto de casas blancas resguardado por una gran cavidad costera de Tijarafe."
+    },
+    {
+      "canonical_id": "146d5c99-5d2a-44b0-bad5-87fe54f91085",
+      "name": "Roque de los Muchachos",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "0d8d2229c2f1aef95f879f2b538250a372c51d049d88852093a0d4c74f80f640",
+      "short_description": "El Roque de los Muchachos es la cumbre de La Palma y un mirador junto a uno de sus principales enclaves astronómicos."
+    },
+    {
+      "canonical_id": "d981d9eb-b7f9-4580-9327-f68bfe4b9e60",
+      "name": "Ruta de los Volcanes",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "0f8d16d46759972ab62e64b76869715ca3f8f87cb6860d55b290188eb507eb3d",
+      "short_description": "La Ruta de los Volcanes recorre la dorsal de Cumbre Vieja entre pinares, conos y paisajes abiertos de La Palma."
+    },
+    {
+      "canonical_id": "5ce8cef7-1bd6-5a08-83c8-9bb26cdbf207",
+      "name": "Salinas de Fuencaliente",
+      "island": "la-palma",
+      "revision": 2,
+      "record_sha256": "c4d3da756335ac4d749788eaa6cfe5234a907893f201b6fc161e6cd636ed59a2",
+      "short_description": "Salinas artesanales del sur de La Palma donde el sol y el viento evaporan el agua de mar para producir sal."
+    },
+    {
+      "canonical_id": "5930cca6-d269-56a8-9718-d80f00ab7592",
+      "name": "Salinas de Los Cancajos",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "862bf9d21b5a9b25e519079af4676f897291dcb96b35eb25a49a723c1418c268",
+      "short_description": "Antiguas salinas del paseo marítimo de Los Cancajos, con estanques junto al mar y una portada de cantería neoclásica."
+    },
+    {
+      "canonical_id": "b3fc7b3d-b34d-4fa6-acb1-c50a36ce88b0",
+      "name": "Santa Cruz de La Palma",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "aefa9abb922cfd5ea6e9c6ddce9b20c47215b2e04765238212c638606e2ae328",
+      "short_description": "Santa Cruz de La Palma reúne calles adoquinadas, plazas históricas y balcones de madera frente al Atlántico."
+    },
+    {
+      "canonical_id": "d56d59c8-ac10-4869-bd8f-c2d4426c09bd",
+      "name": "Santuario de Nuestra Señora de las Nieves",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "c139826134a7f069fcd722f98333a1e4440a0252e34b67cff6ad91e6ce2be850",
+      "short_description": "Santuario sobre Santa Cruz de La Palma que custodia la Virgen de las Nieves, una imagen gótica de terracota policromada."
+    },
+    {
+      "canonical_id": "fd605abf-ffa6-593a-91e6-a6d11ea6286d",
+      "name": "Tazacorte",
+      "island": "la-palma",
+      "revision": 1,
+      "record_sha256": "7b5d4a04d4a04a1feb680107871d97953e9a609439dc51fb101b79d584dd37ee",
+      "short_description": "Pueblo palmero entre plataneras, con casas señoriales en el barrio del Charco y un museo dedicado al plátano."
+    },
+    {
+      "canonical_id": "dbe944bc-cd21-5e68-976f-e0777f00383b",
+      "name": "(CACT) Montañas del Fuego",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "37abc0116c94bf05482862423c65695aa5affb5fda6421f9d85cd755dcbbea30",
+      "short_description": "Centro de visita de Montañas del Fuego, en el Islote de Hilario, con demostraciones del calor del subsuelo y recorrido por Timanfaya."
+    },
+    {
+      "canonical_id": "7f6d497f-df5d-5fb2-923c-4663d8b0af6a",
+      "name": "A Casa José Saramago",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "e6ae9ffc906832f1785785e077cfa93c6e6f01c0772759a3dd7576124d5c1c88",
+      "short_description": "A Casa José Saramago conserva en Lanzarote el hogar y los espacios de trabajo del escritor portugués."
+    },
+    {
+      "canonical_id": "fc247e60-d8d4-5be1-8f4a-7e2ecd29c990",
+      "name": "Aquapark Costa Teguise",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "f4d13cad13bdedcc1ac1f8619894b3b88608602b2cf5371645072abff59dec47",
+      "short_description": "Aquapark Costa Teguise reúne piscinas y toboganes para distintas edades en la costa este de Lanzarote."
+    },
+    {
+      "canonical_id": "9a884a79-1f51-5e6f-aa87-d1078fe34137",
+      "name": "Aquarium Lanzarote",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "8baebb5ab860f9edcab03fed90506c8f7d86b5e38b6e279092f530803312129b",
+      "short_description": "Acuario de Costa Teguise con peces de Canarias, especies tropicales, tiburones y un túnel bajo el tanque principal."
+    },
+    {
+      "canonical_id": "a7b4655e-ee2e-5506-a519-cea9c4bd5c10",
+      "name": "Arrecife",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "9ce532d5830799df2830426db6ae985186da4cc41ff82ec9e6ef6dfd7289ea1c",
+      "short_description": "Capital costera de Lanzarote con el Charco de San Ginés, el Puente de las Bolas y el castillo de San Gabriel como referencias del paseo urbano."
+    },
+    {
+      "canonical_id": "ba42dae7-4453-5d87-8d22-34e7fce194ad",
+      "name": "Balcón de Femés",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "388d0a6e65c75abbac9769a0597d26c6f64921ea0251213591f84cfdf0103274",
+      "short_description": "Mirador de Femés abierto hacia el llano del Rubicón, Montaña Roja y el macizo de Los Ajaches."
+    },
+    {
+      "canonical_id": "e275bc1d-4848-5df2-82a0-80c5c7ce2174",
+      "name": "Caldera de los Cuervos",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "bdbe7f38f4279b5b40fa822adb3bb4d0b06fbce2aea3e8c4a909159117ff5d27",
+      "short_description": "Cráter volcánico de La Geria al que se llega por un sendero entre lavas de las erupciones de Timanfaya."
+    },
+    {
+      "canonical_id": "3345fd87-8d19-5a74-9ad0-9422029caafb",
+      "name": "Casa del Mayor Guerra",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "d26a37e729133631780ae81923e135e18357d304e72142367c8628313059ff82",
+      "short_description": "Casa señorial de San Bartolomé levantada en 1764 sobre la ladera de Montaña Guatisea, con vistas hacia Arrecife."
+    },
+    {
+      "canonical_id": "b2cc3a0a-34b9-558e-ba72-40153a9332dc",
+      "name": "Casa Museo del Campesino",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "a120093809efe71030d9fc6352160c8e9f9f1d9bb455fd82ceec49c99a160ae5",
+      "short_description": "Conjunto de César Manrique en Mozaga dedicado a la vida agrícola de Lanzarote, con patios, aljibes, eras y lagares."
+    },
+    {
+      "canonical_id": "b1df820c-d1bf-544c-b37c-ff5811cf7531",
+      "name": "Casa-Museo César Manrique",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "34b73ce5eda32cc989638ef9ea5685029c33427a0aee8a2f693d5552e2523957",
+      "short_description": "Última casa de César Manrique, en el palmeral de Haría, con sus habitaciones, objetos personales y taller de pintura."
+    },
+    {
+      "canonical_id": "ac99fe66-e5a1-4ef3-8f37-e9acedb4845a",
+      "name": "Castillo de San Gabriel",
+      "island": "lanzarote",
+      "revision": 3,
+      "record_sha256": "73873a574a093ff06b5ce0d6a2498465b0086456f733346fe59fb447426e58c3",
+      "short_description": "Castillo sobre un islote frente a Arrecife, unido a tierra por el Puente de las Bolas y sede del Museo de Historia de la ciudad."
+    },
+    {
+      "canonical_id": "9358578c-28bf-4fab-b17b-c8cfb7017d9f",
+      "name": "Castillo de San José",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "94c5fde84a34eea5f86c3df2f540e8c5c2494393070027c2bde8de016900c1c8",
+      "short_description": "Fortaleza del siglo XVIII frente al puerto de Arrecife que alberga el MIAC, con pintura y escultura contemporáneas."
+    },
+    {
+      "canonical_id": "0591a375-61e7-5ed9-9558-52c213d07a0f",
+      "name": "Castillo las Coloradas",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "cdda14445bb190572f49473b92f81a8c1c8957cebf2d02d20b4d83bfbf1bcbc7",
+      "short_description": "Torre defensiva circular de Playa Blanca, también llamada Torre del Águila, levantada para proteger la costa sur de Lanzarote."
+    },
+    {
+      "canonical_id": "5e45a594-bf10-5e8f-9364-67e5290c402c",
+      "name": "Centro de Visitantes e Interpretación de Mancha Blanca",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "3dac891fbed86a5d2c4d073c2ebc3b15fcda3f0c12c956367a6c43dcddafff42",
+      "short_description": "Centro de Mancha Blanca que explica el paisaje volcánico de Timanfaya y prepara la visita al parque nacional."
+    },
+    {
+      "canonical_id": "c23513b4-5b9a-5e54-bb8a-7cf9eaf30600",
+      "name": "Cueva de Las Palomas - Los Naturalistas (Entrada A)",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "b2a0c9d9ecca7802c69586186f964952a8063624e308f740361825c7b54798c5",
+      "short_description": "Entrada al tubo volcánico de los Naturalistas, también llamado Cueva de Las Palomas de Masdache, formado durante las erupciones de Timanfaya."
+    },
+    {
+      "canonical_id": "4394c104-0cfb-419b-9848-3618b3d3d7a3",
+      "name": "Cueva de los Verdes",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "e99a210c69c7474299395175c539321b08d8c49342ec9ec56bae4634834eac93",
+      "short_description": "Tramo visitable del tubo volcánico de La Corona, con pasadizos a distintas alturas y una iluminación diseñada por Jesús Soto."
+    },
+    {
+      "canonical_id": "4133c49a-d34c-5280-a7d9-d7d4d12f2a8b",
+      "name": "El Cuchillo",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "39c008a150e07ce232a9e7a7a5c541b1ecf42e36a890a7bcf1414816276964b6",
+      "short_description": "Pueblo de Tinajo ligado al paisaje de la caldera de El Cuchillo y a los caminos que llegan desde La Santa."
+    },
+    {
+      "canonical_id": "3445dc43-437b-5ae9-af10-d0686ae1c717",
+      "name": "El Golfo",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "7f08a294dc70b7ee359368ded0534805862ce11995781fc2043ab74c0462f408",
+      "short_description": "Pueblo pesquero de la costa occidental de Lanzarote, con casas blancas junto a una ensenada volcánica y al lago verde del Charco de los Clicos."
+    },
+    {
+      "canonical_id": "ac0900d9-a3c3-5552-938c-97dd0827070b",
+      "name": "Ermita de los Dolores",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "e3831e03722cdea1cb80af7fa27ccc327cbf6ede5651bf63bc2c00edc661ad2f",
+      "short_description": "Templo de Mancha Blanca dedicado a la patrona de Lanzarote, llamada Virgen de los Dolores o de los Volcanes."
+    },
+    {
+      "canonical_id": "76acbb28-737e-5f75-9749-8fdb78b0ef39",
+      "name": "Ermita de San Rafael",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "76b06c192b18fcdd925b80c15a707e6e1db814ea55742d6190697c8d7ec5c81a",
+      "short_description": "Ermita aislada sobre la loma de San Rafael, a las afueras de Teguise, protegida como Bien de Interés Cultural."
+    },
+    {
+      "canonical_id": "b90a401c-290d-5b6c-a02e-8ea5a52c4f23",
+      "name": "Faro de Pechiguera",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "c8015e2d32ed76ba2f9e4dbbe45c0539915167f3e3a5cb9d5e331356a51db9be",
+      "short_description": "Conjunto de faros en el extremo suroeste de Lanzarote, orientado al estrecho de la Bocaina, entre Lanzarote y Fuerteventura."
+    },
+    {
+      "canonical_id": "a24d23d4-cba9-51a2-afaf-0e08f71a4f8a",
+      "name": "Fundación César Manrique",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "5418e530ed812b361df79e8481470416292de6101789426639f3fdb57608639d",
+      "short_description": "Casa de César Manrique en Tahíche, construida sobre lava, con cinco burbujas volcánicas convertidas en habitaciones."
+    },
+    {
+      "canonical_id": "fab514f9-193f-58ad-93e4-e940a7420a6b",
+      "name": "Haría",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "c91de774886b362a2348b29df244f3b90b28854ece3734129f0e206008568754",
+      "short_description": "Pueblo del norte de Lanzarote rodeado de palmeras, con una plaza central y la última casa en la que vivió César Manrique."
+    },
+    {
+      "canonical_id": "a7dc9e0d-73b6-57f8-b5ea-7da5c4b5ac64",
+      "name": "Iglesia de San Bartolomé",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "70c46e511db2248d75b192d36d06a7118f23cf8ecf8fdf13a913483e0c1f9336",
+      "short_description": "Iglesia del centro de San Bartolomé, junto a la plaza diseñada por César Manrique y al Ayuntamiento."
+    },
+    {
+      "canonical_id": "fff8a80c-8818-51f7-a0b1-8ef155c619f7",
+      "name": "Iglesia de San Marcial de Rubicón",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "e8624eb22ee7f3d43c158d2a509192198ac4cb6a5ec19c73ed415265191275a7",
+      "short_description": "Iglesia de Femés dedicada a San Marcial, patrón de Lanzarote, situada junto al balcón sobre el Rubicón."
+    },
+    {
+      "canonical_id": "aae53177-92f3-5d80-9f47-e0f24d67a01d",
+      "name": "Iglesia de San Roque",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "8f06b1a70c2c075b0ad9acf64dccd4aaf26fd98f5d013d909dba175f971346d4",
+      "short_description": "Iglesia de San Roque en el centro de Tinajo, junto a la plaza principal y al Ayuntamiento."
+    },
+    {
+      "canonical_id": "84e58177-1df4-4d4b-a2dc-35cdc8d8e4c9",
+      "name": "Jameos del Agua",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "17378e7173c47b3b6f23badc0251836204031e7eac91d7ebf3e9b145400693bf",
+      "short_description": "César Manrique transformó un tramo del tubo volcánico de La Corona en este espacio de roca, agua y arquitectura en Lanzarote."
+    },
+    {
+      "canonical_id": "8790bc9d-4c47-54ce-89b7-2fd4364faa0f",
+      "name": "Jardín de Cactus",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "b27f4eb4de15da1c4b9d72f09d7bafa7397c458c5d6fb791465dd4fa460e8883",
+      "short_description": "Jardín de cactus diseñado por César Manrique en una antigua cantera de Guatiza, con terrazas de piedra y un molino en la parte alta."
+    },
+    {
+      "canonical_id": "83b87bba-c29c-5e38-8eed-ddeccac754ff",
+      "name": "La Asomada",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "5b67ba9ea5ae09b4d2b4c7bc720ad63716fdbc39dc1117b417d74fbb3cb34266",
+      "short_description": "Pueblo de Tías junto a las laderas de Gaida, desde el que parten caminos hacia los viñedos de La Geria."
+    },
+    {
+      "canonical_id": "c279c73f-74bb-5d84-97f1-bc2c610f79b4",
+      "name": "La Fuente De Chafariz",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "ac9f7ee2893f6f55050c2965c57a75e35d205abadc38e55b795a1e340c509df3",
+      "short_description": "La fuente de Chafariz recuerda la importancia de los nacientes de agua en el barranco de Temisa, en Haría."
+    },
+    {
+      "canonical_id": "ee6530b8-fadd-426a-9a5b-8229a4bb358e",
+      "name": "La Geria",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "75e4e0ed887cce7ab4b15ede27463338ad706fa54495d901a5a2e02c1da34ae2",
+      "short_description": "La Geria es un paisaje de viñedos cultivados en hoyos de ceniza volcánica y protegidos por pequeños muros de piedra."
+    },
+    {
+      "canonical_id": "f3452f9d-e837-5adf-ab58-3f1d224f0034",
+      "name": "La Santa",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "6d16ab6b74a2223c2f52e36431cb7bd9b62955047bcb0bbf05c88cbde170418e",
+      "short_description": "Pueblo marinero de Tinajo, en la costa noroeste de Lanzarote, con una avenida que lleva al pequeño puerto pesquero."
+    },
+    {
+      "canonical_id": "071c482e-e69d-57a7-a141-4cc25f5b47ed",
+      "name": "La Vegueta",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "ca691588cd3082fbf2f0098923e2539bce2c933ad003eea4e67e6c2645ed012b",
+      "short_description": "Pueblo agrícola de Tinajo atravesado por el camino de peregrinación hacia Mancha Blanca y la Virgen de los Volcanes."
+    },
+    {
+      "canonical_id": "4d71bf57-e932-5fd1-bda1-f4d039eaa2be",
+      "name": "Laguna de Janubio",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "0df64a5bda63082d3a85dd202ef7ecfeaa2cd21f42dc488cf55ffbae9464c642",
+      "short_description": "La laguna de Janubio forma un humedal costero junto a las salinas del suroeste de Lanzarote."
+    },
+    {
+      "canonical_id": "a5f3052a-7b93-53f1-ae55-bfdc5f3c49e7",
+      "name": "Laguna Verde",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "31bd2786ddbeaa2b8469d4e8443cc65c2d5f2c058ebe01e503662771922dd92a",
+      "short_description": "Laguna verde dentro de un cráter abierto al Atlántico, junto a la playa negra de El Golfo, en la costa oeste de Lanzarote."
+    },
+    {
+      "canonical_id": "a65a49d1-bcba-5505-ba8b-27c2e5a30bad",
+      "name": "Las Rositas",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "58c3f3181d2f2a29ac57519612e0e274976acaf2c7996db6c59218aab8d4ce3a",
+      "short_description": "Mirador de Las Rositas, junto al inicio del Camino de los Gracioseros en Ye, con vistas al risco de Famara y al archipiélago Chinijo."
+    },
+    {
+      "canonical_id": "5b60d9e5-34a7-5190-9a8c-f6f9b1e2c40e",
+      "name": "Los Hervideros",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "d9d3d95ff045dc9925f4f16264126da9bcb1dddb1603a4d771bb37efdfef7b4d",
+      "short_description": "Tramo de costa volcánica de Yaiza donde las olas entran en cuevas y huecos abiertos en la lava."
+    },
+    {
+      "canonical_id": "75ab9074-d78a-5d7a-85f4-0f85127cf4d0",
+      "name": "Masdache",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "a2168a4619e23f90de948a075a60fee8a66a7432c7b909c742828c1bbdd91e00",
+      "short_description": "Pequeño núcleo de La Geria entre viñedos y bodegas del centro de Lanzarote."
+    },
+    {
+      "canonical_id": "fb23ecb7-7cbd-52c0-bdab-2200312097f5",
+      "name": "Mirador de Las Nieves",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "51e3146531c0da9133f37c36be526bec608baf4cb8c4f0ed027e9dd01e7a06f9",
+      "short_description": "Mirador junto a la ermita de las Nieves, sobre el risco de Famara, con vistas a la playa de Famara y al archipiélago Chinijo."
+    },
+    {
+      "canonical_id": "c4fd3574-f6d9-441b-a52a-ef7eb18cdae1",
+      "name": "Mirador del Río",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "ed844af4aa43fdde184c441325ae1b8acbe6637db412379f53116da9572474da",
+      "short_description": "Mirador de César Manrique en el risco de Famara, con vistas a La Graciosa, el estrecho de El Río y los islotes del Archipiélago Chinijo."
+    },
+    {
+      "canonical_id": "8985b2f3-a4d5-521d-98cf-bd91bfcaaad8",
+      "name": "Molino de José María Gil",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "ae0f27810db50b4f56a2006beffb7367d8523597471732f0282cc6e896d59a45",
+      "short_description": "Molino histórico de San Bartolomé dedicado al gofio, donde se explica la elaboración de este alimento canario."
+    },
+    {
+      "canonical_id": "f1e6884a-fc64-5bb9-a370-05edfe186a34",
+      "name": "Museo del Vino El Grifo",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "d423e193e1ae95b8c616c756e222f220d72720e8766265dc88da49f1ff9743fb",
+      "short_description": "El Museo del Vino El Grifo conserva utensilios y espacios de la elaboración tradicional del vino en Lanzarote."
+    },
+    {
+      "canonical_id": "f658ffe6-0dbd-534a-b6d6-640134ff094d",
+      "name": "Museo Diocesano De Arte Sacro",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "5d4e5a8ba364859f13d08d7cf3739560254306e4105c57110cee61d9deaf99ea",
+      "short_description": "El Museo de Arte Sacro de Teguise ocupa la antigua iglesia del convento de San Francisco."
+    },
+    {
+      "canonical_id": "3208dde0-c5e4-52f8-8f0b-ea362eb33bd4",
+      "name": "Museo Etnográfico Tanit",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "0180fe52f73faf2ef14249d44db5f4d540f9d69c1bfcbad117a931326a7d7fec",
+      "short_description": "Museo de San Bartolomé instalado en una antigua bodega, con objetos de la vida cotidiana y de la agricultura de Lanzarote."
+    },
+    {
+      "canonical_id": "8494d5e6-766d-5daa-b379-4d24ca8fe654",
+      "name": "Mácher",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "4604d4cd905e1f48cfb4aacfb9b6922d7e9fb43e04ca04fd2a0b28c9d6f67480",
+      "short_description": "Mácher conserva casas dispersas y huellas de la agricultura tradicional en el interior del municipio de Tías."
+    },
+    {
+      "canonical_id": "5202a39b-0575-40a9-981f-73d64f19b0d6",
+      "name": "Parque Nacional de Timanfaya",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "25198c646fa10bd5a72923a98121dafe19c5bd0942696a8cd08e04e01fce3afb",
+      "short_description": "Parque nacional de Lanzarote formado por conos volcánicos y campos de lava de las erupciones históricas de la isla."
+    },
+    {
+      "canonical_id": "635a0c50-deb8-52fc-9f6f-79b9558a59a2",
+      "name": "Rancho Texas Park",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "b937251c0235117c8f51c4e83d4aac568761c4e09e54add78398259043eae870",
+      "short_description": "Parque de Puerto del Carmen que combina recintos de animales con piscinas y toboganes, en un decorado del Lejano Oeste."
+    },
+    {
+      "canonical_id": "d53a46ed-abbd-5a3e-bdb1-a78044a4cd83",
+      "name": "San Bartolomé",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "fe41b9eede15f20c23b32ae0e646503ecbadadef59e358070562b603e4b2de81",
+      "short_description": "Pueblo del centro de Lanzarote con casonas como Ajei y Mayor Guerra y un paisaje ligado al cultivo del cereal y la vid."
+    },
+    {
+      "canonical_id": "3f881dd9-3c12-56e4-8b78-55a1d4fbaf5b",
+      "name": "Telamon",
+      "island": "lanzarote",
+      "revision": 2,
+      "record_sha256": "c1b0deef10ce646c679a1e48a6b4d9046db6324c7ed2964676e081d1b8fc1028",
+      "short_description": "Lugar del naufragio del Telamón, el carguero que quedó varado en 1981 junto al puerto de Los Mármoles, en Arrecife."
+    },
+    {
+      "canonical_id": "5ba48b34-ec3f-5d96-8413-9db40479c310",
+      "name": "Tías",
+      "island": "lanzarote",
+      "revision": 1,
+      "record_sha256": "22d80efa70c61ed746967d40ab10ab678418b0a0a74d2a7c80d61f71089c14a9",
+      "short_description": "Pueblo del centro-sur de Lanzarote, escalonado en la ladera de Montaña Blanca y presidido por la iglesia de Nuestra Señora de la Candelaria."
+    },
+    {
+      "canonical_id": "03c3e189-cc5b-4c15-a9d5-dbea6f23b5d0",
+      "name": "Abades",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "328140e763f98ab718a19c18a3d2412b0605729876fdec3077f92af9cfd8f5bf",
+      "short_description": "Localidad costera de Arico junto a Los Abriguitos, una playa de arena volcánica utilizada también para bucear."
+    },
+    {
+      "canonical_id": "9501fd12-dd39-4b57-8f53-82e844807641",
+      "name": "Adeje",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "2d8a54ad0c163afcd348806a3a8c87cecbca5d41709b2b29acd6605635554cbb",
+      "short_description": "Casco histórico del sur de Tenerife con la iglesia de Santa Úrsula y la Casa Fuerte, que recuerdan el pasado señorial de Adeje."
+    },
+    {
+      "canonical_id": "7a67bd02-caff-4493-85ef-8f2d3cc35d8d",
+      "name": "Afur",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "bdfd379c3a735ed8ad8d0f7a9d91b4fb06ab2c92e5c272809a0ef68cd2aa8b7d",
+      "short_description": "Caserío de Anaga desde cuya plaza parte el camino que baja por el barranco de Afur hacia la playa de Tamadite."
+    },
+    {
+      "canonical_id": "e50b4aa4-28a7-486b-9680-813829f69f36",
+      "name": "Almáciga",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "3f7310fd2a29ef8d3df18e785c6f20f969e80bb3f8e4e4727ea0fcdb5d0b83a3",
+      "short_description": "Caserío de la costa de Anaga situado sobre la playa de Almáciga, entre acantilados y arena volcánica."
+    },
+    {
+      "canonical_id": "e3386dd2-b239-5e3b-9003-ee616ba941a8",
+      "name": "Aqualand",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "aedb6fcf8bb3ef2858994f0db65ede6e58c80e95cd831b42e76c0ecc31bb7966",
+      "short_description": "Aqualand Costa Adeje reúne piscinas y atracciones acuáticas en el sur de Tenerife."
+    },
+    {
+      "canonical_id": "e8dd2b29-680b-4ede-a904-31641ae660b2",
+      "name": "Arafo",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "a68b22e21616233ba51bdf997dea1bc7eb74764ad69b28ab266868ea1aeb1968",
+      "short_description": "Pueblo de medianías de Tenerife con la iglesia de San Juan Degollado, un antiguo molino y lavaderos que conservan su pasado rural."
+    },
+    {
+      "canonical_id": "ad5b2375-ce3a-403c-b77b-f7a710f3f243",
+      "name": "Araya",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "f1f0f57104554bf79814c221b576ef8d351946c5c8b706963722a85fbd897a37",
+      "short_description": "Pueblo de Candelaria con la iglesia de San Juan Bautista y caminos que suben hacia Los Brezos y La Mesa."
+    },
+    {
+      "canonical_id": "1b8419ce-85e6-4054-9485-968f861bfd51",
+      "name": "Arico Viejo",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "0b4d2a8750b04a1c27b5f22b71985b6eb8c98dadf2ee6bb9e317ac28935f81db",
+      "short_description": "Núcleo rural de Arico con arquitectura tradicional y caminos hacia el barranco de Tamadaya y las medianías del sureste de Tenerife."
+    },
+    {
+      "canonical_id": "5176792e-009a-45f5-9e52-d4dd8aed1868",
+      "name": "Arona",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "98fb68afd36134ecfdc0c931868098cc3560142f166ead30c3462d16f1789d4f",
+      "short_description": "Pueblo del sur de Tenerife con calles adoquinadas y casas tradicionales alrededor de la iglesia de San Antonio Abad."
+    },
+    {
+      "canonical_id": "9de4abf4-af08-447c-9fda-32ed6cedc810",
+      "name": "Atogo",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "0e325fa3ff87e6c2a3d147a9014bf27151d4bacabaaa2582edb87d865f445165",
+      "short_description": "Atogo es un núcleo de Granadilla de Abona con tradición de automovilismo y un polideportivo municipal."
+    },
+    {
+      "canonical_id": "c0075fe7-bc9d-4bbe-8912-36acc1a96c88",
+      "name": "Auditorio de Tenerife Adán Martín",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "05b209f76adf63d632628be8444558c5ae674da1bda81edfae976a75ea91ebb3",
+      "short_description": "El auditorio de Santiago Calatrava marca el frente marítimo de Santa Cruz de Tenerife con su gran cubierta curva."
+    },
+    {
+      "canonical_id": "1f699369-7e8a-47eb-8f16-121616eb8457",
+      "name": "Basílica de Nuestra Señora de Candelaria",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "e31889bbb7a9f8f9c34f0aef790379f68ef631e1db4368b5f9d60064b7bac663",
+      "short_description": "Basílica junto al mar dedicada a la Virgen de Candelaria, con una talla de Fernando Estévez y murales de José Aguiar."
+    },
+    {
+      "canonical_id": "9115e7e4-2125-466f-958c-1fa49f3a6bc9",
+      "name": "Batería de Santa Bárbara",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "09581b65a322738de52a6c3aca4c7e4d9c0b687a13ca2ee25979d2a0852b9dee",
+      "short_description": "Fortificación junto a la Casa de la Aduana de Puerto de la Cruz, levantada para defender el embarcadero."
+    },
+    {
+      "canonical_id": "fb58135b-71ca-48fa-9f94-48bd8785dca2",
+      "name": "Buenavista del Norte",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "9469b92801a296bcd69b9644f053231f67d9f3c4774b5b41a6bf1a12084252de",
+      "short_description": "Pueblo del noroeste de Tenerife cuyo casco reúne la plaza de los Remedios, su iglesia y casas de arquitectura tradicional."
+    },
+    {
+      "canonical_id": "e75ee7a3-f60c-4472-83af-b73677fe3e41",
+      "name": "Candelaria",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "e9c0c134a173c92762691b9e0b4c136ad5349aed41c19d5bff9404d3b2c40dd2",
+      "short_description": "Villa costera de Tenerife con la basílica de la Virgen de Candelaria y las esculturas de los nueve menceyes junto al mar."
+    },
+    {
+      "canonical_id": "1f3d23f7-89e2-44f5-bd47-fa1a02cdd57d",
+      "name": "Casa de Las Breñas",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "08b9cb1410ee8496299c7de58e1f62daca59cbbf0e630675d58b2616d39a54a0",
+      "short_description": "Casa en ruinas de Las Breñas, una antigua finca agrícola del litoral septentrional de Anaga."
+    },
+    {
+      "canonical_id": "e3bba370-a235-4c74-aecf-466ac7ac7923",
+      "name": "Casa de los Balcones",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "c98c2d3546a13bc2c32ef69b036403da026f3c78ad694f1e02f76f7af5d2fba6",
+      "short_description": "Casa histórica de La Orotava con balcones de madera, un patio interior y muestras de calados y artesanía canaria."
+    },
+    {
+      "canonical_id": "74047832-b6c2-52d8-ac54-872cb2f8754d",
+      "name": "Casa del Marqués de la Quinta Roja (Hotel la Quinta)",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "fa5c88dd223762bbe2f438ee91e251677733679c65d3747c7c17425b62252a34",
+      "short_description": "La Casa del Marqués de la Quinta Roja conserva la historia de una residencia señorial de Garachico, hoy dedicada al alojamiento."
+    },
+    {
+      "canonical_id": "f1890466-c1ba-47cc-b04a-222b3d32ce51",
+      "name": "Casas de Tafada",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "9ccf9ca0b791fb9c63ee954cf32da413d6f8d5b9a4f9a7430f24a7ea5a54d948",
+      "short_description": "Las ruinas de las Casas de Tafada recuerdan la actividad agrícola y ganadera de las antiguas haciendas de Anaga."
+    },
+    {
+      "canonical_id": "e21497f6-ba91-5041-a679-ec84ea530acb",
+      "name": "Castillo de San Felipe",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "e018878d111ac317909452981ad212c7ba4b7d25016b98afd7b74e229a33fd3a",
+      "short_description": "Fortín pentagonal junto a Playa Jardín, en Puerto de la Cruz, que protegía la costa frente a piratas y corsarios."
+    },
+    {
+      "canonical_id": "e5928847-ae4d-56ce-8dee-2a4c7cded5e4",
+      "name": "Castillo de San Miguel",
+      "island": "tenerife",
+      "revision": 3,
+      "record_sha256": "985cc8727311b9f8c90bb0f51a070b5e7b1d03c9d04694e2f31e296ca9f038d1",
+      "short_description": "Fortaleza costera del siglo XVI en Garachico, junto a El Caletón, construida para proteger la antigua villa portuaria."
+    },
+    {
+      "canonical_id": "fc0a1105-bee0-4cf6-bef9-59354b7b580c",
+      "name": "Centro Histórico de La Laguna",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "21e75adfebf6a1ef20219533501ce9cd0b331fb4b150b861727f163c54d1090b",
+      "short_description": "Casco histórico de calles trazadas en cuadrícula, con casas de patios, iglesias y conventos de los siglos XVI al XVIII."
+    },
+    {
+      "canonical_id": "73bfc0a5-977f-4c3a-a0aa-5625190a7c03",
+      "name": "Cueva de Achbinico",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "a80485382bb7c6425b0b24b02e1362ba3b2b4d430ca632b3529a80133572cbc0",
+      "short_description": "Cueva junto al mar de Candelaria, integrada en la ermita de San Blas y vinculada al antiguo culto guanche a la Virgen."
+    },
+    {
+      "canonical_id": "7eead250-212d-4c72-a70e-5f774257a256",
+      "name": "Cueva de Bencomo",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "7bf45d5e8d9c3108c81e00ce73d810213cb93365ed4b98efdff5afbacf58ac01",
+      "short_description": "Gruta del barranco del Pinito, en el valle de La Orotava, asociada por la tradición a la residencia del mencey Bencomo."
+    },
+    {
+      "canonical_id": "a94c566c-dff1-43c2-918e-fae2e49f663f",
+      "name": "Cueva de Chinguaro",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "562ed5408157700fcc9694ce074df65820f363738ee75a36b58fc5f04d66506b",
+      "short_description": "Cueva de Güímar vinculada al mencey Acaymo y al primer culto a la imagen de la Virgen de Candelaria."
+    },
+    {
+      "canonical_id": "20e1973e-d676-4848-baa2-adaf2c2fbb12",
+      "name": "Cueva del Viento Centro de Visitantes",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "99188710951acfe9364054be30f52dec0f5865b645e1a31613f675643fa27ad7",
+      "short_description": "El centro de visitantes de la Cueva del Viento informa sobre el tubo volcánico de Icod de los Vinos y sus visitas guiadas."
+    },
+    {
+      "canonical_id": "eca12a1c-801d-4891-9490-009bf2c3bef9",
+      "name": "Elevador de agua de Gordejuela de Casa Hamilton",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "7249f33587edef7883798558a60a88c4944a2f836a12ff30bf0a25eb5545f087",
+      "short_description": "Las ruinas del elevador de Gordejuela recuerdan cómo la Casa Hamilton impulsó el agua hacia los cultivos de plátano."
+    },
+    {
+      "canonical_id": "beb59ca2-0529-42e2-a35c-40f92305a0cb",
+      "name": "Faro de Anaga",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "8317d621293c7889c0907ee107f8523c91e823b534f3db87403e7de63a3cb295",
+      "short_description": "Faro histórico sobre Roque Bermejo, en la ladera de Tafada del extremo de Anaga."
+    },
+    {
+      "canonical_id": "f5c58949-3689-4f25-b65f-86484124c20d",
+      "name": "Faro de Punta Abona",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "0412f2a1eedddb29ffc00944f27e460f171e07688c31d2d82401a1326ed0de7b",
+      "short_description": "Conjunto de dos faros en Punta de Abona: el edificio antiguo y la torre que lo sustituyó."
+    },
+    {
+      "canonical_id": "58a9242d-193c-422a-a69c-1821daee3c0a",
+      "name": "Faro de Rasca",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "f1c0b74f3ccdca4f3c141b51d18d0a7a81224e92cc33facb9615951212a55004",
+      "short_description": "Dos faros de épocas distintas marcan Punta Rasca, en el sur de Tenerife."
+    },
+    {
+      "canonical_id": "fb17d066-4b48-51fa-8474-7c0a95ac41c1",
+      "name": "Fundación Cristino Vera",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "fe4f92f2550cf54eebb67fc321f1a7d035f9f5b752d0419d5c937c52a8c442f3",
+      "short_description": "Colección de pintura de Cristino de Vera en una casona del siglo XVIII del casco histórico de La Laguna."
+    },
+    {
+      "canonical_id": "38b4068a-528f-46e4-ade6-6ab28341f3a2",
+      "name": "Garachico",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "bf16471a6e3f98474b2c6fca9ea6870487ac2dc3d821cbed0e7834ada87c4f42",
+      "short_description": "Garachico reúne plazas, conventos y casas históricas en uno de los conjuntos patrimoniales del norte de Tenerife."
+    },
+    {
+      "canonical_id": "c2cbbe23-eddb-4c16-827d-114f25c89351",
+      "name": "Granadilla de Abona",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "faada88c9630f13cfd2326f50da7970d81a3c3675b99c4c468980400d0726a36",
+      "short_description": "Pueblo del sur de Tenerife cuyo casco histórico reúne la iglesia de San Antonio de Padua y edificios de arquitectura tradicional canaria."
+    },
+    {
+      "canonical_id": "94aab0be-201e-53dd-af1b-6ecd3553162a",
+      "name": "Guía de Isora",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "28444cfb308cd1e641ec9cbb1a9a645560a12ecfe01b489f4a60d3df249ce3a9",
+      "short_description": "Pueblo de medianías del suroeste de Tenerife con casas tradicionales, callejones y la iglesia de Nuestra Señora de la Luz."
+    },
+    {
+      "canonical_id": "8193b09d-40e0-5994-b984-fc40fed592d0",
+      "name": "Hijuela del Botánico",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "060e7b01f20b0167830ecd9455e366b60f9dc866c0ba8cab01dbfdaa0c1928ef",
+      "short_description": "Jardín histórico detrás del ayuntamiento de La Orotava, con árboles de distintos continentes y caminos entre la vegetación."
+    },
+    {
+      "canonical_id": "febc2544-a364-5ee5-8821-94167b8ba03f",
+      "name": "Jardín Botánico Pirámides de Güímar",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "18aeccc806ce8e37b8cef61e77ae91d71c80f01fc5d0ee97274157c4ff9e2335",
+      "short_description": "El jardín botánico de Pirámides de Güímar reúne colecciones vegetales y espacios dedicados a la conservación y la educación."
+    },
+    {
+      "canonical_id": "bf5cb4d2-d94d-5387-a3a7-43ed04fd8fac",
+      "name": "Jardín de Orquídeas Sitio Litre",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "72e64d8aced86cf9bc7977821ec111ef917874b5a9a06f0e74caa751f0a063fe",
+      "short_description": "Sitio Litre es un jardín histórico de Puerto de la Cruz conocido por sus orquídeas y su gran drago."
+    },
+    {
+      "canonical_id": "a0d848c7-ae1f-4d02-8ae8-825a6f6e5b79",
+      "name": "Juan Évora Ethnographic Museum",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "d7d78c29d0a65c694e64896f00cdda038be5953b9876c88d00b6640fe62f4ce3",
+      "short_description": "Pequeño museo de Boca Tauce instalado en la casa de Juan Évora, dedicado a la vida de los pastores de Las Cañadas."
+    },
+    {
+      "canonical_id": "a4c99b8b-24d4-57f2-b3b9-458cdf3e37b1",
+      "name": "Karting Club Tenerife",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "3eaa065944fd58c0ffb6013070f64f127b009f85ac9a5d0563e08a9d5eb5d547",
+      "short_description": "Karting Club Tenerife dispone de dos trazados para vivir las carreras de karts con distintos niveles de experiencia."
+    },
+    {
+      "canonical_id": "0d73694a-c3b6-467d-a82a-0771d170b0dd",
+      "name": "La Orotava",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "0bb1bcaf9880d569bac0afcad269c3bebefa5c86901c11f30cd2e438b483f683",
+      "short_description": "Villa del norte de Tenerife con calles empedradas, balcones de madera y un casco histórico en el que destaca la iglesia de la Concepción."
+    },
+    {
+      "canonical_id": "df8362a1-532a-49a5-aa8c-675a183e7ad3",
+      "name": "Laboratorio de Energía Solar Termoeléctrica",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "bbe588419a17125df906641972ef3971da734b19a0f9940245fe3505fbf826a7",
+      "short_description": "Proyecto de laboratorio solar termoeléctrico de Granadilla de Abona cuyas obras quedaron paralizadas en 2009."
+    },
+    {
+      "canonical_id": "2b9e0055-7d43-5e90-9956-ab9e98192763",
+      "name": "Lago Martiánez",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "b7cdcd8b1e7ffdc3e75be2934cf62acd11fd61a6e1b14ac92e08089648202f3c",
+      "short_description": "Complejo de piscinas junto al mar en Puerto de la Cruz, diseñado por César Manrique alrededor de un gran lago artificial."
+    },
+    {
+      "canonical_id": "092e81c1-b0cc-4002-b377-9ca31006403e",
+      "name": "Las Águilas Jungle Park",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "c93d74ad7cf9a5d27889ddc6044dfd2b19cd77a5c2876367e2811cc1aa630f6c",
+      "short_description": "Zoológico del sur de Tenerife con primates, aves y senderos entre vegetación, cascadas y lagunas."
+    },
+    {
+      "canonical_id": "5b461e53-5393-4ef3-8ca9-73f12396cc66",
+      "name": "Loro Parque",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "210c7d6cf7b3ae8e0c788cb61c2224e1519e3b6f3be0266193125e0e1ef220e5",
+      "short_description": "Zoológico de Puerto de la Cruz con loros, pingüinos, gorilas y grandes acuarios, rodeados de vegetación tropical."
+    },
+    {
+      "canonical_id": "75bc8a24-df71-5d5e-a5c4-dd244e176da8",
+      "name": "Mariposario del Drago",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "ef2356211f92b616a26f3646cd3af4285bb76d3eda8def953477f2a15e25cf30",
+      "short_description": "El Mariposario del Drago alberga mariposas en un jardín tropical acristalado de Icod de los Vinos."
+    },
+    {
+      "canonical_id": "44233f9a-1584-5dcf-9e97-cb61f57dc6cb",
+      "name": "Masca",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "c60b8cf0c0ee75f753f8026f5eadd315f7da08b1331bcb7c245460d06346d005",
+      "short_description": "Masca es un caserío de Teno cuyas casas se escalonan en las crestas que separan profundos barrancos."
+    },
+    {
+      "canonical_id": "6b46c902-c8cd-450c-9b86-79aaf1a150a8",
+      "name": "Mirador de Chimague",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "c63714c9da8ed4745b9a69d1669a0ca103a8f3a7b209db11e1bb40fe5ecf1587",
+      "short_description": "Chimague mira hacia el valle de Güímar, las cumbres de Arafo y, con tiempo despejado, Gran Canaria."
+    },
+    {
+      "canonical_id": "3409ba91-0383-49cd-ad4f-c3942ff8599d",
+      "name": "Mirador de las Narices del Teide",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "690f40b6dd6b88b912baa448ae0af6bfa55867e7730a532c8ceaacfd79da8419",
+      "short_description": "Mirador de la TF-38 frente a las coladas de 1798 y las bocas eruptivas de las Narices del Teide, en la ladera de Pico Viejo."
+    },
+    {
+      "canonical_id": "a66b844a-d760-4081-a179-24352e1f19cb",
+      "name": "Mirador Izaña",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "3154b9107e844f44bfcade121e99dc4b6e1e20d978a3bb518c9934aad3f3ad1b",
+      "short_description": "El mirador de Izaña permite comparar distintos volcanes junto a los observatorios de las cumbres de Tenerife."
+    },
+    {
+      "canonical_id": "84324b9d-de6d-46be-be2d-891ae7273ba3",
+      "name": "Mirador La Tarta",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "e7948dc4b07bf26c6fe9a75ccddad1897bcaccb9f755946f5508514d0aeeca91",
+      "short_description": "La Tarta se asoma a un barranco de cumbre de la TF-24, con la silueta de La Palma al fondo cuando hay visibilidad."
+    },
+    {
+      "canonical_id": "131e94fc-3aab-46b4-ba6d-fa2c3f0b2efb",
+      "name": "Mirador La Tarta 2",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "9d03c072799ce55ac1ba08bf60d4567c6de4c40cf04e54b4ef38140e364ce1e7",
+      "short_description": "La Tarta 2 permite ver de cerca las franjas de colores de un talud volcánico junto a la carretera de las cumbres de Tenerife."
+    },
+    {
+      "canonical_id": "ef2f2b3b-08c4-4686-9f34-0c027f47f6d4",
+      "name": "Mirador Montaña Limón",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "8c984bd6ac4deeb42015e0448f2c21b47282ebd533e52dbcb7d8f1ace1cc22cc",
+      "short_description": "El mirador Montaña Limón muestra un valle de conos volcánicos entre las lomas de Izaña y la Yegua Blanca."
+    },
+    {
+      "canonical_id": "4dc2ed8f-f863-471c-aacf-d2daf8c4b4fe",
+      "name": "Molino de Cuevas Blancas",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "7e3a037c6271063802dd03591dab95fd49b6d823ddda10a9eb7004cb64617ecd",
+      "short_description": "El Molino de Cuevas Blancas conserva el testimonio de la molienda eólica tradicional en Santa Cruz de Tenerife."
+    },
+    {
+      "canonical_id": "0ba0cd92-2b88-5520-abb9-c21ddaa1bbf4",
+      "name": "Monkey Park",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "733425666a715e6bf41595c73240921000226ae940e12153f568bfa177d57f95",
+      "short_description": "Zoo del sur de Tenerife con primates, aves exóticas y otros animales en un recorrido entre jardines."
+    },
+    {
+      "canonical_id": "f9c57dd6-b607-5b89-a42b-d8ac76baa143",
+      "name": "Montaña Roja",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "e2065d6c5b825423168108ac33005dd40822130dd9064b71d5aeb4a15cb96788",
+      "short_description": "Montaña Roja es un cono volcánico del litoral de El Médano, rodeado de playas, arenas y humedales protegidos."
+    },
+    {
+      "canonical_id": "ef8a3b49-72ca-431e-a8e6-8ef28bee1ca1",
+      "name": "Museo de Arte Contemporáneo Eduardo Westerdahl",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "2ccd27952865db0f22b5bb4173a7cb7bc4d4f48fad1b4cff5824a2c203717938",
+      "short_description": "Arte del siglo XX en la Casa de la Aduana del Puerto de la Cruz, con obras de Óscar Domínguez, César Manrique y Manolo Millares."
+    },
+    {
+      "canonical_id": "48905763-ed85-5086-a825-aa70e69b4091",
+      "name": "Museo de Arte Sacro Santa Clara",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "b236639e3b038d6fa0ab7efb9ef1a3e6613c228b2d1d9e8b3f76f6639e34820b",
+      "short_description": "El Museo de Arte Sacro Santa Clara muestra el patrimonio artístico y la vida conventual de las clarisas de La Laguna."
+    },
+    {
+      "canonical_id": "0fdc2c6a-b29d-50b1-a401-7c9219eabf66",
+      "name": "Museo de Artesanía Iberoamericana de Tenerife – MAIT",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "7a063019b92b9078756d6831ada20079cfeb4ccd31d6dc8be5031322abb50cdd",
+      "short_description": "El MAIT presenta artesanía de Canarias e Iberoamérica en un antiguo convento de La Orotava."
+    },
+    {
+      "canonical_id": "cd4792e4-20a4-4570-924d-e37149b0a400",
+      "name": "Museo de Historia de Tenerife",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "bda1cf3bf73e15080e8efe592dec95ff3e7a33a13ed4e60cfd9778a9f1fa0ccb",
+      "short_description": "La Casa Lercaro, en La Laguna, alberga el MHA y un recorrido por la historia de Tenerife entre los siglos XV y XX."
+    },
+    {
+      "canonical_id": "bd6b4dfd-96a6-412c-80ba-4d8247cd071a",
+      "name": "Museo de la Ciencia y el Cosmos",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "967d191b6bb3fdb1173554d3538fe025c496e41b8ba41562be556692cb714bdb",
+      "short_description": "Museo de La Laguna donde se prueban experimentos sobre el cuerpo humano, la Tierra, el Sol y el universo."
+    },
+    {
+      "canonical_id": "2f3a93ec-af62-4da0-924c-47eb1270109d",
+      "name": "Museo de la Naturaleza y el Hombre",
+      "island": "tenerife",
+      "revision": 3,
+      "record_sha256": "e193dddf076926d2540ba6e88b12b558c91695e6741fd49310ca8a376f6f3617",
+      "short_description": "El MUNA, en Santa Cruz de Tenerife, reúne arqueología guanche, momias y colecciones sobre la naturaleza de las islas."
+    },
+    {
+      "canonical_id": "6bd7649d-7a3b-490d-a050-496638f01c83",
+      "name": "Museo de las Alfombras",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "a60994d852b97e5404319a87f51374e3450d4b79ce45b3b3d28406bd918e34f5",
+      "short_description": "Museo de La Orotava dedicado a las alfombras de flores y arenas del Teide que se elaboran para el Corpus Christi."
+    },
+    {
+      "canonical_id": "3157828a-81ee-44a1-80f5-ccbde896d567",
+      "name": "Museo Histórico Militar de Canarias",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "d83a110907d23ae577b53da2753ca5f8f7f7cff5179034c48582e852617efaed",
+      "short_description": "Museo del Fuerte de Almeyda, en Santa Cruz de Tenerife, con armas, uniformes y cartografía histórica de Canarias."
+    },
+    {
+      "canonical_id": "df3564dd-63af-5524-be0a-b29d29e83252",
+      "name": "Museo Municipal de Bellas Artes",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "4a695d0ed0f24b099375f76401b4196816f61a0ea0bbc320341d7d5f167870e0",
+      "short_description": "El Museo Municipal de Bellas Artes de Santa Cruz reúne pintura europea y canaria en un edificio de líneas clasicistas."
+    },
+    {
+      "canonical_id": "25161407-7c87-5b3f-8951-660cd784187f",
+      "name": "Parque de Taoro",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "b9f4b26e24aca9f8dffbf275c11492750e7aef23197d116d507bdc978815148e",
+      "short_description": "Parque sobre Puerto de la Cruz con jardines, cascadas y miradores hacia la ciudad."
+    },
+    {
+      "canonical_id": "ca8edb2c-0cb2-5483-b2a9-49c5ee4ccdc9",
+      "name": "Parque del Drago Milenario",
+      "island": "tenerife",
+      "revision": 1,
+      "record_sha256": "a0a8946f14f736d433a967733631221c623488b5f850951871c1204d1f2d4c5e",
+      "short_description": "El Parque del Drago permite conocer el gran drago de Icod y otras especies de la flora canaria entre jardines y senderos."
+    },
+    {
+      "canonical_id": "d8e1f904-89bf-5f31-a0d2-3f19e8e2f316",
+      "name": "Parque Nacional del Teide",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "1f4c9d3fde7b7f741dfaaefbbde0afcfa371118440f88ff3721407c568d8ee43",
+      "short_description": "El Parque Nacional del Teide reúne lavas, conos y paisajes de alta montaña en el centro de Tenerife."
+    },
+    {
+      "canonical_id": "fb72f102-7aae-521a-b660-2962481f8be0",
+      "name": "Parque Rural de Anaga",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "0ccc542583608d29c5f9f7d6fdf28bf29df393e85ade531a42336a3d92108825",
+      "short_description": "Anaga combina bosques de laurisilva, barrancos profundos y caseríos en las montañas del nordeste de Tenerife."
+    },
+    {
+      "canonical_id": "db696221-07ce-4d79-aaad-0293725d2855",
+      "name": "Roque Caramujo",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "1e46f9f5ea58c8b5e22fec64f61f3b877656c26ac57ec89ce87ed0ae497b3027",
+      "short_description": "Mirador junto al Roque del Caramujo, en las cumbres de Tenerife, con restos de antiguas cabañas de pastores en el entorno."
+    },
+    {
+      "canonical_id": "ce9f3936-aae0-5e87-b664-3a9cd31a5c46",
+      "name": "Siam Park",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "f7446bc4e12314864073a19e1fa28eb0b941df3d0e52c11400e3239689bd1f08",
+      "short_description": "Parque acuático del sur de Tenerife con grandes toboganes, piscinas y el río artificial Mai Thai River."
+    }
+  ],
+  "withheld": [
+    {
+      "canonical_id": "4df6ba50-ecfd-57eb-bc43-1e2ef795c4f4",
+      "name": "Ermita de La Peña",
+      "island": "el-hierro",
+      "revision": 2,
+      "record_sha256": "4326ce2965562fd0f7f21986cc1154cfcd274c2d55104e0c158cad5a04d9156e",
+      "short_description": "La ermita de La Peña recuerda la devoción que acompañaba los antiguos caminos de acceso al valle de El Golfo.",
+      "detailed_description": "El pequeño templo está dedicado a la Virgen de La Peña. Su historia se vincula al camino de La Peña o Tibataje, que unía las tierras altas con El Golfo.",
+      "source_urls": "https://www.holaislascanarias.com/museos-y-visitas-de-interes/el-hierro/ermita-de-la-pena/",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "Informacja turystyczna rozróżnia mały kościół od historycznego camino. Nie przeniesiono ograniczeń niebezpiecznego szlaku na samą ermitę."
+    },
+    {
+      "canonical_id": "0d607dbd-254d-5ef4-b560-b22226b3cfbb",
+      "name": "Molina de Almácigo",
+      "island": "fuerteventura",
+      "revision": 2,
+      "record_sha256": "ede692378e6869b7a19e720f7ec234bc663c16267306e98cc15a8308005aeffd",
+      "short_description": "La Molina de Almácigo forma parte del patrimonio de molienda eólica protegido en el municipio de Puerto del Rosario.",
+      "detailed_description": "Su tipología combina una construcción de planta cuadrangular con una torre de madera que sostiene las aspas. El eje de la torre transmite el movimiento del viento a las piedras de molienda.",
+      "source_urls": "https://patrimoniofuerteventura.com/molinos-del-municipio-de-puerto-del-rosario/",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "Cabildo potwierdza zespół molinas w Almácigo, lecz nie rozstrzygnięto, którą z dwóch historycznych konstrukcji przedstawia zachowany UUID. Ogólny opis nie wystarcza do potwierdzenia indywidualnej tożsamości."
+    },
+    {
+      "canonical_id": "c99731a6-de0b-5dbf-b04d-fa3480b91da8",
+      "name": "Casa de los Quilla",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "4e1481a16d83c9d2a2c2f696e1773d7dd2f28940c67a7959028168e6d2e8fabf",
+      "short_description": "La Casa de los Quilla destaca en la Calle Real de San Sebastián por su balcón cerrado con celosías.",
+      "detailed_description": "La vivienda se encuentra frente a la iglesia de la Asunción. Su construcción se fecha en el último tercio del siglo XVIII.",
+      "source_urls": "https://www.holaislascanarias.com/museos-y-visitas-de-interes/la-gomera/casa-de-los-quilla-0/",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "Dawny adres z końcówką -0 jest niesprawny. Właściwa karta musi potwierdzić dom naprzeciw Asunción i celosías; ograniczenie dostępu odnosi się wyłącznie do wnętrza."
+    },
+    {
+      "canonical_id": "9bbc15f6-2e25-563d-a3b4-61385b6ac087",
+      "name": "Museo Etnográfico",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "65a52c8abd421ef9bb933de8edf4efb2887b87b40aa762b79cf657e80bde80df",
+      "short_description": "Museo de Hermigua sobre la vida cotidiana de La Gomera, con cerámica, molinos de mano y utensilios de los oficios rurales.",
+      "detailed_description": "La colección inicial procede de Virgilio Brito y reúne utensilios de la vida rural. El recorrido se centra sobre todo en la sociedad gomera del siglo XX.",
+      "source_urls": "https://museos.lagomera.es/megmuseo/megcoleccion/; https://lagomera.travel/museos-y-visitas-de-interes/la-gomera/museo-etnografico-de-la-gomera/; https://museos.lagomera.es/megmuseo/",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "La colección y el marco histórico están confirmados. Se retiró de la copia la afirmación de cierre actual: el portal turístico contiene horario de apertura mientras el informe anterior y el acta de julio señalan cierre. Se mantiene bloqueo hasta una confirmación actual del operador."
+    },
+    {
+      "canonical_id": "19c19e65-779e-5831-a8e1-527b00cd1f79",
+      "name": "Pescante de Hermigua",
+      "island": "la-gomera",
+      "revision": 2,
+      "record_sha256": "5d145fc343c45c8d7f77b6b9becd32c27a18f6120757661e12da688fb1edb1f2",
+      "short_description": "Restos del antiguo embarcadero de Hermigua, con pilares de piedra que sostenían las grúas para transportar mercancías entre la costa y los barcos.",
+      "detailed_description": "Un brazo de hierro y un motor de vapor permitían mover mercancías, animales y personas entre la costa y los barcos. El conjunto incluía almacén y oficinas para organizar el transporte.",
+      "source_urls": "https://lagomera.travel/museos-y-visitas-de-interes/la-gomera/pescante-de-hermigua/",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "Historia confirmada, pero el alcance y vigencia del cierre no están resueltos frente a las obras de acceso de 2026 y noticias de reapertura. Se retiró la afirmación absoluta del breve; el expediente queda bloqueado y no se promete acceso."
+    },
+    {
+      "canonical_id": "0fe3867a-abf4-45e0-9d20-9ac61b032a3a",
+      "name": "Mirador Barranco la Fajana.",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "0fafb7c56f3777383d736e9bb75d78920b84a8d82875759d70e2219fec2b25c4",
+      "short_description": "Asomadero del camino que rodea el Roque de Taborno, con vistas a las crestas y barrancos de Anaga.",
+      "detailed_description": "Se alcanza siguiendo la cresta que sale del caserío de Taborno hacia el roque. Desde el punto panorámico también se ve el pueblo al volver la mirada.",
+      "source_urls": "https://kittiaroundtheworld.com/hiking-roque-de-taborno-in-anaga-rural-park-tenerife/",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "Jedna relacja podróżnicza nie pozwala niezależnie potwierdzić, że dokładny punkt katalogowy jest opisywanym miradorem. Brakuje źródła instytucjonalnego lub drugiego niezależnego dowodu tożsamości."
+    },
+    {
+      "canonical_id": "20628b0f-406c-4be4-a340-b66831f538ae",
+      "name": "Museo Guanche",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "008d18456a9d830423e64ce5565f1f2c16e06ac287935a317f528fb7724fd1be",
+      "short_description": "El Museo Guanche se concibió como un espacio de Icod para explicar la historia de los primeros habitantes de Canarias.",
+      "detailed_description": "Turismo de Tenerife documentó su sede en el centro comercial La Magalona. Su propuesta interpretativa estaba dedicada al pasado de la población guanche.",
+      "source_urls": "https://whichmuseum.com/es/museo/museo-guanche-icod-de-los-vinos-29177; https://www.webtenerife.com/blogcorporativo/2019/05/el-parque-del-drago-de-icod-celebrara-su-i-festival-de-arte-al-aire-libre-el-dia-internacional-de-los-museos/",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "Operator nadal zwraca 502, a serwisy wtórne nie rozstrzygają zamknięcia czasowego/trwałego. Instytucjonalne potwierdzenie z 2019 wspiera tylko historię, nie aktualną działalność."
+    },
+    {
+      "canonical_id": "5fa5afb6-2b8f-5c27-bcfd-1f92c954d718",
+      "name": "Museo y Parque Etnográfico Pinolere",
+      "island": "tenerife",
+      "revision": 2,
+      "record_sha256": "cbca19d58115bd9c4fa215d53047d756de3d97ced4e3a7351e055a7c6cc45da1",
+      "short_description": "Pinolere reúne pajares, casas y espacios de cultivo que muestran cómo se vivía en las medianías del valle de La Orotava.",
+      "detailed_description": "Los antiguos pajares de cubierta vegetal se utilizan como salas de exposición. El conjunto incluye una era, corrales y la reproducción de una venta tradicional.",
+      "source_urls": "https://www.laorotava.es/es/lugares/museo-etnografico-de-pinolere",
+      "frontend_commit": "5c0f17fdee5d543b8d88dfff8c28b2624b6c7f18",
+      "reason": "Gminna karta podaje punkt około 280 m od katalogowej pinezki. Opis muzeum jest poparty źródłem, lecz dokładna lokalizacja wymaga osobnego rozstrzygnięcia; geometrii nie zmieniono."
+    }
+  ]
+}

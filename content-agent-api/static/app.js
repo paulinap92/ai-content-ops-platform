@@ -1302,3 +1302,12 @@ $("new-manual-event").onclick=()=>{const raw=$('event-island-filter').value||'Te
 window.addEventListener('DOMContentLoaded',()=>{for(const [slug,name]of [['tenerife','Tenerife'],['gran-canaria','Gran Canaria'],['lanzarote','Lanzarote'],['fuerteventura','Fuerteventura'],['la-palma','La Palma'],['la-gomera','La Gomera'],['el-hierro','El Hierro'],['la-graciosa','La Graciosa']])$('photo-upload-island').append(new Option(name,slug));const target=sessionStorage.getItem('cc-editor-photo-target');if(target){sessionStorage.removeItem('cc-editor-photo-target');const i=JSON.parse(target);$('site-editor-frame').src='/site/?'+new URLSearchParams({...i});$('photo-selection-target').textContent='Wybierz zdjęcie do otwartej treści.';}if(new URLSearchParams(location.search).get('library')==='photos')document.querySelector('[data-view="photos"]').click();});
 
 window.addEventListener('cc-social-open-photos',()=>{state.photoSelectionTarget='social';$('photo-selection-target').textContent='Wybierz zdjęcie do przygotowywanego posta.';$('photo-use').textContent='Użyj w poście';document.querySelector('[data-view="photos"]').click();});
+
+window.addEventListener('message',event=>{
+ if(event.origin!==location.origin||event.source!==$('site-editor-frame').contentWindow||event.data?.type!=='cc-studio-open-tool')return;
+ if(['events','editor','photos'].includes(event.data.tool))document.querySelector(`[data-view="${event.data.tool}"]`)?.click();
+});
+window.addEventListener('DOMContentLoaded',()=>{
+ const tool=new URLSearchParams(location.search).get('view');
+ if(['events','editor','photos'].includes(tool))document.querySelector(`[data-view="${tool}"]`)?.click();
+});
