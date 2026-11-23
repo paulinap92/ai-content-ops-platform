@@ -1,0 +1,17 @@
+<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lugares · Content Editor</title><link rel="stylesheet" href="/site/assets/studio.css"></head><body>
+<main class="editor-main"><a href="/site/">← Content Editor</a><h1>Opisy Lugares</h1>
+<p id="message" role="status" aria-live="polite">Wczytywanie…</p>
+<form id="search-form" class="toolbar card"><label>Szukaj nazwy lub UUID<input id="q" type="search"></label><label>Wyspa<select id="island"><option value="">Wszystkie osiem wysp</option><option value="tenerife">Tenerife</option><option value="gran-canaria">Gran Canaria</option><option value="lanzarote">Lanzarote</option><option value="fuerteventura">Fuerteventura</option><option value="la-palma">La Palma</option><option value="la-gomera">La Gomera</option><option value="el-hierro">El Hierro</option><option value="la-graciosa">La Graciosa</option></select></label><label>Status<select id="state"><option value="">Wszystkie</option><option value="draft">Szkice</option><option value="blocked">Wymagają wyjaśnienia</option><option value="approved">Zatwierdzone</option><option value="published">Opublikowane</option></select></label><button>Szukaj</button></form>
+<div class="columns"><aside class="card"><div id="list"></div><button id="prev">←</button><span id="page"></span><button id="next">→</button></aside>
+<section class="card"><h2 id="title">Wybierz miejsce</h2><p id="identity"></p><p id="status"></p><p id="blocked" role="alert"></p><form id="editor" hidden>
+<label>Osoba redagująca / zatwierdzająca<input id="actor" required minlength="2" maxlength="150" autocomplete="name"></label>
+<label>Krótki opis ES (maks. 220 znaków)<textarea id="short" maxlength="220" required></textarea></label><output id="length"></output>
+<label>Opis szczegółowy ES (2–4 konkretne zdania)<textarea id="body" rows="6" maxlength="6000" required></textarea></label>
+<h3>Źródła</h3><p>Otwórz źródła, sprawdź tożsamość miejsca i fakty. Data kontroli jest zapisywana przy jawnym potwierdzeniu weryfikacji.</p><div id="sources"></div><button id="add-source" type="button">+ Dodaj źródło</button>
+<div class="actions"><button id="save">Zapisz nową wersję roboczą</button></div>
+<label><input id="facts" type="checkbox"> Sprawdziłam tożsamość miejsca i wszystkie fakty</label><label><input id="links" type="checkbox"> Otworzyłam każde źródło i potwierdzam poprawną odpowiedź oraz zgodność treści</label><label><input id="sentences" type="checkbox"> Opis szczegółowy ma 2–4 konkretne zdania</label>
+<div class="actions"><button id="verify" type="button">Potwierdź weryfikację tej wersji</button></div>
+<label><input id="style" type="checkbox"> Akceptuję treść i naturalny styl hiszpański tej wersji</label>
+<div class="actions"><button id="approve" type="button">Zatwierdź redakcyjnie</button><button id="publish" type="button" class="primary">Opublikuj zatwierdzoną wersję</button></div>
+<p id="publish-help"></p></form><button id="history-button" hidden>Historia i poprzednie teksty</button><div id="history"></div>
+</section></div></main><script type="module" src="/site/assets/lugares.js"></script></body></html>
