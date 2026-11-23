@@ -31,6 +31,7 @@ class Draft(BaseModel):
 
 class Version(BaseModel):
     expected_version: int = Field(ge=1)
+    review_confirmed: bool = False
 
 
 class Restore(Version):
@@ -62,7 +63,7 @@ async def studio_page():
 
 @router.get("/site/assets/{name}", include_in_schema=False)
 async def studio_asset(name: str):
-    if name not in {"studio.js", "studio.css", "lugares.js", "editorialText.js", "inspector.js", "charts.js"}:
+    if name not in {"studio.js", "studio.css", "lugares.js", "recordPhotos.js", "visualStudio.js", "editorialText.js", "inspector.js", "charts.js"}:
         raise HTTPException(404)
     return FileResponse(ASSETS / name, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
 
@@ -105,7 +106,7 @@ async def save_draft(payload: Draft, session: Session):
 @router.post("/site/api/documents/{document_id}/publish", include_in_schema=False)
 async def publish(document_id: str, payload: Version, session: Session):
     try:
-        return await service.publish(session, document_id, payload.expected_version)
+        return await service.publish(session, document_id, payload.expected_version, payload.review_confirmed)
     except ValueError as exc:
         translate_error(exc)
 
@@ -121,7 +122,7 @@ async def history(document_id: str, session: Session):
 @router.post("/site/api/documents/{document_id}/restore", include_in_schema=False)
 async def restore(document_id: str, payload: Restore, session: Session):
     try:
-        return await service.restore(session, document_id, **payload.model_dump())
+        return await service.restore(session, document_id, version=payload.version, expected_version=payload.expected_version)
     except ValueError as exc:
         translate_error(exc)
 
@@ -182,3 +183,21 @@ async def media_metadata(media_id:str,payload:MediaMetadata,session:Session):
     row.published=value;row.draft=value;row.version+=1;row.updated_at=datetime.now(timezone.utc)
     await session.commit()
     return {**value,'media_id':str(row.id),'island':row.island}
+
+
+@router.get('/site/api/lugares-catalog', include_in_schema=False)
+async def lugares_catalog(session: Session, q: str = Query('', max_length=200), island: str = Query('', max_length=50), state: str = Query('', pattern='^(|published|blocked)$')):
+    from canarias_site.services.visual_studio import release_catalog
+    return await release_catalog(session, q=q, island=island, state=state)
+
+
+@router.get('/site/api/open-record', include_in_schema=False)
+async def open_record(session: Session, kind: str, island: str, resource: str, record_key: str):
+    from canarias_site.services.visual_studio import open_record
+    return await open_record(session, dict(kind=kind,island=island,resource=resource,record_key=record_key))
+
+
+@router.get('/site/api/site-manifest', include_in_schema=False)
+async def site_manifest(session: Session):
+    from canarias_site.services.visual_studio import site_manifest
+    return await site_manifest()

@@ -27,11 +27,13 @@ def preferred_feature(rows, catalog, island=None):
         return None
     candidates.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
     selected = deepcopy(candidates[0][3])
+    if candidates[0][1] != 'canarias-cerca-editorial':
+        selected['properties'].pop('cc_studio_copy', None)
     # A second source can supply useful metadata absent from the preferred
     # source; null external fields must not erase an editorial description.
     for _, _, _, record in candidates[1:]:
         for key, value in record["properties"].items():
-            if key in {"hidden", "editorial_override", "cc_curated", "geometry_override"}:
+            if key in {"hidden", "editorial_override", "cc_curated", "geometry_override", "cc_studio_copy"}:
                 continue
             if selected["properties"].get(key) in (None, "", [], {}) and value not in (
                 None,

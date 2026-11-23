@@ -77,13 +77,13 @@ const server=createServer(async(req,res)=>{
   res.writeHead(404);res.end('{}');return;
  }
  const name=path==='/site/'?'index.html':path.startsWith('/site/assets/')?path.slice('/site/assets/'.length):null;
- if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js','charts.js','recordPhotos.js'].includes(name)){res.writeHead(404);res.end();return;}
+ if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js','charts.js','recordPhotos.js','visualStudio.js'].includes(name)){res.writeHead(404);res.end();return;}
  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);
  res.end(await readFile(resolve(assets,name)));
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin=`http://127.0.0.1:${server.address().port}`;
-const browser=await chromium.launch();
+const browser=await chromium.launch(process.env.CC_TEST_CHROMIUM?{executablePath:process.env.CC_TEST_CHROMIUM}:{});
 const page=await browser.newPage();await page.route('https://www.canariascerca.es/**',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Public site preview fixture</title><p>Podgląd strony</p>'}));await page.route('https://public.example/**',r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')}));page.on('dialog',d=>d.accept());const errors=[];page.on('pageerror',e=>errors.push(e.message));
 await mkdir('test-results/site-editor',{recursive:true});
 async function idle(){await page.waitForFunction(()=>!document.querySelector('#save-settings').disabled);}
@@ -200,7 +200,7 @@ try{
  assert.equal(await page.getByRole('button',{name:'LangGraph',exact:true}).count(),0);
  await page.goto(origin+'/site/?section=live&resource=weather&island=tenerife');await idle();assert.equal(await page.locator('#site-tree').getByRole('button',{name:'Własne punkty Live',exact:true}).count(),0);await page.getByRole('button',{name:'Dodaj punkt',exact:true}).click();await idle();assert.equal(await page.locator('#kind').inputValue(),'live-point');assert.equal(await page.locator('[data-key="latitude"]').count(),1);
  optionalHealthFailure=false;await page.goto(origin);await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
- await page.getByRole('button',{name:'Wydarzenia',exact:true}).click();await page.locator('#new-manual-event').click();
+ await page.locator('[data-view="events"]').click();await page.locator('#new-manual-event').click();
  const editor=page.frameLocator('#site-editor-frame');await editor.getByRole('heading',{name:'Nowe wydarzenie',exact:true}).waitFor();assert.equal(await editor.locator('#island').inputValue(),'tenerife');assert.equal(await editor.locator('#kind').inputValue(),'calendar');
  // Photo upload and selection stay in the article and preserve unsaved text.
  await page.goto(origin+'/site/?section=guide&resource=history&island=tenerife');await idle();
@@ -318,4 +318,4 @@ try{
  assert.deepEqual(errors,[],'editor must boot and switch views without JS failures');
  assert.ok(writes.every(r=>['/site/api/draft','/site/api/media'].includes(r.path)||r.path.startsWith('/api/studio/social/drafts')),'UI test never publishes');
  console.log('EDITOR UI PASS: site tree, real text, automatic article selection, contextual switches, inheritance, draft preservation, empty state and direct links.');
-}finally{await browser.close();server.close();}
+}catch(e){console.error({errors,body:await page.locator('body').innerText()});throw e;}finally{await browser.close();server.close();}

@@ -1,5 +1,5 @@
 // Contextual photo controls reuse the same protected library and upload API.
-const imageKeys = new Set(['image_url', 'image_alt', 'image_credit', 'image_source_url']);
+const imageKeys = new Set(['image_url', 'image_alt', 'image_credit', 'image_source_url','image_license']);
 export {imageKeys};
 const slug = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replaceAll(' ', '-');
 const publicImage = value => /^https?:\/\//i.test(value || '');
@@ -14,20 +14,23 @@ async function photoRequest(path) {
   return response;
 }
 
-export async function preparePhoto(file) {
+export async function preparePhoto(file, crop = {}) {
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Wybierz zdjęcie JPEG, PNG lub WebP.');
   if (file.size > 20_000_000) throw new Error('Zdjęcie może mieć najwyżej 20 MB.');
   let bitmap;
   try { bitmap = await createImageBitmap(file); }
   catch { throw new Error('Nie można odczytać tego zdjęcia. Wybierz inny plik JPEG, PNG lub WebP.'); }
-  const factor = Math.min(1, 1920 / Math.max(bitmap.width, bitmap.height));
+  const ratio=Number(crop.ratio)||0;
+  let sx=0,sy=0,sw=bitmap.width,sh=bitmap.height;
+  if(ratio>0){if(sw/sh>ratio){const width=sh*ratio;sx=(sw-width)*Math.max(0,Math.min(1,crop.x??.5));sw=width;}else{const height=sw/ratio;sy=(sh-height)*Math.max(0,Math.min(1,crop.y??.5));sh=height;}}
+  const factor = Math.min(1, 1920 / Math.max(sw, sh));
   const canvas = document.createElement('canvas');
-  canvas.width = Math.max(1, Math.round(bitmap.width * factor));
-  canvas.height = Math.max(1, Math.round(bitmap.height * factor));
+  canvas.width = Math.max(1, Math.round(sw * factor));
+  canvas.height = Math.max(1, Math.round(sh * factor));
   const context = canvas.getContext('2d');
   context.fillStyle = '#fff';
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  context.drawImage(bitmap,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
   bitmap.close();
   const encoded = canvas.toDataURL('image/jpeg', 0.86).split(',')[1];
   if (encoded.length * 3 / 4 > 5_000_000) throw new Error('Zmniejsz zdjęcie przed wysłaniem: wynik może mieć najwyżej 5 MB.');
@@ -64,10 +67,18 @@ export function recordPhotoControls({item, node, field, api, payload, apply, mes
   const choose = node('button', 'Wybierz zdjęcie z biblioteki', {type: 'button'});
   const remove = node('button', 'Usuń zdjęcie z wpisu', {type: 'button'});
   remove.onclick = () => { apply({url: '', alt: '', credit: '', source_url: ''}); message('Usunięto zdjęcie ze szkicu. Plik pozostaje w bibliotece. Zapisz i opublikuj wpis, aby zmienić stronę.'); };
-  actions.append(uploadButton, choose, remove, upload);
+  const cropSelect=node('select',undefined,{'aria-label':'Kadr zdjęcia'});for(const [label,value] of [['Oryginalny kadr',0],['Panorama 16:9',16/9],['Kadr 4:3',4/3],['Kwadrat',1]])cropSelect.append(new Option(label,value));
+  const cropX=node('input',undefined,{type:'range',min:'0',max:'1',step:'.05',value:'.5','aria-label':'Poziomy środek kadru'}),cropY=node('input',undefined,{type:'range',min:'0',max:'1',step:'.05',value:'.5','aria-label':'Pionowy środek kadru'});
+  const crop=node('button','Kadruj wybrane zdjęcie',{type:'button'});crop.onclick=async()=>{try{
+    const draft=payload(),r=await photoRequest('/site/api/media/file?'+new URLSearchParams({url:draft.image_url}));
+    const blob=await r.blob(),prepared=await preparePhoto(new File([blob],'kadrowane.jpg',{type:blob.type}),{ratio:cropSelect.value,x:Number(cropX.value),y:Number(cropY.value)});
+    const saved=await api('/media',{method:'POST',body:JSON.stringify({island:item.identity.island,...prepared,alt:draft.image_alt||'',credit:draft.image_credit||''})});
+    apply({...saved,license:draft.image_license||''},JSON.stringify(item.identity));message('Dodano wykadrowaną kopię do szkicu. Oryginał pozostaje w bibliotece.');
+  }catch(e){message(e.message,true);}};
+  actions.append(uploadButton, choose, remove, upload,cropSelect,cropX,cropY,crop);
   panel.append(actions, node('p', 'Wgranie dodaje publiczny plik do biblioteki strony i przypisuje go do tego szkicu. Wpis zmieni się dopiero po zapisaniu i publikacji.', {class: 'view-help'}));
   const metadata = node('div', undefined, {class: 'photo-metadata'});
-  for (const key of ['image_alt', 'image_credit']) metadata.append(field(key, item.draft[key] || ''));
+  for (const key of ['image_alt', 'image_credit', 'image_license']) metadata.append(field(key, item.draft[key] || ''));
   const addresses = node('details');
   addresses.append(node('summary', 'Adres i źródło zdjęcia'));
   for (const key of ['image_url', 'image_source_url']) addresses.append(field(key, item.draft[key] || ''));
@@ -86,7 +97,7 @@ export function recordPhotoControls({item, node, field, api, payload, apply, mes
     dialog.addEventListener('cancel', event => event.preventDefault());
     document.body.append(dialog); dialog.showModal();
     try {
-      const prepared = await preparePhoto(file), draft = payload();
+      const prepared = await preparePhoto(file,{ratio:cropSelect.value,x:Number(cropX.value),y:Number(cropY.value)}), draft = payload();
       const saved = await api('/media', {method: 'POST', body: JSON.stringify({island: item.identity.island, ...prepared, alt: draft.image_alt || '', credit: draft.image_credit || ''})});
       apply({...saved, alt: draft.image_alt || '', credit: draft.image_credit || '', source_url: ''}, identity);
       message('Zdjęcie dodano do szkicu i biblioteki strony. Teraz: Zapisz treść roboczą → Podgląd i zmiany → Opublikuj treść.');

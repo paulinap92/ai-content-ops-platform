@@ -101,9 +101,10 @@ def identity_of(row):
 
 
 def document_view(row):
-    return {"id": str(row.id), "identity": identity_of(row), "version": row.version,
+    from canarias_site.services.visual_studio import annotate_record
+    return annotate_record({"id": str(row.id), "identity": identity_of(row), "version": row.version,
             "status": row.status, "draft": row.draft, "published": row.published,
-            "base_fingerprint": row.base_fingerprint, "updated_at": row.updated_at.isoformat()}
+            "base_fingerprint": row.base_fingerprint, "updated_at": row.updated_at.isoformat()})
 
 
 def document_query(identity):
@@ -164,6 +165,9 @@ async def list_records(session, kind, island, resource, q="", offset=0, limit=10
         if not q or q.casefold() in (title + json.dumps(item["draft"], ensure_ascii=False)).casefold():
             results.append(item)
     results.sort(key=lambda r: str(r["draft"].get("name") or r["draft"].get("title") or "").casefold())
+    from canarias_site.services.visual_studio import annotate_record
+    for item in results:
+        annotate_record(item)
     return {"items": results[offset:offset + limit], "count": len(results), "offset": offset, "limit": limit}
 
 
@@ -205,13 +209,15 @@ async def _locked_document(session, document_id, expected_version):
     return row
 
 
-async def publish(session, document_id, expected_version):
+async def publish(session, document_id, expected_version, review_confirmed=False):
     row = await _locked_document(session, document_id, expected_version)
     identity = identity_of(row)
     current = json_value(await canonical_value(session, identity, lock=True))
     if fingerprint(current) != row.base_fingerprint:
         raise HTTPException(409, "Wpis na stronie zmienił się od rozpoczęcia edycji. Wczytaj i porównaj aktualną treść.")
     payload = validate_payload(identity, row.draft)
+    from canarias_site.services.visual_studio import prepare_publication
+    payload = await prepare_publication(session, identity, current, payload, row.version, review_confirmed)
     public = public_payload(payload)
     kind, island, resource = (identity[k] for k in ("kind", "island", "resource"))
     if kind == "settings":
@@ -240,6 +246,9 @@ async def publish(session, document_id, expected_version):
             row.record_key = saved["_editor_key"]
         else:
             await sql_editor.update_explore(session, island, resource, row.record_key, public, allow_geometry=True)
+            if resource in {"places", "museums-visits", "leisure-centers"}:
+                from canarias_site.services.visual_studio import propagate_place
+                await propagate_place(session, identity, public)
     elif kind == "calendar":
         target_month = public["start_date"][:7]
         if current is None:

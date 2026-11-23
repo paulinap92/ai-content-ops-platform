@@ -1,3 +1,4 @@
+import {createVisualStudio} from './visualStudio.js';
 import {createInspector,renderMonth} from "./inspector.js";
 import {renderEditorialText} from "./editorialText.js";
 import {recordPhotoControls, imageKeys} from "./recordPhotos.js";
@@ -40,7 +41,8 @@ const labels = {
   title: "Tytuł",
   slug: "Adres wpisu (slug)",
   description: "Treść / opis",
-  short_description: "Krótki opis",
+  short_description: "Krótki opis (do 220 znaków)",
+  detailed_description: "Opis szczegółowy",
   summary: "Streszczenie",
   category: "Kategoria",
   tags: "Tagi",
@@ -50,6 +52,7 @@ const labels = {
   image_url: "Adres zdjęcia",
   image_alt: "Opis alternatywny zdjęcia",
   image_credit: "Autor / prawa do zdjęcia",
+  image_license:"Licencja / zgoda autora",
   image_source_url: "Źródło zdjęcia",
   source_url: "Źródło informacji",
   url: "Adres strony",
@@ -256,6 +259,7 @@ function field(key, value, readonly = false) {
     object ||
     [
       "description",
+      "detailed_description",
       "short_description",
       "summary",
       "body_markdown",
@@ -291,6 +295,8 @@ function field(key, value, readonly = false) {
 }
 function renderRecord() {
   const item = state.record;
+  $('publication-review-label').hidden=item.identity.kind!=='explore';
+  $('publication-review').checked=false;
   state.dirty = false;
   $("history-list").replaceChildren();
   $("editor-title").textContent =
@@ -301,6 +307,7 @@ function renderRecord() {
   preview.replaceChildren(node("h3",item.published?.name || item.published?.title || "Jeszcze nieopublikowane"));
   const body=node("div");body.innerHTML=renderEditorialText(item.published?.description || item.published?.summary || "");preview.append(body);
   const fields = node("div", undefined, { class: "fields" });
+  if(item.blocked_reason)fields.append(node('p','Wstrzymane: '+item.blocked_reason,{class:'release-blocked wide'}));
   const advanced = node("details");
   advanced.append(node("summary", "Dodatkowe pola i dane strukturalne"));
   const keys = new Set([
@@ -315,7 +322,8 @@ function renderRecord() {
     "editor_notes",
   ]);
   for (const key of keys) {
-    if (key.startsWith("_") || protectedKeys.has(key) || imageKeys.has(key)) continue;
+    if (key.startsWith("_") || key.startsWith("cc_") || key === "sources" || key === "gallery" || protectedKeys.has(key) || imageKeys.has(key)) continue;
+    if(key==='description'&&item.identity.kind==='explore'&&Object.hasOwn(item.draft,'detailed_description'))continue;
     const value = Object.hasOwn(item.draft, key) ? item.draft[key] : (key === "hidden" ? false : key === "editor_notes" ? [] : "");
     (Object.hasOwn(labels, key) ? fields : advanced).append(
       field(
@@ -325,6 +333,10 @@ function renderRecord() {
       ),
     );
   }
+  if(item.identity.kind==='explore') {
+    fields.append(sourceControls(item),locationControls(item));
+  }
+  if(item.identity.kind!=='live-point')fields.append(galleryControls(item));
   let photoControls;
   if (item.identity.kind !== "live-point") {
     photoControls = recordPhotoControls({item, node, field, api, payload: recordPayload, apply: applyRecordImage, message,
@@ -343,7 +355,7 @@ function renderRecord() {
   $("edit-actions").hidden = false;
   $("save").textContent=item.identity.kind==="live-point"?"Zapisz i włącz punkt":"Zapisz treść roboczą";
   $("publish").hidden=item.identity.kind==="live-point";
-  $("publish").disabled = !item.id;
+  $("publish").disabled = !item.id || Boolean(item.blocked_reason);
   $("publish").textContent=item.identity.kind==="calendar"?"Opublikuj wydarzenie":item.identity.kind==="live-point"?"Włącz punkt w jobach Live":"Opublikuj treść";
   $("improve-ai").hidden=item.identity.kind!=="guide";
 }
@@ -364,6 +376,9 @@ function recordPayload() {
     else if (input.value === "" && input.dataset.null === "true") v = null;
     value[input.dataset.key] = v;
   }
+  if(state.record.identity.kind==='explore')value.sources=Array.from(document.querySelectorAll('#record-form .source-row')).map(row=>({url:row.querySelector('[data-source-url]').value,title:row.querySelector('[data-source-title]').value||'Fuente'})).filter(s=>s.url);
+  const gallery=document.getElementById('record-gallery');
+  if(gallery)value.gallery=JSON.parse(gallery.dataset.images||'[]');
   return value;
 }
 async function digest(value) {
@@ -429,8 +444,9 @@ async function publish(which) {
     return;
   state[which] = await api(`/documents/${item.id}/publish`, {
     method: "POST",
-    body: JSON.stringify({ expected_version: item.version }),
+    body: JSON.stringify({ expected_version: item.version, review_confirmed: $("publication-review").checked }),
   });
+  visual.refresh();
   $("preview-dialog").close();
   message(
     "Opublikowano. Strona pobierze zmianę przy odświeżeniu; ustawienia aktualizują się także w otwartych kartach.",
@@ -732,6 +748,7 @@ function renderTree(){
  add("database",null,"Baza danych");
 }
 async function navigate(section,resource=null,nextScope=state.scope){
+ $("workspace").classList.remove("visual-selection");
  document.querySelectorAll("[data-live-back]").forEach(e=>e.remove());
  if(!warnUnsaved()){$("tree-scope").value=state.scope;return;}
  collectSettings();
@@ -808,6 +825,8 @@ async function init() {
   else if(Object.hasOwn(state.options.sections,requested.get("section")) && (!requested.get("resource") || state.options.features[requested.get("section")]?.includes(requested.get("resource")) || requested.get("section")==="explore" && requested.get("resource")==="featured")) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(requested.has("kind")) {const p=params();await navigate(p.kind,p.resource,p.island);}
   else await navigate("home");
+  await visual.load();
+  if(requested.get("view")==="lugares")await visual.catalog();
   if(requested.get("new")==="1")await newRecord();
   parent.postMessage({type:"cc-editor-ready"},location.origin);
 }
@@ -971,7 +990,8 @@ window.addEventListener("beforeunload", (e) => {
     e.returnValue = "";
   }
 });
-task(init);
+// Initialized after the shared preview/navigation controller.
+queueMicrotask(()=>task(init));
 
 $("close-history").onclick=()=>$("history-dialog").close();
 $("rebase").onclick=()=>task(async()=>{
@@ -998,7 +1018,7 @@ for(const [id,delta] of [["calendar-prev",-1],["calendar-next",1],["calendar-tod
 function applyRecordImage(image, expectedIdentity) {
   if (!state.record || expectedIdentity && JSON.stringify(state.record.identity) !== expectedIdentity)
     throw new Error('Wybrany wpis zmienił się. Zdjęcie pozostało w bibliotece; wybierz je ponownie do właściwego wpisu.');
-  state.record.draft = {...recordPayload(), image_url: image.url, image_alt: image.alt || '', image_credit: image.credit || '', image_source_url: image.source_url || ''};
+  state.record.draft = {...recordPayload(), image_url: image.url, image_alt: image.alt || '', image_credit: image.credit || '', image_source_url: image.source_url || '', image_origin:image.url?'studio-library':'', image_removed:!image.url, image_license:image.license||recordPayload().image_license||''};
   renderRecord(); state.dirty = true;
   $("record-status").textContent = 'Niezapisane zmiany · zdjęcie jest przypisane do szkicu';
 }
@@ -1016,4 +1036,84 @@ async function manageLivePoints(resource,island,create){
  state.target={section:'live',resource};renderTree();$("context-title").textContent='Live / '+resourceLabel(resource)+' / Punkty';
  const back=node('button','← Wróć do danych Live',{type:'button'});back.onclick=()=>task(()=>navigate('live',resource,scope));$("content-location").before(back);back.dataset.liveBack='1';
  if(create)await newRecord();
+}
+
+async function openVisualRecord(identity) {
+ if(!warnUnsaved())return;
+ // A map selection can originate in any of the three Lugares catalogs.
+ let record;
+ try{record=await api('/open-record?'+new URLSearchParams(identity));}
+ catch(error){
+  if(identity.kind!=='explore'||identity.resource!=='places')throw error;
+  for(const resource of ['museums-visits','leisure-centers']){
+   try{record=await api('/open-record?'+new URLSearchParams({...identity,resource}));break;}catch{}
+  }if(!record)throw error;
+ }
+ state.scope=record.identity.island;state.target={section:record.identity.kind,resource:record.identity.resource};
+ $('tree-scope').value=state.scope;$('island').value=state.scope;$('kind').value=record.identity.kind;
+ resources();if(record.identity.kind==='calendar')$('month').value=record.identity.resource;else $('resource').value=record.identity.resource;
+ $('context-title').textContent=record.draft.name||record.draft.title;
+ $('context-path').textContent=islandName(state.scope)+' / '+resourceLabel(record.identity.resource);
+ $('context-help').textContent=record.blocked_reason?'Wstrzymana publikacja. Możesz pracować nad szkicem.':'Edytujesz dane odczytywane przez stronę. Zapisz szkic, sprawdź podgląd i opublikuj.';
+ state.record=record;renderSettings();view('content');renderRecord();$('workspace').classList.add('visual-selection');
+}
+const visual=createVisualStudio({api,node,message,onSelect:openVisualRecord,
+ onNavigate:async(route,copyKey)=>{
+  if(!route)return;
+  if(route.mode==='editorial'&&route.editor){await navigate(route.editor.kind,route.editor.resource,route.island||'global');}
+  else await navigate(route.section||'home',route.resource,route.island||'global');
+  if(copyKey)document.querySelector(`[data-copy="${CSS.escape(copyKey)}"]`)?.scrollIntoView({block:'center'});
+ },onExternal:tool=>{
+  if(tool==='draft-preview'){
+   if(!state.record)return message('Najpierw wybierz miejsce.');
+   visual.draft(state.record.identity,recordPayload());return;
+  }
+  if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool},location.origin);
+  else location.assign('/?view='+tool);
+ }});
+$('open-visual').onclick=()=>visual.open();
+$('open-lugares').onclick=()=>task(()=>visual.catalog());
+$('open-events').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool:'events'},location.origin);else location.assign('/?view=events');};
+$('open-articles').onclick=()=>task(()=>navigate('guide','history',state.scope==='global'?'tenerife':state.scope));
+$('open-media').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-editor-open-photos'},location.origin);else task(()=>navigate('media'));};
+$('open-settings').onclick=()=>task(()=>navigate('home'));
+
+function sourceControls(item){
+ const panel=node('section',undefined,{class:'wide'});panel.append(node('h3','Źródła opisu'));
+ const list=node('div');panel.append(list);
+ function add(source={}){
+  const row=node('div',undefined,{class:'source-row'}),title=node('input',undefined,{'data-source-title':'',placeholder:'Nazwa źródła','aria-label':'Nazwa źródła'}),url=node('input',undefined,{type:'url','data-source-url':'',placeholder:'https://…','aria-label':'Adres źródła'});
+  title.value=source.title||'';url.value=source.url||'';
+  const remove=node('button','Usuń źródło',{type:'button'});remove.onclick=()=>{row.remove();state.dirty=true;};
+  row.append(title,url,remove);row.oninput=()=>{state.dirty=true;};list.append(row);
+ }
+ for(const source of item.draft.sources||item.draft.cc_lugares_source_urls?.map(url=>({url,title:'Fuente'}))||[])add(source);
+ const plus=node('button','+ Dodaj źródło',{type:'button'});plus.onclick=()=>{add();state.dirty=true;};panel.append(plus);return panel;
+}
+function locationControls(item){
+ const panel=node('section',undefined,{class:'map-location wide'});panel.append(node('h3','Położenie pinezki'));
+ const p=item.draft,lon=Number(p.longitude),lat=Number(p.latitude);
+ if(Number.isFinite(lon)&&Number.isFinite(lat)){
+  const frame=node('iframe',undefined,{loading:'lazy',title:'Mapa położenia pinezki',src:`https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent([lon-.01,lat-.008,lon+.01,lat+.008].join(','))}&layer=mapnik&marker=${lat}%2C${lon}`});
+  const link=node('a','Sprawdź punkt na mapie ↗',{href:`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}`,target:'_blank',rel:'noopener'});panel.append(frame,link);
+ }
+ panel.append(node('p','Współrzędne i kategorię zmieniasz w formularzu. Przed publikacją potwierdź ich kontrolę. Geometria dostawcy pozostaje zachowana.'));return panel;
+}
+function galleryControls(item){
+ const panel=node('section',undefined,{class:'wide',id:'record-gallery'});let images=structuredClone(item.draft.gallery||[]);panel.dataset.images=JSON.stringify(images);
+ panel.append(node('h3','Galeria zdjęć'));const list=node('div');panel.append(list);
+ const sync=()=>{panel.dataset.images=JSON.stringify(images);state.dirty=true;};
+ function draw(){list.replaceChildren();images.forEach((image,index)=>{
+  const row=node('div',undefined,{class:'gallery-row'});row.append(node('img',undefined,{src:image.url,alt:image.alt||'',loading:'lazy'}));
+  for(const [key,label]of [['alt','Opis ALT'],['credit','Autor'],['license','Licencja'],['source_url','Źródło zdjęcia']]){const l=node('label',label),input=node('input');input.value=image[key]||'';input.oninput=()=>{image[key]=input.value;sync();};l.append(input);row.append(l);}
+  const up=node('button','↑',{type:'button','aria-label':'Przesuń zdjęcie wcześniej'});up.disabled=index===0;up.onclick=()=>{[images[index-1],images[index]]=[images[index],images[index-1]];sync();draw();};
+  const remove=node('button','Usuń z galerii',{type:'button'});remove.onclick=()=>{images.splice(index,1);sync();draw();};row.append(up,remove);list.append(row);
+ });}
+ const add=node('button','+ Dodaj zdjęcie z biblioteki',{type:'button'});add.onclick=()=>task(async()=>{
+  const result=await api('/media?island='+item.identity.island),dialog=node('dialog');
+  const close=node('button','Zamknij',{type:'button'});close.onclick=()=>dialog.close();dialog.append(close);
+  for(const image of result.items){const button=node('button',image.filename||'Zdjęcie',{type:'button'});button.append(node('img',undefined,{src:image.url,alt:'',width:'90',loading:'lazy'}));button.onclick=()=>{if(images.length>=20)throw Error('Limit 20 zdjęć.');images.push({url:image.url,alt:image.alt||'',credit:image.credit||'',source_url:image.source_url||'',license:image.license||''});sync();draw();dialog.close();};dialog.append(button);}
+  if(!result.items.length)dialog.append(node('p','Najpierw wgraj zdjęcie przyciskiem „Wgraj zdjęcie z komputera” lub w zakładce Zdjęcia.'));
+  dialog.onclose=()=>dialog.remove();document.body.append(dialog);dialog.showModal();
+ });panel.append(add);draw();return panel;
 }
