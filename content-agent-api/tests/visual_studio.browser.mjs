@@ -22,7 +22,7 @@ await page.route('**/*',async route=>{
  if(u.origin!==EDITOR)return route.abort();
  const path=u.pathname;
  if(path==='/site/')return route.fulfill({contentType:'text/html',body:await readFile(resolve(assets,'index.html'))});
- if(path.startsWith('/site/assets/')){const name=path.split('/').at(-1);return route.fulfill({contentType:extname(name)==='.css'?'text/css':'text/javascript',body:await readFile(resolve(assets,name))});}
+ if(path.startsWith('/site/assets/')){const name=path.split('/').at(-1);return route.fulfill({contentType:({'.css':'text/css','.png':'image/png','.jpg':'image/jpeg'})[extname(name)]||'text/javascript',body:await readFile(resolve(assets,name))});}
  if(request.method()!=='GET'){
   const body=request.postDataJSON();
  if(path==='/site/api/media'){const image={url:'https://public.example/image.png',filename:'Own image',alt:body.alt||'',credit:body.credit||'',media_id:'one',island:'tenerife'};uploads.push(image);return json(image);}
@@ -45,6 +45,28 @@ await page.route('**/*',async route=>{
 try{
  await page.goto(EDITOR+'/site/');await page.locator('#visual-frame').waitFor();
  await page.frameLocator('#visual-frame').locator('#choose').click();await page.locator('[data-key="short_description"]').waitFor();
+ assert.equal(await page.locator('[data-key="detailed_description"]').inputValue(),'Existing details.');
+ await page.locator('#generate-social-graphic').click();
+ assert.equal(await page.locator('#tpl-title').inputValue(),'Existing place');
+ assert.equal(await page.locator('#tpl-type').inputValue(),'lugares');
+ await page.waitForFunction(()=>!document.querySelector('#tpl-save').disabled);
+ for(const type of ['noticias','eventos','lugares','datos','guia']){
+  await page.locator('#tpl-type').selectOption(type);
+  for(const style of ['oficial','ai']){
+   await page.locator('#tpl-style').selectOption(style);
+   for(const [format,width,height] of [['ig',1080,1350],['fb',1200,630],['wa',1080,1080],['story',1080,1920]]){
+    await page.locator('#tpl-format').selectOption(format);
+    const dims=await page.locator('#tpl-canvas').evaluate(c=>[c.width,c.height,c.toDataURL('image/png').startsWith('data:image/png;base64,')]);
+    assert.deepEqual(dims,[width,height,true]);
+   }
+  }
+ }
+ await page.locator('#tpl-title').fill('Un título largo para conocer todos los lugares increíbles de las Islas Canarias durante el próximo fin de semana');
+ await page.locator('#tpl-detail').fill('Una descripción extensa con información útil, fechas, horarios, recomendaciones y detalles para preparar la visita.');
+ await page.locator('#tpl-photo').setInputFiles({name:'test.png',mimeType:'image/png',buffer:png});
+ await page.waitForFunction(()=>!document.querySelector('#tpl-library').disabled);
+ assert.equal(uploads.length,0,'Opening templates must not persist or publish anything');
+ await page.locator('#tpl-back').click();
  assert.equal(await page.locator('[data-key="detailed_description"]').inputValue(),'Existing details.');
  await page.locator('[data-key="short_description"]').fill('A new short description.');await page.locator('[data-key="detailed_description"]').fill('A new detailed description.');
  await page.getByRole('button',{name:'Zdjęcia i galeria',exact:true}).click();

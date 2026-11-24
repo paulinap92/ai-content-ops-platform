@@ -2,6 +2,7 @@ import {createVisualStudio} from './visualStudio.js';
 import {createInspector,renderMonth} from "./inspector.js";
 import {renderEditorialText} from "./editorialText.js";
 import {recordPhotoControls, imageKeys, preparePhoto} from "./recordPhotos.js";
+import {createSocialTemplates} from "./socialTemplates.js";
 const $ = (id) => document.getElementById(id);
 const base = location.pathname.replace(/\/$/, "");
 const state = {
@@ -379,6 +380,7 @@ function renderRecord() {
   $("publish").disabled = !item.id || Boolean(item.blocked_reason);
   $("publish").textContent=item.identity.kind==="calendar"?"Opublikuj wydarzenie":item.identity.kind==="live-point"?"Włącz punkt w jobach Live":"Opublikuj treść";
   $("improve-ai").hidden=item.identity.kind!=="guide";
+  $("generate-social-graphic").hidden=!["news","calendar","guide","explore"].includes(item.identity.kind);
 }
 function recordPayload() {
   const value = structuredClone(state.record.draft);
@@ -715,10 +717,11 @@ async function loadMedia() {
 }
 function view(name) {
   inspection.cancel();
+  $("templates-view").hidden = name !== "templates";
   $("inspection-view").hidden = name !== "inspection";
   $("calendar-view").hidden = name !== "content" || params().kind !== "calendar";
   $("content-view").hidden = name !== "content";
-  const noSettings=["media","database","coverage","live-points","transport"].includes(state.target.section);
+  const noSettings=name==="templates"||["media","database","coverage","live-points","transport"].includes(state.target.section);
   $("settings-view").hidden = noSettings;
   $("context-settings").hidden = noSettings;
   $("context-settings").open = name === "settings";
@@ -785,6 +788,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  if(section==="transport")resource ||= "airports";
  if(section==="live-points")resource ||= "weather";
  state.target={section,resource};
+ $("context-visibility").hidden=false;
  const transport=section==="transport" || section==="explore" && ["airports","ports","ferries","titsa-stops","titsa-routes","tilp-routes"].includes(resource);
  const editable=!transport && ["guide","explore","calendar","news","live-points"].includes(section) && (resource || section==="calendar" || section==="news");
  $("scope").value=state.scope;$("tree-scope").value=state.scope;
@@ -859,6 +863,7 @@ async function init() {
   else await navigate("home");
   await visual.load({preview:requested.get("view")==="preview" || !requested.has("view") && !requested.has("kind") && !requested.has("section")});
   if(requested.get("view")==="lugares")await visual.catalog();
+  if(requested.get("view")==="templates")openTemplates();
   if(requested.get("new")==="1")await newRecord();
   const selectedImage=sessionStorage.getItem('cc-editor-selected-image');
   if(selectedImage && state.record){sessionStorage.removeItem('cc-editor-selected-image');state.editorTab='photos';applyRecordImage(JSON.parse(selectedImage));}
@@ -1105,7 +1110,28 @@ const visual=createVisualStudio({api,node,message,onSelect:openVisualRecord,
   if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool},location.origin);
   else location.assign('/?view='+tool);
  }});
-$('open-visual').onclick=()=>visual.open();
+const templates=createSocialTemplates($("templates-view"),{api});
+let templateReturn=null;
+function openTemplates(fromRecord=false){
+ if(!$("templates-view").hidden)return;
+ const record=fromRecord&&state.record?{...state.record,draft:recordPayload()}:null;
+ templateReturn={view:["content","inspection","media"].find(v=>!$(v+"-view").hidden)||"settings",title:$("context-title").textContent,path:$("context-path").textContent,help:$("context-help").textContent,catalog:$("catalog-actions").hidden};
+ visual.close();
+ $("workspace").classList.remove("visual-selection");
+ view("templates");$("context-title").textContent="Plantillas";$("context-path").textContent="Canarias Cerca · Social Media";$("context-help").textContent="Twórz grafiki bez zmiany treści na stronie.";
+ $("context-visibility").hidden=true;$("catalog-actions").hidden=true;
+ templates.open(record,state.target.section==="datos"?"datos":"noticias");
+}
+function closeTemplates(){
+ if($("templates-view").hidden||!templateReturn)return;
+ const back=templateReturn;templateReturn=null;view(back.view);
+ $("context-title").textContent=back.title;$("context-path").textContent=back.path;$("context-help").textContent=back.help;
+ $("catalog-actions").hidden=back.catalog;$("context-visibility").hidden=false;
+}
+$("open-templates").onclick=()=>task(()=>openTemplates());
+$("generate-social-graphic").onclick=()=>task(()=>openTemplates(true));
+$("tpl-back").onclick=closeTemplates;
+$('open-visual').onclick=()=>{closeTemplates();visual.open();};
 $('open-lugares').onclick=()=>task(async()=>{visual.close();await navigate('explore','places',state.scope==='global'?'tenerife':state.scope);});
 $('open-release').onclick=()=>task(()=>visual.catalog());
 $('open-database').onclick=()=>task(()=>navigate('database'));

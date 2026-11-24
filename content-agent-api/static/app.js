@@ -1219,6 +1219,7 @@ function initTabs() {
     tab.addEventListener("click", async () => {
       if (tab.dataset.view === 'site') {location.assign('/site/');return;}
       if (tab.dataset.view === 'database') {location.assign('/site/?view=database');return;}
+      if (tab.dataset.view === 'templates') {location.assign('/site/?view=templates');return;}
       if (tab.dataset.view === 'preview') {location.assign('/site/?view=preview');return;}
       document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
       document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
