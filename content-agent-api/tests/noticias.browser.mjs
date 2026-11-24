@@ -50,7 +50,7 @@ try{
  await page.locator('#noticias-extract').click();await page.locator('#noticias-material').filter({visible:true}).waitFor();
  await page.waitForFunction(()=>document.querySelector('#noticias-material').value.includes('Additional source'));
  await page.locator('#noticias-summary').fill('Resumen propio.');await page.locator('#noticias-body').fill('## Información\n\nEl texto completo de la noticia, redactado por nosotros.');
- await page.setViewportSize({width:390,height:844});await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Noticias desk fits a phone');
+ await page.setViewportSize({width:390,height:844});await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));const layout=await page.evaluate(()=>({width:document.documentElement.scrollWidth,viewport:innerWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().width&&e.getBoundingClientRect().right>innerWidth+1).slice(0,12).map(e=>({tag:e.tagName,id:e.id,class:e.className,width:e.getBoundingClientRect().width}))}));assert.ok(layout.width<=layout.viewport+1,'Noticias desk fits a phone: '+JSON.stringify(layout));
  await mkdir('test-results/site-editor',{recursive:true});await page.screenshot({path:'test-results/site-editor/noticias-phone.png',fullPage:true});
  await page.locator('#noticias-save').click();await page.locator('[data-key=description]').waitFor();
  assert.equal(record.identity.kind,'news');assert.equal(record.identity.island,'tenerife');assert.equal(record.draft.category,'science');

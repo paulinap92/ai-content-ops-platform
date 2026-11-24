@@ -547,3 +547,6 @@ body{background:var(--bg);font-family:system-ui,sans-serif}
 
 .noticias-layout>*{min-width:0;max-width:100%}.noticias-layout form{min-width:0}.noticias-layout button{max-width:100%;white-space:normal;overflow-wrap:break-word}.noticias-candidate{min-width:0}.noticias-candidate h4{overflow-wrap:anywhere}
 @media(max-width:800px){.noticias-layout,.noticias-source-controls,#noticias-search-form{grid-template-columns:minmax(0,1fr)}}
+
+.topbar>*{min-width:0}.topbar .ghost-link{color:var(--text)}
+@media(max-width:760px){.topbar{flex-wrap:wrap;gap:12px}.topbar-actions{flex-wrap:wrap;max-width:100%;gap:8px}.topbar-actions>*{max-width:100%}.tabs{max-width:100%;min-width:0}}
