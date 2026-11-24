@@ -36,7 +36,13 @@ async def create_content(
     from src.core.config import settings
     if not settings.ai_configured:
         raise HTTPException(503, "Uzupełnij klucz wybranego dostawcy AI w prywatnej konfiguracji Content Editora. Edycja ręczna działa niezależnie.")
+    extra = {}
+    if not payload.review_outline:
+        if payload.content_type_hint!='news' or not isinstance(payload.site_target,dict) or payload.site_target.get('identity',{}).get('kind')!='news':
+            raise HTTPException(422,'Przygotowanie bez zatwierdzania konspektu jest dostępne dla szkicu Noticias.')
+        extra['review_outline']=False
     return await service.create_content(
+        **extra,
         topic=payload.topic,
         source_text=payload.source_text,
         source_url=payload.source_url,

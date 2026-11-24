@@ -132,3 +132,19 @@ async def test_ai_draft_cannot_publish_empty_material_and_delivers_into_noticias
     assert row['draft']['description']=='Cuerpo para revisar.'
     published=await studio.publish(session,row['id'],row['version'])
     assert published['published']['title']=='Título revisado'
+
+
+@pytest.mark.parametrize('kind,review,expected',[('news',False,'ready'),('news',True,'awaiting_review'),('guide',False,'awaiting_review')])
+def test_simple_news_generation_keeps_publication_review_but_skips_outline_review(monkeypatch,kind,review,expected):
+    from langgraph.checkpoint.memory import MemorySaver
+    from src.agent import graph as module
+    monkeypatch.setattr(module,'research',lambda state:{'research_data':'Facts'})
+    monkeypatch.setattr(module,'curate',lambda state:{'outline':'Outline','status':'awaiting_review'})
+    monkeypatch.setattr(module,'write',lambda state:{'draft':'Private draft','status':'exporting'})
+    monkeypatch.setattr(module,'publish',lambda state:{'status':'ready','file_path':'private.json'})
+    graph=module.build_content_agent(MemorySaver())
+    config={'configurable':{'thread_id':str(uuid4())}}
+    graph.invoke({'topic':'Test','content_type_hint':kind,'review_outline':review},config)
+    snapshot=graph.get_state(config)
+    assert snapshot.values['status']==expected
+    assert bool(snapshot.next)==(expected=='awaiting_review')
