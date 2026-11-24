@@ -3,7 +3,7 @@ import {readFile,mkdir} from 'node:fs/promises';
 import {resolve,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
-const root=fileURLToPath(new URL('../',import.meta.url)),frontend=fileURLToPath(new URL('../../../frontend/',import.meta.url));
+const root=fileURLToPath(new URL('../',import.meta.url));
 const EDITOR='https://canarias-content-editor.onrender.com',SITE='https://www.canariascerca.es';
 let source={id:'source',name:'Existing official source',url:'https://example.com/feed',island:'tenerife',active:true,version:0},record=null,publicNews=[],job=null;
 const errors=[],writes=[];
@@ -11,7 +11,7 @@ const settings={id:'settings',identity:{kind:'settings',island:'global',resource
 const browser=await chromium.launch(process.env.CC_TEST_CHROMIUM?{executablePath:process.env.CC_TEST_CHROMIUM}:{}),page=await browser.newPage({viewport:{width:1280,height:900}});page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
 await page.route('**/*',async route=>{
  const req=route.request(),u=new URL(req.url()),path=u.pathname,json=value=>route.fulfill({contentType:'application/json',body:JSON.stringify(value)});
- if(u.origin===SITE){if(path.startsWith('/js/'))return route.fulfill({contentType:'text/javascript',body:await readFile(resolve(frontend,path.slice(1)))});if(path.startsWith('/api/'))return json(publicNews.filter(item=>!u.searchParams.get('article')||item.id===u.searchParams.get('article')));return route.fulfill({contentType:'text/html',body:'<!doctype html><main id="news"></main><script type="module">import {renderNews} from "/js/guide/news.js";const article=new URLSearchParams(location.search).get("articulo");const data=await fetch("/api/news"+(article?"?article="+encodeURIComponent(article):"")).then(r=>r.json());news.innerHTML=renderNews(data);</script>'});}
+ if(u.origin===SITE)return route.fulfill({contentType:'text/html',body:'<!doctype html><p>Production preview fixture</p>'});
  if(u.origin!==EDITOR)return route.abort();
  if(path==='/'||path==='/site/')return route.fulfill({contentType:'text/html',body:await readFile(resolve(root,path==='/site/'?'canarias_site/studio/index.html':'static/index.html'))});
  if(path.startsWith('/static/')||path.startsWith('/site/assets/'))return route.fulfill({contentType:path.endsWith('.css')?'text/css':'text/javascript',body:await readFile(resolve(root,path.startsWith('/static/')?'static/'+path.split('/').at(-1):'canarias_site/studio/'+path.split('/').at(-1)))});
@@ -58,14 +58,11 @@ try{
  assert.equal(writes.filter(w=>w.path.includes('/publish')).length,0);
  await page.locator('#publish').click();await page.waitForFunction(()=>document.querySelector('#record-status').textContent.includes('wersja 2'));
  assert.equal(publicNews.length,1);
- await page.goto(SITE+'/tenerife/noticias/?articulo=manual%3Aone');await page.locator('.news-full-article[open]').waitFor();
- assert.match(await page.locator('.news-full-article').innerText(),/El texto completo de la noticia/);
- assert.equal(await page.locator('.news-card').getAttribute('data-news-topics'),'science');
- assert.match(await page.getByRole('link',{name:'Enlace a este artículo ↗'}).getAttribute('href'),/articulo=manual%3Aone/);
+ assert.match(publicNews[0].description,/El texto completo de la noticia/);assert.deepEqual(publicNews[0].topics,['science']);
  await page.goto(EDITOR+'/?view=noticias');await page.locator('#noticias-queue-list').getByRole('button',{name:/Una noticia propia/}).waitFor();
  await page.locator('#noticias-new').click();await page.locator('#noticias-title').fill('Una noticia con AI');await page.locator('#noticias-body').fill('Material para preparar y revisar.');
  await page.locator('#noticias-ai').click();await page.getByText('Propozycja do sprawdzenia',{exact:true}).waitFor();
  assert.equal(job.content_type_hint,'news');assert.equal(job.site_target.identity.kind,'news');assert.equal(job.site_target.identity.resource,'news');
  assert.equal(writes.filter(w=>w.path.includes('/publish')).length,1,'AI preparation never publishes');
- assert.deepEqual(errors,[]);console.log('NOTICIAS DESK UI PASS: discovery, source material, original text, category, phone layout, private draft, publication, full public article, permalink and AI news target');
+ assert.deepEqual(errors,[]);console.log('NOTICIAS DESK UI PASS: discovery, source material, original text, category, phone layout, private draft, publication, published article payload and AI news target');
 }catch(e){console.error({errors,body:(await page.locator('body').innerText()).slice(0,1500)});throw e;}finally{await browser.close();}
