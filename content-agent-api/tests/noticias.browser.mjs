@@ -50,7 +50,7 @@ try{
  await page.locator('#noticias-extract').click();await page.locator('#noticias-material').filter({visible:true}).waitFor();
  await page.waitForFunction(()=>document.querySelector('#noticias-material').value.includes('Additional source'));
  await page.locator('#noticias-summary').fill('Resumen propio.');await page.locator('#noticias-body').fill('## Información\n\nEl texto completo de la noticia, redactado por nosotros.');
- await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Noticias desk fits a phone');
+ await page.setViewportSize({width:390,height:844});await page.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Noticias desk fits a phone');
  await mkdir('test-results/site-editor',{recursive:true});await page.screenshot({path:'test-results/site-editor/noticias-phone.png',fullPage:true});
  await page.locator('#noticias-save').click();await page.locator('[data-key=description]').waitFor();
  assert.equal(record.identity.kind,'news');assert.equal(record.identity.island,'tenerife');assert.equal(record.draft.category,'science');
@@ -65,4 +65,4 @@ try{
  assert.equal(job.content_type_hint,'news');assert.equal(job.site_target.identity.kind,'news');assert.equal(job.site_target.identity.resource,'news');
  assert.equal(writes.filter(w=>w.path.includes('/publish')).length,1,'AI preparation never publishes');
  assert.deepEqual(errors,[]);console.log('NOTICIAS DESK UI PASS: discovery, source material, original text, category, phone layout, private draft, publication, published article payload and AI news target');
-}catch(e){console.error({errors,body:(await page.locator('body').innerText()).slice(0,1500)});throw e;}finally{await browser.close();}
+}catch(e){await mkdir('test-results/site-editor',{recursive:true});await page.screenshot({path:'test-results/site-editor/noticias-failed.png',fullPage:true});console.error({errors,body:(await page.locator('body').innerText()).slice(0,1500)});throw e;}finally{await browser.close();}
