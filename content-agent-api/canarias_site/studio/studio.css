@@ -457,5 +457,45 @@ input[type="checkbox"] {
 @media(max-width:1150px){#workspace.editor-shell.visual-mode{grid-template-columns:170px minmax(0,1fr)}}
 @media(max-width:700px){#workspace.editor-shell.visual-mode{display:block}}
 @media(min-width:1151px){#workspace.visual-mode .editor-main{position:sticky;top:0;max-height:calc(100dvh - 120px);overflow:auto;overscroll-behavior:contain}#workspace.editor-shell.visual-mode{min-height:0}}
-#workspace.visual-mode.visual-selection .editor-main>.actions,#workspace.visual-mode.visual-selection #settings-state,#workspace.visual-mode.visual-selection #context-settings,#workspace.visual-mode.visual-selection #content-view>.toolbar,#workspace.visual-mode.visual-selection #content-view>.view-help,#workspace.visual-mode.visual-selection #content-view>h2,#workspace.visual-mode.visual-selection #content-view .columns>aside,#workspace.visual-mode.visual-selection #editor-title{display:none}
+
 #workspace.visual-mode #edit-actions{position:sticky;bottom:0;z-index:2;background:#fff;padding:10px 0;border-top:1px solid #d4dfd5;box-shadow:0 -8px 16px #fff}
+
+/* One document scroll; preview and catalogue sit above the editor. */
+body{margin:0;background:#f4f6f2;color:#19352f;font-family:system-ui,sans-serif}
+body>header{display:flex;justify-content:space-between;align-items:center;padding:14px 24px;background:#fff;border-bottom:1px solid #d1ddd7}
+body>header h1{font-size:21px;margin:0}body>header small{display:none}
+.universal-nav{margin:0;padding:10px 24px;background:#fff;border-bottom:1px solid #d1ddd7;align-items:center}
+.universal-nav a{font-size:13px;padding:8px;color:#19352f}
+#workspace.editor-shell,#workspace.editor-shell.visual-mode{display:grid;grid-template-columns:210px minmax(0,1fr);gap:18px;max-width:1500px;margin:auto;align-items:start;padding:18px}
+#workspace.editor-shell .site-outline{position:static;max-height:none;overflow:visible;grid-column:1;grid-row:1 / span 2}
+#workspace.editor-shell .editor-main,#workspace.editor-shell.visual-mode .editor-main{position:static;max-height:none;overflow:visible;grid-column:2;min-width:0;padding:0}
+#workspace.editor-shell #visual-preview{position:static;grid-column:2;max-width:100%;width:100%}
+#workspace.editor-shell #visual-frame{height:300px;min-height:0;width:100%;border:1px solid #d1ddd7}
+#visual-tree,#site-tree,#workspace.editor-shell #record-list,#workspace.editor-shell #context-settings{max-height:none;overflow:visible}
+#workspace.editor-shell.visual-mode #site-tree{display:block}
+#visual-tree{max-height:260px;overflow:auto;margin-bottom:15px}
+#workspace.editor-shell .columns{display:block}#workspace.editor-shell .columns>aside{margin:0 0 16px;padding:12px}
+#record-list{display:flex;flex-wrap:wrap;gap:6px}#record-list button{width:auto;max-width:260px;font-size:13px}
+#workspace.editor-shell .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+#workspace.editor-shell .fields>.wide{grid-column:1/-1}
+#workspace.editor-shell .record-panel[hidden]{display:none}
+#workspace.editor-shell .visual-selection .toolbar,#workspace.editor-shell.visual-selection #content-view>.toolbar{display:flex}
+#workspace.editor-shell.visual-selection #content-view>.columns>aside{display:block}
+.record-tabs,.catalog-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin:12px 0}
+.record-tabs button[aria-pressed=true]{background:#236649;color:#fff;border-color:#236649}
+#workspace.editor-shell #edit-actions{position:static;background:transparent;padding:14px 0;box-shadow:none}
+#workspace.editor-shell .map-location iframe{height:180px}
+#workspace.editor-shell #context-settings{margin-bottom:14px}
+#context-settings:not([open]){padding:10px}
+#record-form label:has([data-key=hidden]){background:#e3eee6;padding:12px;border-radius:8px}
+#workspace.editor-shell #settings-state:empty{display:none}
+#workspace.editor-shell:has(#inspection-view:not([hidden])) #context-settings,#workspace.editor-shell:has(#inspection-view:not([hidden])) #save-settings,#workspace.editor-shell:has(#inspection-view:not([hidden])) #publish-settings,#workspace.editor-shell:has(#inspection-view:not([hidden])) #preview-settings,#workspace.editor-shell:has(#inspection-view:not([hidden])) #settings-history{display:none}
+.data-grid-scroll{max-height:none;overflow-x:auto;overflow-y:visible}
+@media(max-width:800px){#workspace.editor-shell,#workspace.editor-shell.visual-mode{display:block;padding:12px}#workspace.editor-shell .site-outline{margin-bottom:12px}#site-tree{display:flex;flex-wrap:wrap;gap:6px}#site-tree button{width:auto}#visual-tree{max-height:160px}#workspace.editor-shell .fields{grid-template-columns:1fr}body>header,.universal-nav{padding:12px}#workspace.editor-shell #visual-frame{height:240px}}
+
+body>header,body>header h1,body>header a{color:#19352f}#workspace:not(.visual-mode) #visual-tree{display:none}#workspace.editor-shell.visual-mode #site-tree{display:none}
+
+#workspace.editor-shell.visual-selection .editor-main>.actions,#workspace.editor-shell.visual-selection #settings-state,#workspace.editor-shell.visual-selection #context-settings,#workspace.editor-shell.visual-selection #content-view>.toolbar,#workspace.editor-shell.visual-selection #content-view>.view-help,#workspace.editor-shell.visual-selection #content-view .columns>aside,#workspace.editor-shell.visual-selection #editor-title{display:none}
+#workspace.editor-shell.visual-selection #content-view>.toolbar{display:none}
+.record-photo .photo-metadata{grid-template-columns:repeat(3,minmax(0,1fr))}.gallery-row{display:flex;gap:12px;flex-wrap:wrap;align-items:start}.gallery-row .gallery-metadata{flex:1;min-width:180px}.gallery-metadata label{margin-top:8px}.photo-crop-options label{margin:12px 0}.gallery-metadata summary,.photo-crop-options summary{cursor:pointer;font-weight:600}
+@media(max-width:700px){.record-photo .photo-metadata{grid-template-columns:1fr}.gallery-row .gallery-metadata{min-width:100%}}

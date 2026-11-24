@@ -84,7 +84,7 @@ const server=createServer(async(req,res)=>{
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
 const origin=`http://127.0.0.1:${server.address().port}`;
 const browser=await chromium.launch(process.env.CC_TEST_CHROMIUM?{executablePath:process.env.CC_TEST_CHROMIUM}:{});
-const page=await browser.newPage();await page.route('https://www.canariascerca.es/**',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Public site preview fixture</title><p>Podgląd strony</p>'}));await page.route('https://public.example/**',r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')}));page.on('dialog',d=>d.accept());const errors=[];page.on('pageerror',e=>errors.push(e.message));
+const page=await browser.newPage();page.setDefaultTimeout(10000);await page.route('https://www.canariascerca.es/**',r=>r.fulfill({contentType:'text/html',body:'<!doctype html><title>Public site preview fixture</title><p>Podgląd strony</p>'}));await page.route('https://public.example/**',r=>r.fulfill({contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')}));page.on('dialog',d=>d.accept());const errors=[];page.on('pageerror',e=>errors.push(e.message));
 await mkdir('test-results/site-editor',{recursive:true});
 async function idle(){await page.waitForFunction(()=>!document.querySelector('#save-settings').disabled);}
 try{
@@ -122,7 +122,7 @@ try{
  assert.equal(await page.locator('#resource').inputValue(),'history');
  assert.match(await page.locator('#content-location').innerText(),/Tenerife → Guía → Conoce la isla → Historia/);
  assert.equal(await page.locator('[data-key="description"]').inputValue(),'Treść istniejącego artykułu z wybranej kategorii.','first existing article opens automatically');
- assert.match(await page.locator('#published-record-preview').innerText(),/Treść istniejącego artykułu/);
+ assert.match(await page.locator('#published-record-preview').textContent(),/Treść istniejącego artykułu/);
  assert.match(await page.locator('#context-visibility').innerText(),/Cała sekcja Guía jest ukryta/);
  await page.screenshot({path:'test-results/site-editor/article-workspace.png',fullPage:false});
  await page.locator('#tree-scope').selectOption('el-hierro');await idle();
@@ -191,20 +191,19 @@ try{
  await page.locator('#site-tree').getByRole('button',{name:'Transporte',exact:true}).click();await idle();assert.equal(await page.locator('#site-tree').getByRole('button',{name:'Aeropuertos',exact:true}).count(),1);
  await page.locator('#inspection-view').screenshot({path:'test-results/site-editor/transport.png'});
  await page.goto(origin);
- await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
- await page.frameLocator('#site-editor-frame').locator('[data-copy="home.title"] textarea').waitFor();
+ await page.locator('[data-copy="home.title"] textarea').waitFor();
+ assert.equal(new URL(page.url()).pathname,'/site/');
+ assert.equal(await page.locator('#site-editor-frame').count(),0,'content editor is a full page');
+ assert.ok(await page.locator('#visual-frame').evaluate(e=>e.getBoundingClientRect().height)<=302,'preview starts compact');
+ assert.equal(await page.locator('.editor-main').evaluate(e=>getComputedStyle(e).overflowY),'visible','the editor uses the document scroll');
  await page.screenshot({path:'test-results/site-editor/unified-editor.png',fullPage:false});
- await page.getByRole('button',{name:'Podgląd strony',exact:true}).click();
- await page.getByRole('button',{name:'Telefon',exact:true}).click();
- assert.equal(await page.locator('#website-preview-frame').evaluate(e=>e.getBoundingClientRect().width),390);
- assert.equal(await page.getByRole('button',{name:'LangGraph',exact:true}).count(),0);
  await page.goto(origin+'/site/?section=live&resource=weather&island=tenerife');await idle();assert.equal(await page.locator('#site-tree').getByRole('button',{name:'Własne punkty Live',exact:true}).count(),0);await page.getByRole('button',{name:'Dodaj punkt',exact:true}).click();await idle();assert.equal(await page.locator('#kind').inputValue(),'live-point');assert.equal(await page.locator('[data-key="latitude"]').count(),1);
- optionalHealthFailure=false;await page.goto(origin);await page.waitForFunction(()=>document.querySelector('#api-status').textContent==='Edytor · połączony');
- await page.locator('[data-view="events"]').click();await page.locator('#new-manual-event').click();
- const editor=page.frameLocator('#site-editor-frame');await editor.getByRole('heading',{name:'Nowe wydarzenie',exact:true}).waitFor();assert.equal(await editor.locator('#island').inputValue(),'tenerife');assert.equal(await editor.locator('#kind').inputValue(),'calendar');
+ optionalHealthFailure=false;await page.goto(origin+'/?view=events');await page.locator('#new-manual-event').click();
+ const editor=page;await editor.getByRole('heading',{name:'Nowe wydarzenie',exact:true}).waitFor();assert.equal(await editor.locator('#island').inputValue(),'tenerife');assert.equal(await editor.locator('#kind').inputValue(),'calendar');
  // Photo upload and selection stay in the article and preserve unsaved text.
  await page.goto(origin+'/site/?section=guide&resource=history&island=tenerife');await idle();
  await page.locator('[data-key="description"]').fill('Mi texto sin guardar.');
+ await page.getByRole('button',{name:'Zdjęcia i galeria',exact:true}).click();
  await page.locator('[data-key="image_alt"]').fill('Vista del Teide');
  await page.locator('[data-key="image_credit"]').fill('Paulina');
  const photosBefore=uploaded.length,writesBefore=writes.length;
@@ -247,11 +246,11 @@ try{
  await page.getByText('Nie można odczytać tego zdjęcia. Wybierz inny plik JPEG, PNG lub WebP.',{exact:true}).first().waitFor();
  assert.equal(uploaded.length,photosBefore+2);assert.equal(await page.locator('[data-key="description"]').inputValue(),'Mi texto sin guardar.');
  uploaded.splice(0,uploaded.length); // Independent existing full-library and social fixtures.
- await page.goto(origin);await page.frameLocator('#site-editor-frame').locator('#tree-scope').selectOption('tenerife');await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Guía',exact:true}).click();await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Historia',exact:true}).click();await page.frameLocator('#site-editor-frame').locator('[data-key="description"]').waitFor();
- await page.frameLocator('#site-editor-frame').locator('.record-photo details summary').click();await page.frameLocator('#site-editor-frame').getByRole('button',{name:'Otwórz pełną bibliotekę zdjęć',exact:true}).click();await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).waitFor();assert.match(await page.locator('#photo-folder-tree').innerText(),/volcanoes/);assert.equal(await page.locator('#photo-library-frame').count(),0,'one photo library, no duplicate iframe');await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).click();await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='Teide.jpg');assert.equal(await page.locator('#photo-use').isEnabled(),true,'approved Drive photos remain usable even when their metadata is locked');
+ await page.goto(origin+'/site/?kind=guide&island=tenerife&resource=history');await page.locator('[data-key="description"]').waitFor();
+ await page.getByRole('button',{name:'Zdjęcia i galeria',exact:true}).click();await page.getByText('Adres i źródło zdjęcia',{exact:true}).click();await page.getByRole('button',{name:'Otwórz pełną bibliotekę zdjęć',exact:true}).click();await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).waitFor();assert.match(await page.locator('#photo-folder-tree').innerText(),/volcanoes/);assert.equal(await page.locator('#photo-library-frame').count(),0,'one photo library, no duplicate iframe');await page.locator('#photo-gallery').getByRole('button',{name:/Teide.jpg/}).click();await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='Teide.jpg');assert.equal(await page.locator('#photo-use').isEnabled(),true,'approved Drive photos remain usable even when their metadata is locked');
  await page.locator('#photo-upload-file').setInputFiles({name:'own.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64')});await page.waitForFunction(()=>document.querySelector('#photo-preview-title').textContent==='own.jpg');assert.equal(uploaded.length,1);assert.equal(await page.locator('#photo-folder-tree').getByRole('button',{name:/Tenerife/}).count(),1,'Drive and uploaded pictures share the same island folder');assert.match(writes.at(-1).body.data,/^\/9j\//,'phone photo is JPEG before durable upload');
- await page.locator('#view-photos').screenshot({path:'test-results/site-editor/unified-photo-library.png'});await page.locator('#photo-use').click();await page.waitForFunction(()=>document.querySelector('#site-editor-frame').contentDocument?.querySelector('[data-key="image_url"]')?.value==='https://public.example/own.jpg');assert.equal(await page.frameLocator('#site-editor-frame').locator('[data-key="image_url"]').inputValue(),'https://public.example/own.jpg');
- await page.frameLocator('#site-editor-frame').locator('#improve-ai').click();await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');
+ await page.locator('#view-photos').screenshot({path:'test-results/site-editor/unified-photo-library.png'});await page.locator('#photo-use').click();await page.waitForFunction(()=>document.querySelector('[data-key="image_url"]')?.value==='https://public.example/own.jpg');assert.equal(await page.locator('[data-key="image_url"]').inputValue(),'https://public.example/own.jpg');
+ await page.locator('#improve-ai').click();await page.waitForFunction(()=>document.querySelector('#topic').value==='Historia de Tenerife');
  // Deep links open the library before the configuration request completes.
  healthDelay=800;readinessFailure=true;
  await page.goto(origin+'/?library=photos');
@@ -268,11 +267,10 @@ try{
  await page.getByText('Google Drive: nie udało się odczytać konfiguracji.',{exact:false}).waitFor();
  assert.doesNotMatch(await page.locator('#photo-storage-status').innerText(),/niepołączony|nie jest skonfigurowany/,'failed configuration request is unknown, not disconnected');
  optionalHealthFailure=false;
- await page.getByRole('button',{name:'Podgląd strony',exact:true}).click();
  await page.getByRole('button',{name:'Zdjęcia',exact:true}).click();
  await page.getByText('Google Drive: skonfigurowany.',{exact:false}).waitFor();
  // Social drafts use the same library and never claim an external publication automatically.
- await page.goto(origin);await page.getByRole('button',{name:'Social Media',exact:true}).click();
+ await page.goto(origin+'/?view=social');
  await page.getByText('Brak materiałów w tym widoku.',{exact:true}).waitFor();
  await page.getByLabel('Nazwa robocza',{exact:true}).fill('Tiempo en Canarias');
  await page.getByLabel('Treść wspólna',{exact:true}).fill('Mañana en Canarias: consulta el tiempo y prepara tu ruta.');

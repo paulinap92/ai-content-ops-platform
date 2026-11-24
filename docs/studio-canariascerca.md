@@ -1,25 +1,37 @@
 # Studio CanariasCerca
 
-Wejdź na **https://canarias-content-editor.onrender.com/** i zaloguj się dotychczasowym kluczem. Zakładka **Studio CanariasCerca** otwiera tę samą aplikację `/site/`. Wydarzenia, AI, artykuły, zdjęcia i social pozostają dostępne. Niczego nie uruchamiasz lokalnie.
+Otwórz **https://canarias-content-editor.onrender.com/** i zaloguj się dotychczasowym kluczem. Główny edytor otwiera się bezpośrednio pod `/site/`, na pełnej stronie. Wspólne menu prowadzi do treści, wydarzeń, zdjęć, bazy, AI i publikacji społecznościowych. Nie trzeba nic uruchamiać lokalnie.
 
-## Miejsca i zdjęcia
+## Dodawanie i edycja
 
-1. Kliknij **Lugares · miejsca i mapa**. Katalog pokazuje 372 opisy na stronie i 8 wstrzymanych. Wyszukaj nazwę lub UUID. Możesz też wybrać wyspę w mapie witryny i kliknąć kartę albo pinezkę w podglądzie Lugares.
-2. Obok podglądu otworzy się formularz. Zmień krótki opis, szczegóły, źródła, kategorię, linki lub współrzędne. Mapa pod formularzem pomaga sprawdzić punkt.
-3. **Wgraj zdjęcie z komputera** lub wybierz je z dotychczasowej biblioteki. Uzupełnij ALT, autora, licencję i źródło. Proporcje i środek kadru można ustawić przed wysłaniem; **Kadruj wybrane zdjęcie** tworzy kopię, zachowując oryginał. Galeria mieści 20 zdjęć; edytujesz opisy, kolejność i przypisania.
-4. **Pokaż szkic Lugares** wyświetla treść i zdjęcia w bieżącym podglądzie. Miejsce musi być załadowane w Lugares; otwórz jego kartę. **Odśwież stronę** przywraca wersję opublikowaną. Pozostałe rodziny treści mają dotychczasowy przycisk **Podgląd i zmiany**.
-5. **Zapisz treść roboczą** zachowuje szkic; dotychczasowy opis pozostaje na stronie. Sprawdź tekst, źródła i położenie, zaznacz potwierdzenie i wybierz **Opublikuj treść**. Podgląd się odświeży. Odwiedzający zobaczą zmianę przy odświeżeniu strony.
-6. **Historia wersji treści** → przywróć wersję jako szkic → sprawdź → opublikuj. Konflikt wersji wymaga wczytania aktualnych danych i porównania.
+1. **Miejsca i mapa** → wybierz wyspę i katalog w lewym menu: Lugares, Playas, Piscinas naturales, Buceo, Rutas itd. **+ Dodaj punkt** tworzy wpis w wybranym katalogu. W całym archipelagu można wybrać wyspę obok przycisku. W Guía przycisk dodaje artykuł, w kalendarzu wydarzenie, w Noticias aktualność.
+2. **Przegląd strony** otwiera mały podgląd. Wybierz wyspę/widok w automatycznej mapie witryny i kliknij kartę, tekst lub pinezkę. Edytor otworzy właściwy wpis. **Zwiń podgląd** zostawia pełną szerokość dla pracy; formularz przewijasz razem ze stroną.
+3. Formularz ma zakładki **Treść**, **Zdjęcia i galeria**, **Położenie / pinezka**, **Linki i źródła**, **Dodatkowe dane**. **Przeglądaj wpisy w tej sekcji** rozwija listę; wyszukiwarka filtruje aktualny katalog.
+4. W **Położenie / pinezka** wpisz szerokość i długość geograficzną. **Odśwież położenie na mapie** sprawdza wpisane współrzędne. Nowy punkt bez współrzędnych nie pokazuje fikcyjnej pinezki. Rutas wymagają rzeczywistej geometrii linii w polu GeoJSON; samo wskazanie punktu nie tworzy przebiegu szlaku.
+5. **Zapisz treść roboczą** → **Podgląd i zmiany** → **Opublikuj treść**. Zapis szkicu nie zmienia witryny. Lugares wymagają sprawdzenia tekstu, źródeł, kategorii i położenia oraz zaznaczenia potwierdzenia. Odwiedzający zobaczą publikację po odświeżeniu strony.
 
-Osiem wstrzymanych pozycji zachowuje powody blokad. Możesz poprawiać szkice; zwykły edytor ani klient API nie mogą ich opublikować. Odblokowanie wymaga osobnej decyzji redakcyjnej i kontrolowanej zmiany rejestru.
+## Widoczność i linki
 
-## Jedna aplikacja
+- **Treść → Widoczne na stronie (po publikacji)**: zaznaczone pokazuje wpis; odznaczone ukrywa. Zapisz i opublikuj, aby zmienić witrynę. Ukryty wpis pozostaje dostępny w Studio.
+- **Linki i źródła → Pokazuj linki na stronie** steruje linkami tego wpisu. Uzupełnij stronę internetową/adres/źródła, zapisz i opublikuj. Strona wyświetla klikalne, bezpieczne linki ze Studia; wyłączenie przełącznika je ukrywa. Źródło zdjęcia i prywatne notatki nie są przyciskami nawigacyjnymi.
+- Widoczność całej sekcji ustawiasz przełącznikiem przy jej nagłówku. Przyciski **Zapisz teksty i widoczność** i **Opublikuj zmiany strony** dotyczą ustawień witryny, a nie pojedynczego wpisu. Ukryta sekcja nadrzędna ukrywa również swoje podsekcje.
 
-Wybierz wyspę i katalog w drzewie, potem **+ Dodaj**, aby utworzyć miejsce, artykuł lub wydarzenie. Nowe miejsce wymaga rzeczywistych współrzędnych; importer kontroluje duplikaty i lokalizację. Wydarzenia zachowują dotychczasowe źródła, odkrywanie, selekcję i import do szkicu. Artykuły zachowują poprawianie z AI. Zdjęcia w formularzu i zakładce korzystają z tej samej biblioteki.
+## Jak dodać zdjęcie
 
-Mapa witryny jest generowana przy buildzie z `js/core/routes.js`: **497 rzeczywistych widoków na 8 wyspach**, także sekcje w rozwoju. Manifest podaje komponent, API, źródło i zakres edycji. Pogoda, kalima, sejsmika i statystyki są oznaczone jako automat: edytujesz prezentację i widoczność, a pomiary pozostają automatyczne.
+1. Otwórz wpis → **Zdjęcia i galeria** → **Wgraj zdjęcie z komputera**. JPEG, PNG i WebP do 20 MB są zmniejszane przed wysłaniem. Albo kliknij **Wybierz zdjęcie z biblioteki** — ta sama biblioteka obsługuje dotychczasowe zdjęcia z Drive i pliki strony.
+2. Uzupełnij ALT, autora i licencję. **Kadrowanie (opcjonalne)** pozwala wybrać proporcje i środek kadru; kadrowanie tworzy kopię i zachowuje oryginał.
+3. Do galerii użyj **Wgraj zdjęcia do galerii** (można wybrać kilka plików) lub **+ Dodaj zdjęcie z biblioteki**. Limit: 20 zdjęć. Rozwiń podpis konkretnego zdjęcia, aby zmienić ALT, autora, licencję i źródło. Strzałka zmienia kolejność.
+4. Zapisz i opublikuj wpis. Sam upload zapisuje plik w bibliotece i przypisanie do szkicu. **Usuń zdjęcie z wpisu** usuwa przypisanie; plik pozostaje w bibliotece.
 
-To pierwszy pionowy zakres issue #4: podgląd całej strony, wybór treści, Lugares, zdjęcia, galerie i realna publikacja. Nowe niestandardowe bloki, dowolny HTML i pełna edycja konfiguracji wszystkich automatycznych źródeł wymagają kolejnych adapterów. Istniejące formularze i inspektor pozostają we wspólnej nawigacji.
+## Baza danych i narzędzia
+
+**Baza danych** to rzeczywiste tabele PostgreSQL ze schematu `design`: wybór tabeli, kolumn, wyszukiwanie, sortowanie, paginacja i szczegóły rekordu. Nie otwiera podglądu witryny. To przeglądarka tylko do odczytu; treści zmienia się zwykłymi formularzami.
+
+Mapa witryny powstaje z `js/core/routes.js`: **497 rzeczywistych widoków na 8 wyspach**. Dla pogody, kalimy, sejsmiki i statystyk można zmieniać prezentację i widoczność. Pomiary aktualizują zadania automatyczne; nie wpisujemy ich ręcznie. Obsługiwane punkty Live dodaje przycisk **Dodaj punkt** w danych danej warstwy. Konfiguracje pozostałych automatycznych źródeł wymagają kolejnych adapterów.
+
+Wyszukiwanie wydarzeń, źródła, selekcja i import do szkicu oraz poprawianie artykułów z AI pozostają w tej samej aplikacji. **Historia wersji treści** przywraca wersję jako szkic do sprawdzenia i publikacji. Konflikt wersji wymaga wczytania aktualnych danych i porównania.
+
+Osiem wstrzymanych opisów ma zachowane powody blokad. Lista **Opisy: 372 opublikowane / 8 wstrzymanych** otwiera rejestr publikacji. Szkice można poprawiać; blokada uniemożliwia publikację także przez API. Odblokowanie wymaga osobnej decyzji redakcyjnej.
 
 ## Dane i wdrożenie
 

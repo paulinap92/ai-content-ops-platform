@@ -133,3 +133,36 @@ async def test_withheld_catalog_is_read_from_membership_not_guessed_from_name(se
     catalog=await visual.release_catalog(session,q=key)
     assert catalog['items'][0]['resource']=='places'
     assert catalog['items'][0]['state']=='blocked'
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize('resource', ['places','beaches','natural-pools','marinas','food-producers','diving-spots','leisure-centers','museums-visits','natural-spaces','surf-spots','stargazing','markets','volcanoes','summits','routes','fauna','flora'])
+async def test_new_point_links_and_visibility_publish_in_every_editable_catalog(session, resource):
+    identity={'kind':'explore','island':'tenerife','resource':resource,'record_key':'new:'+uuid4().hex}
+    payload={'name':'Manual point '+resource,'description':'A manual description.','category':'museum',
+             'latitude':28.2,'longitude':-16.5,'website':'https://example.com/official', 'show_links':True, 'hidden':False}
+    if resource=='routes':payload['geometry']={'type':'LineString','coordinates':[[-16.5,28.2],[-16.4,28.3]]}
+    draft=await studio.save_draft(session,identity,payload,0,studio.fingerprint(None))
+    published=await studio.publish(session,draft['id'],draft['version'],review_confirmed=True)
+    public=published['published']
+    assert public['cc_studio_links']['links'][0]['url']=='https://example.com/official'
+    assert public['cc_studio_links']['visible'] is True
+    draft=await studio.save_draft(session,published['identity'],{**published['draft'],'hidden':True,'show_links':False},published['version'],published['base_fingerprint'])
+    hidden=await studio.publish(session,draft['id'],draft['version'],review_confirmed=True)
+    assert hidden['published']['hidden'] is True
+    assert hidden['published']['cc_studio_links']['visible'] is False
+    rows=await sql_editor._explore_features(session,'tenerife',resource)
+    saved=next(f for f in rows if f['properties']['canonical_id']==hidden['identity']['record_key'])
+    assert saved['properties']['hidden'] is True
+    assert saved['geometry'] is not None
+
+
+@pytest.mark.asyncio
+async def test_public_links_reject_unsafe_urls_and_cannot_be_forged(session):
+    identity={'kind':'guide','island':'tenerife','resource':'history','record_key':'new:'+uuid4().hex}
+    slug='links-'+uuid4().hex
+    with pytest.raises(ValueError):
+        await studio.save_draft(session,identity,{'name':'Links','slug':slug,'source_url':'javascript:alert(1)'},0,studio.fingerprint(None))
+    safe=await studio.save_draft(session,identity,{'name':'Links','slug':slug,'source_url':'https://example.com/source','cc_studio_links':{'visible':True,'links':[{'url':'javascript:bad'}]}},0,studio.fingerprint(None))
+    published=await studio.publish(session,safe['id'],safe['version'])
+    assert published['published']['cc_studio_links']['links']==[{'url':'https://example.com/source','title':'Fuente'}]

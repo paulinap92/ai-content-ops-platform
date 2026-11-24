@@ -532,3 +532,10 @@ input:focus, textarea:focus, select:focus { border-color: #596c65; box-shadow: 0
 body:has(#view-social.active) .tabs{display:flex;flex-wrap:wrap;max-width:100%;border-radius:18px}
 .shell:has(#view-social.active) #editor-configuration{display:none}
 @media(max-width:760px){body:has(#view-social.active) .topbar{position:static;flex-wrap:wrap;gap:14px}body:has(#view-social.active) .topbar-actions{flex-wrap:wrap;gap:8px;max-width:100%}body:has(#view-social.active) .topbar-actions>*{max-width:100%}body:has(#view-social.active) .tabs .tab{padding:9px 12px}}
+
+/* Shared Studio palette and controls across all full-page tools. */
+:root{color-scheme:light;--bg:#f4f6f2;--panel:#fff;--panel-2:#edf2ec;--line:#d1ddd7;--text:#19352f;--muted:#52685d;--accent:#236649;--accent-soft:#e3eee6;--danger:#9e3426;--warning:#8b6208;--radius:10px}
+body{background:var(--bg);font-family:system-ui,sans-serif}
+.topbar{position:static;background:#fff;padding:14px 24px;backdrop-filter:none}.topbar h1{font-size:21px;letter-spacing:normal}.topbar .eyebrow,.topbar .status-dot{display:none}
+.tabs{background:#fff;border:0;border-radius:0;display:flex;flex-wrap:wrap;padding:0;gap:6px}.tab{border:1px solid var(--line);border-radius:6px;padding:8px 12px;color:var(--text);font-size:13px}.tab.active{background:#236649;color:#fff}
+.panel{background:#fff;box-shadow:none}.shell{padding:12px 24px}.primary-button{background:var(--accent);color:#fff}.secondary-button,input,textarea,select{background:#fff;color:var(--text);border:1px solid var(--line)}
