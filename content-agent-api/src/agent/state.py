@@ -9,6 +9,7 @@ class AgentState(TypedDict, total=False):
     source_text: str
     source_url: str
     island_hint: str
+    review_outline: bool
     content_type_hint: str
 
     # Research

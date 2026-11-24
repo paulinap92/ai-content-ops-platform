@@ -31,7 +31,7 @@ def build_content_agent(checkpointer: BaseCheckpointSaver) -> CompiledStateGraph
 
     builder.add_edge(START, "research")
     builder.add_edge("research", "curate")
-    builder.add_edge("curate", "human_review")
+    builder.add_conditional_edges("curate", lambda state: "write" if state.get("review_outline") is False and state.get("content_type_hint")=="news" else "human_review")
     builder.add_edge("write", "publish")
     builder.add_edge("publish", END)
 

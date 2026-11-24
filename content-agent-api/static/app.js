@@ -240,6 +240,8 @@ async function refreshCurrentDraft() {
 }
 
 function renderDraft(draft) {
+  state.draftSiteTarget=draft.site_target || null;
+  $("canarias-section").closest("label").hidden=state.draftSiteTarget?.identity?.kind==="news";
   $("thread-id").textContent = draft.thread_id;
   $("review-topic").textContent = draft.topic;
   $("revision-count").textContent = draft.revision_count;
@@ -471,7 +473,8 @@ async function publishToCanarias() {
       }),
     });
     toast(`Zapisano wersję roboczą: ${result.section}/${result.slug}`);
-    location.assign("/site/?"+new URLSearchParams({kind:"guide",island:result.island,resource:result.section}));
+    const identity=result.backend_response?.identity || {kind:state.draftSiteTarget?.identity?.kind||"guide",island:result.island,resource:result.section};
+    location.assign("/site/?"+new URLSearchParams(identity));
   } catch (error) {
     toast(error.message, true);
   } finally {
@@ -1227,6 +1230,7 @@ function initTabs() {
       if(tab.dataset.view === "preview" && !$("website-preview-frame").getAttribute("src")) $("website-preview-frame").src="https://www.canariascerca.es/";
       if (tab.dataset.view === "photos") await loadPhotoLibrary();
       if (tab.dataset.view === "events") await loadEventSources();
+      if (tab.dataset.view === "noticias") window.dispatchEvent(new Event("cc-noticias-open"));
       if (tab.dataset.view === "site" && !$("site-editor-frame").getAttribute("src")) $("site-editor-frame").src = "/site/";
     });
   });
@@ -1272,17 +1276,19 @@ window.addEventListener("message",(event)=>{
  if(event.data?.type!=="cc-editor-ai")return;
  openArticleImprovement(event.data.record);
 });
-function openArticleImprovement(record){
- if(!record || record.identity?.kind!=="guide")return;
+async function openArticleImprovement(record){
+ if(!record || !["guide","news"].includes(record.identity?.kind))return;
  state.siteTarget={identity:record.identity,version:record.version,base_fingerprint:record.base_fingerprint,payload:record.draft};
  $("topic").value=record.draft.name || record.draft.title || "Popraw artykuł";
- $("source_text").value=record.draft.description || record.draft.short_description || "";
+ $("source_text").value=record.source_material || record.draft.description || record.draft.short_description || record.draft.summary || "";
+ $("source_url").value=record.draft.source_url || "";
  $("island_hint").value=[...$("island_hint").options].find(x=>x.text.toLowerCase().replaceAll(" ","-")===record.identity.island)?.value || "";
- $("content_type_hint").value="guide";
+ $("content_type_hint").value=record.identity.kind==="news"?"news":"guide";
  document.querySelector('[data-view="editor"]').click();
  $("topic").focus();toast("Artykuł wczytany. Wpisz oczekiwane poprawki i uruchom pracę AI.");
+ if(record.auto_start)await createDraft({preventDefault(){}});
 }
-window.addEventListener("DOMContentLoaded",()=>{const raw=sessionStorage.getItem("cc-editor-ai-record");if(raw){sessionStorage.removeItem("cc-editor-ai-record");try{openArticleImprovement(JSON.parse(raw));}catch(e){toast(e.message,true);}}});
+window.addEventListener("DOMContentLoaded",()=>{const raw=sessionStorage.getItem("cc-editor-ai-record");if(raw){sessionStorage.removeItem("cc-editor-ai-record");try{openArticleImprovement(JSON.parse(raw)).catch(e=>toast(e.message,true));}catch(e){toast(e.message,true);}}});
 
 $("preview-desktop").onclick=()=>{$("website-preview-shell").classList.remove("phone-preview");};
 $("preview-phone").onclick=()=>{$("website-preview-shell").classList.add("phone-preview");};
@@ -1310,5 +1316,5 @@ window.addEventListener('message',event=>{
 });
 window.addEventListener('DOMContentLoaded',()=>{
  const tool=new URLSearchParams(location.search).get('view');
- if(['events','editor','photos','social'].includes(tool))document.querySelector(`[data-view="${tool}"]`)?.click();
+ if(['events','editor','photos','social','noticias'].includes(tool))document.querySelector(`[data-view="${tool}"]`)?.click();
 });
