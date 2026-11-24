@@ -379,7 +379,7 @@ function renderRecord() {
   $("publish").hidden=item.identity.kind==="live-point";
   $("publish").disabled = !item.id || Boolean(item.blocked_reason);
   $("publish").textContent=item.identity.kind==="calendar"?"Opublikuj wydarzenie":item.identity.kind==="live-point"?"Włącz punkt w jobach Live":"Opublikuj treść";
-  $("improve-ai").hidden=item.identity.kind!=="guide";
+  $("improve-ai").hidden=!["guide","news"].includes(item.identity.kind);
   $("generate-social-graphic").hidden=!["news","calendar","guide","explore"].includes(item.identity.kind);
 }
 function recordPayload() {
@@ -1040,7 +1040,7 @@ $("rebase").onclick=()=>task(async()=>{
  renderRecord();state.dirty=dirty;preview("record");message("Wczytano aktualną wersję do porównania. Twoje poprawki pozostały w formularzu.");
 });
 $("improve-ai").onclick=()=>task(async()=>{
- if(!state.record || state.record.identity.kind!=="guide")throw new Error("Wybierz artykuł Guía do poprawy z AI.");
+ if(!state.record || !["guide","news"].includes(state.record.identity.kind))throw new Error("Wybierz artykuł Guía lub Noticias do poprawy z AI.");
  const record={...state.record,draft:recordPayload()};
  if(window.parent===window){sessionStorage.setItem('cc-editor-ai-record',JSON.stringify(record));location.assign('/?edit=article');return;}
  parent.postMessage({type:"cc-editor-ai",record},location.origin);message("Otwieram formularz poprawy artykułu z AI…");
@@ -1136,6 +1136,7 @@ $('open-lugares').onclick=()=>task(async()=>{visual.close();await navigate('expl
 $('open-release').onclick=()=>task(()=>visual.catalog());
 $('open-database').onclick=()=>task(()=>navigate('database'));
 $('open-events').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool:'events'},location.origin);else if(warnUnsaved())location.assign('/?view=events');};
+$('open-noticias').onclick=()=>{if(warnUnsaved())location.assign('/?view=noticias');};
 $('open-articles').onclick=()=>task(()=>navigate('guide','history',state.scope==='global'?'tenerife':state.scope));
 $('open-media').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-editor-open-photos'},location.origin);else task(()=>navigate('media'));};
 $('open-settings').onclick=()=>task(()=>navigate('home'));

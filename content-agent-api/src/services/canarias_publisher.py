@@ -99,12 +99,15 @@ class CanariasPublisherService:
         async with session_scope() as session:
             if site_target:
                 identity = studio.validate_identity(site_target["identity"])
-                if identity["kind"] != "guide":
-                    raise BusinessRuleException("AI poprawia istniejące artykuły Guide. Pozostałe rodzaje treści edytuj w formularzu strony.")
+                if identity["kind"] not in {"guide", "news"}:
+                    raise BusinessRuleException("AI poprawia artykuły Guía i Noticias. Pozostałe treści edytuj w formularzu strony.")
                 previous = site_target["payload"]
-                item = {**previous, **{k: item[k] for k in ("name", "description", "short_description", "translations")}}
+                if identity['kind']=='news':
+                    item={**previous,'title':item['name'],'summary':item['short_description'],'description':item['description'],'translations':item['translations']}
+                else:
+                    item = {**previous, **{k: item[k] for k in ("name", "description", "short_description", "translations")}}
                 result = await studio.save_draft(session, identity, item, site_target["version"], site_target["base_fingerprint"])
-                return CanariasPublishResponse(status="sent_as_draft", island=identity["island"], section=identity["resource"], slug=item["slug"], language=request.language, backend_response=result)
+                return CanariasPublishResponse(status="sent_as_draft", island=identity["island"], section=identity["resource"], slug=item.get("slug") or package.slug, language=request.language, backend_response=result)
             listing = await studio.list_records(session, "guide", package.island, request.section, package.slug)
             existing = next((r for r in listing["items"] if r.get("draft", {}).get("slug") == package.slug), None)
             if existing:

@@ -99,6 +99,10 @@ async def prepare_publication(session, identity, current, payload, version, revi
     value.setdefault('gallery',[])
     value.setdefault('image_removed',False)
     validate_media(value)
+    if identity['kind']=='news' and '_studio_news_origin' in value and not str(value.get('description') or value.get('summary') or '').strip():
+        raise ValueError('Wpisz treść wiadomości albo przygotuj ją z AI przed publikacją.')
+    if identity['kind']=='news' and '_studio_news_origin' in value and current is None:
+        value['published_at']=datetime.now(timezone.utc).isoformat()
     key = identity['record_key']
     if identity['kind']=='explore' and key in WITHHELD:
         raise HTTPException(409, 'Wstrzymano publikację: '+WITHHELD[key]['reason'])

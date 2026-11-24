@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ContentCreateRequest(BaseModel):
+    review_outline: bool = True
     site_target: dict[str, Any] | None = None
     topic: str = Field(
         min_length=3,

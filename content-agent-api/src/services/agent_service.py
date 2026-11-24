@@ -91,6 +91,7 @@ class AgentService:
             island_hint: str = "",
             content_type_hint: str = "",
             site_target: dict | None = None,
+            review_outline: bool = True,
     ) -> ContentCreatedResponse:
         thread_id = str(uuid.uuid4())
 
@@ -112,6 +113,7 @@ class AgentService:
                     "source_url": source_url,
                     "island_hint": island_hint,
                     "content_type_hint": content_type_hint,
+                    "review_outline": review_outline,
                 },
             )
         )
