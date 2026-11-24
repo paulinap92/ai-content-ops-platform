@@ -23,6 +23,19 @@ Otwórz **https://canarias-content-editor.onrender.com/** i zaloguj się dotychc
 3. Do galerii użyj **Wgraj zdjęcia do galerii** (można wybrać kilka plików) lub **+ Dodaj zdjęcie z biblioteki**. Limit: 20 zdjęć. Rozwiń podpis konkretnego zdjęcia, aby zmienić ALT, autora, licencję i źródło. Strzałka zmienia kolejność.
 4. Zapisz i opublikuj wpis. Sam upload zapisuje plik w bibliotece i przypisanie do szkicu. **Usuń zdjęcie z wpisu** usuwa przypisanie; plik pozostaje w bibliotece.
 
+## Noticias — wiadomości i własne artykuły
+
+Otwórz **Noticias · wiadomości** w menu Studia (bezpośrednio: https://canarias-content-editor.onrender.com/?view=noticias).
+
+1. Wybierz wyspę albo całe Kanary. Kliknij **Napisz wiadomość**, wklej własny tekst i wybierz kategorię. Możesz dodać link źródłowy.
+2. Możesz też wybrać źródło → **Pobierz propozycje ze źródła**, albo wpisać temat → **Szukaj w internecie**. Wyszukiwanie korzysta z istniejącego Tavily i jest dostępne po jego konfiguracji. HTML, RSS i Atom z podanego linku działają bez AI.
+3. Kliknij **Przygotuj wiadomość na podstawie materiału**. **Pobierz materiał z linku** pobiera tekst do osobnego pola roboczego. Materiał źródłowy nie jest automatycznie kopiowany do artykułu ani publikowany.
+4. Napisz własną treść albo użyj opcjonalnego **Przygotuj szkic z AI**. AI korzysta z istniejącego procesu redakcyjnego: sprawdzasz propozycję, zatwierdzasz ją, a gotowy tekst zapisujesz do tego samego szkicu Noticias. Zachowuje wyspę, kategorię i źródło; nie trafia do Guía.
+5. **Zapisz szkic i otwórz edytor** → dodaj zdjęcie/galerię → **Podgląd i zmiany** → **Opublikuj treść**. Strona wyświetla krótki opis oraz rozwijaną pełną treść własnego artykułu, źródła i galerię. **Enlace a este artículo** daje stały link; otworzy artykuł także poza listą 50 najnowszych wiadomości.
+6. Kolejka pokazuje szkice, opublikowane i ukryte wiadomości. **Przeglądaj wiadomości na stronie** otwiera istniejące wpisy, także z automatycznego importu. Ukrywanie i przywracanie wersji używają tego samego edytora i historii. Wyłączone źródło pozostaje w katalogu i można je włączyć ponownie.
+
+Źródła zainicjowano z istniejącej konfiguracji importu wiadomości dla ośmiu wysp i Gobierno de Canarias. Nie włączamy nowych harmonogramów. Zapis źródła lub pobranie propozycji nie zapisuje wiadomości na stronie. Powtórny import tego samego linku otwiera istniejący szkic, zachowując poprawki. Własne artykuły mają osobną tożsamość, więc nie nadpisują wpisów RSS. Guía zachowuje osobny edytor przewodnika.
+
 ## Baza danych i narzędzia
 
 **Baza danych** to rzeczywiste tabele PostgreSQL ze schematu `design`: wybór tabeli, kolumn, wyszukiwanie, sortowanie, paginacja i szczegóły rekordu. Nie otwiera podglądu witryny. To przeglądarka tylko do odczytu; treści zmienia się zwykłymi formularzami.

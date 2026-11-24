@@ -29,6 +29,7 @@
       <button class="tab" data-view="editor">AI — teksty</button>
       <button class="tab active" data-view="site">Treści i mapa</button>
       <button class="tab" data-view="photos">Zdjęcia</button>
+      <button class="tab" data-view="noticias">Noticias · wiadomości</button>
       <button class="tab" data-view="events">Wydarzenia · wyszukiwarka</button>
       <button class="tab" data-view="preview">Podgląd strony</button>
       <button class="tab" data-view="database">Baza danych</button>
@@ -118,6 +119,31 @@
       </div>
     </section>
 
+    <section id="view-noticias" class="view">
+      <div class="noticias-heading"><div><p class="eyebrow">REDAKCJA CANARIASCERCA</p><h2>Noticias — wiadomości i artykuły</h2><p>Własny tekst lub materiał źródłowy → szkic → podgląd → publikacja. Nic nie publikuje się automatycznie.</p></div><button id="noticias-new" type="button" class="primary-button">+ Napisz wiadomość</button></div>
+      <p id="noticias-status" role="status" aria-live="polite"></p>
+      <div class="noticias-layout">
+        <aside class="panel noticias-queue"><div class="panel-heading"><h3>Twoje wiadomości</h3><button id="noticias-refresh" type="button">Odśwież</button></div><div class="noticias-panel-body"><label>Wyspa / zakres<select id="noticias-island"></select></label><label>Stan<select id="noticias-state"><option value="">Wszystkie</option><option value="draft">Szkice</option><option value="published">Opublikowane</option><option value="hidden">Ukryte</option></select></label><label>Szukaj szkicu<input id="noticias-queue-query" type="search"></label><p id="noticias-queue-count"></p><div id="noticias-queue-list"></div><div class="noticias-pagination"><button id="noticias-prev" type="button">←</button><button id="noticias-next" type="button">→</button></div><button id="noticias-live" type="button">Przeglądaj wiadomości na stronie</button></div></aside>
+        <div>
+          <details class="panel noticias-discovery" open><summary>Znajdź materiał do wiadomości</summary><div class="noticias-panel-body">
+            <form id="noticias-search-form"><label>Temat<input id="noticias-query" maxlength="300" placeholder="Np. transporte Tenerife, nuevas rutas"></label><button id="noticias-search" class="secondary-button" type="submit">Szukaj w internecie</button></form><p id="noticias-search-help" class="muted"></p>
+            <div class="noticias-source-controls"><label>Źródło<select id="noticias-source"></select></label><button id="noticias-discover" type="button" class="secondary-button">Pobierz propozycje ze źródła</button></div>
+            <details><summary>Dodaj lub zarządzaj źródłami</summary><form id="noticias-source-form"><label>Nazwa źródła<input id="noticias-source-name" maxlength="150" required></label><label>Adres strony / RSS<input id="noticias-source-url" type="url" required placeholder="https://…" maxlength="2048"></label><button type="submit" class="secondary-button">Dodaj źródło</button><button id="noticias-source-toggle" type="button">Wyłącz wybrane źródło</button></form></details>
+            <div id="noticias-results" aria-live="polite"></div>
+          </div></details>
+          <section class="panel noticias-composer"><div class="panel-heading"><h3>Napisz wiadomość</h3></div><form id="noticias-draft-form" class="noticias-panel-body">
+            <label>Tytuł<input id="noticias-title" required maxlength="250"></label>
+            <label>Kategoria<select id="noticias-category"></select></label>
+            <label>Link źródłowy (opcjonalnie)<input id="noticias-url" type="url" placeholder="https://…" maxlength="2048"></label><button id="noticias-extract" type="button" class="secondary-button">Pobierz materiał z linku</button>
+            <details id="noticias-material-section"><summary>Materiał źródłowy do opracowania</summary><label>Materiał źródłowy<textarea id="noticias-material" rows="7" maxlength="18000" placeholder="Wklej materiały albo pobierz je z linku. To materiał roboczy; nie zostanie opublikowany."></textarea></label></details>
+            <label>Krótki opis<textarea id="noticias-summary" rows="3" maxlength="500"></textarea></label>
+            <label>Treść artykułu<textarea id="noticias-body" rows="12" maxlength="40000" placeholder="Napisz własną wiadomość. Możesz używać nagłówków i list Markdown."></textarea></label>
+            <div class="noticias-compose-actions"><button id="noticias-save" type="submit" class="primary-button">Zapisz szkic i otwórz edytor</button><button id="noticias-ai" type="button" class="secondary-button">Przygotuj szkic z AI</button></div>
+            <p class="muted">W edytorze dodasz zdjęcie i galerię, sprawdzisz podgląd, a następnie opublikujesz wiadomość. Szkic zachowuje dotychczasową wersję strony.</p>
+          </form></section>
+        </div>
+      </div>
+    </section>
     <section id="view-events" class="view">
       <div class="events-toolbar panel">
         <div>
@@ -449,6 +475,7 @@
 
   <div id="toast" class="toast hidden" role="status"></div>
   <script src="/static/app.js?v=article-photos-20261106-1" defer></script>
+  <script src="/static/newsDesk.js?v=noticias-20261124" defer></script>
   <script src="/static/studio-extras.js?v=social-workspace-20261104-1" defer></script>
 </body>
 </html>
