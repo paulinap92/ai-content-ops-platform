@@ -132,7 +132,7 @@ async function task(action) {
   if (state.busy) return;
   state.busy = true;
   document
-    .querySelectorAll(".actions button")
+    .querySelectorAll(".actions button:not(#templates-view button)")
     .forEach((b) => (b.disabled = true));
   try {
     await action();
@@ -141,7 +141,7 @@ async function task(action) {
   } finally {
     state.busy = false;
     document
-      .querySelectorAll(".actions button")
+      .querySelectorAll(".actions button:not(#templates-view button)")
       .forEach((b) => (b.disabled = false));
     if(state.record)$("publish").disabled=!state.record.id || Boolean(state.record.blocked_reason);
   }

@@ -16,7 +16,7 @@ function draw(){const k=$('type').value,[w,h]=formats[$('format').value];canvas.
 if(landscape){let split=Math.round(w*.53);photoX=split;photoY=0;photoW=w-split;photoH=h;imageArea(photoX,photoY,photoW,photoH,k);logoAt(m,28,86);text('CANARIAS CERCA',m+104,56,25,600);text(examples[k][0],m,160,23,700,C.teal);let tw=split-m*1.8;let th=block(title,m,202,tw,165,58,700,C.dark);rect(m,202+th+10,66,5,C.gold);block(detail,m,202+th+32,tw,Math.max(22,h-90-202-th-32),29,400,C.dark);text('canariascerca.es',m,h-63,25,600);return}
 let header=story?225:162;logoAt(m,story?74:28,story?118:105);text('CANARIAS CERCA',m+(story?142:129),story?117:61,story?36:32,600);photoX=0;photoY=header;photoW=w;photoH=Math.round(h*(story?.49:($('format').value==='wa'?.49:.51)));imageArea(photoX,photoY,photoW,photoH,k);let top=photoY+photoH+(story?52:35);text(examples[k][0],m,top,story?31:26,700,C.teal);let ty=top+(story?60:49),footer=story?h-177:h-84;let maxTitle=Math.min(story?200:150,Math.max(70,footer-ty-92));let th=block(title,m,ty,w-2*m,maxTitle,story?78:67,700,C.dark);let line=ty+th+14;rect(m,line,86,6,C.gold);block(detail,m,line+25,w-2*m,Math.max(26,footer-line-35),story?37:32,400,C.dark);rect(m,footer-18,w-2*m,2,'#c3c9ba');text('canariascerca.es',m,footer+9,story?33:28,600,C.dark);
 }
-function setExample(){identity=null;credit='';seq++;loading=false;failed=false;asset=null;lastDraft=null;$('url').value='';$('caption').value='';$('source').textContent='Samodzielna grafika';let e=examples[$('type').value];$('title').value=e[1];$('detail').value=e[2];photo=null;$('photo').value='';draw()}
+function setExample(){identity=null;credit='';$('credit').value='';seq++;loading=false;failed=false;asset=null;lastDraft=null;$('url').value='';$('caption').value='';$('source').textContent='Samodzielna grafika';let e=examples[$('type').value];$('title').value=e[1];$('detail').value=e[2];photo=null;$('photo').value='';draw()}
 
 
 function round(x,y,w,h,r,color){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fillStyle=color;ctx.fill()}
@@ -51,7 +51,7 @@ async function loadPhoto(value,isFile=false){
 function open(record=null,type='noticias'){
  $('type').value=kindMap[record?.identity?.kind]||type;setExample();
  if(!record)return;
- const v=record.draft||{},id=record.identity||{};identity=id.record_key?{kind:id.kind,island:id.island,resource:id.resource,record_key:id.record_key}:null;credit=plain(v.image_credit);
+ const v=record.draft||{},id=record.identity||{};identity=id.record_key?{kind:id.kind,island:id.island,resource:id.resource,record_key:id.record_key}:null;credit=plain(v.image_credit);$('credit').value=credit;
  $('source').textContent='Grafika dla: '+plain(v.title||v.name);$('title').value=clip(v.title||v.name||examples[$('type').value][1],125);
  const detail=id.kind==='calendar'?[v.start_date,v.location||v.venue,id.island?.replaceAll('-',' ')].map(plain).filter(Boolean).join(' · '):v.short_description||v.summary||v.description||v.detailed_description;
  $('detail').value=clip(detail||examples[$('type').value][2],160);$('caption').value=clip(v.summary||v.short_description||v.description||v.detailed_description,1800);
@@ -62,13 +62,13 @@ const getBlob=()=>new Promise((res,rej)=>canvas.toBlob(b=>b?res(b):rej(Error('Ni
 const encode=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(b)});
 async function saveAsset(){
  if(asset)return asset;const blob=await getBlob();if(blob.size>5_000_000)throw Error('PNG przekracza limit 5 MB.');
- asset=await api('/media',{method:'POST',body:JSON.stringify({island:$('island').value,filename:filename(),data:await encode(blob),alt:clip($('title').value,300),credit:clip(['Canarias Cerca',credit].filter(Boolean).join(' · '),200),social_context:{category:$('type').value,style:$('style').value,format:$('format').value,record:identity}})});return asset;
+ asset=await api('/media',{method:'POST',body:JSON.stringify({island:$('island').value,filename:filename(),data:await encode(blob),alt:clip($('title').value,300),credit:clip(['Canarias Cerca',$('credit').value].filter(Boolean).join(' · '),200),social_context:{category:$('type').value,style:$('style').value,format:$('format').value,record:identity}})});return asset;
 }
 async function action(fn){if(busy||loading||failed||!logo.naturalWidth)return;busy=true;syncButtons();const inputs=[...root.querySelectorAll('input,textarea,select')];inputs.forEach(e=>e.disabled=true);try{await fn()}catch(e){status(e.message,true)}finally{inputs.forEach(e=>e.disabled=false);busy=false;syncButtons()}}
 for(const id of ['type','format','style','title','detail'])$(id).addEventListener(id==='title'||id==='detail'?'input':'change',redraw);
-$('island').onchange=()=>{asset=null;lastDraft=null};$('caption').oninput=()=>{lastDraft=null};
-$('reset').onclick=()=>setExample();$('photo').onchange=()=>{$('url').value='';credit='';void loadPhoto($('photo').files[0],true)};
-$('load-url').onclick=()=>{credit='';$('photo').value='';void loadPhoto($('url').value.trim())};$('url').onchange=()=>{credit='';$('photo').value='';void loadPhoto($('url').value.trim())};
+$('island').onchange=()=>{asset=null;lastDraft=null};$('caption').oninput=()=>{lastDraft=null};$('credit').oninput=()=>{asset=null;lastDraft=null};
+$('reset').onclick=()=>setExample();$('photo').onchange=()=>{$('url').value='';credit='';$('credit').value='';void loadPhoto($('photo').files[0],true)};
+$('load-url').onclick=()=>{credit='';$('credit').value='';$('photo').value='';void loadPhoto($('url').value.trim())};$('url').onchange=()=>{credit='';$('photo').value='';void loadPhoto($('url').value.trim())};
 $('clear').onclick=()=>{$('url').value='';$('photo').value='';credit='';void loadPhoto(null)};
 $('save').onclick=()=>action(async()=>{const u=URL.createObjectURL(await getBlob()),a=document.createElement('a');a.href=u;a.download=filename();a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);status('PNG wygenerowany.')});
 $('library').onclick=()=>action(async()=>{if(!photo)throw Error('Dodaj zdjęcie lub wykres.');await saveAsset();status('Grafika w bibliotece. Nic nie opublikowano.')});
