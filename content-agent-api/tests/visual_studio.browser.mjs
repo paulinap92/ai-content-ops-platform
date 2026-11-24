@@ -13,6 +13,7 @@ const errors=[],uploads=[];
 const manifest={schema_version:1,generated_from:'js/core/routes.js',routes:[{path:'/',island:null,section:null,resource:null,title:'Home',mode:'presentation'}, {path:'/tenerife/explore/lugares/',island:'tenerife',section:'explore',resource:'places',title:'Lugares',mode:'editorial',api:'/api/regions/canarias/places',source:'design.entity_source_properties',editor:{kind:'explore',resource:'places'}}]};
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAD0lEQVR4nGNgmOAAQhAKABXOA0GMr+LCAAAAAElFTkSuQmCC','base64');
 const browser=await chromium.launch(process.env.CC_TEST_CHROMIUM?{executablePath:process.env.CC_TEST_CHROMIUM}:{}),page=await browser.newPage({viewport:{width:1600,height:1000}});
+page.setDefaultTimeout(8000);
 page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
 await page.route('**/*',async route=>{
  const request=route.request(),u=new URL(request.url()),json=v=>route.fulfill({contentType:'application/json',body:JSON.stringify(v)});
@@ -24,12 +25,14 @@ await page.route('**/*',async route=>{
  if(path.startsWith('/site/assets/')){const name=path.split('/').at(-1);return route.fulfill({contentType:extname(name)==='.css'?'text/css':'text/javascript',body:await readFile(resolve(assets,name))});}
  if(request.method()!=='GET'){
   const body=request.postDataJSON();
-  if(path==='/site/api/media'){const image={url:'https://public.example/image.png',filename:'Own image',alt:body.alt||'',credit:body.credit||'',media_id:'one',island:'tenerife'};uploads.push(image);return json(image);}
+ if(path==='/site/api/media'){const image={url:'https://public.example/image.png',filename:'Own image',alt:body.alt||'',credit:body.credit||'',media_id:'one',island:'tenerife'};uploads.push(image);return json(image);}
   if(path==='/site/api/draft'){item={...item,id:'document',draft:body.payload,version:item.version+1,status:'draft'};return json(item);}
   if(path.endsWith('/publish')){assert.equal(body.review_confirmed,true);item={...item,published:item.draft,version:item.version+1,status:'published'};return json(item);}
   throw Error('Unexpected mutation '+path);
  }
- if(path==='/site/api/options')return json({islands:['tenerife'],sections:{explore:'Explore',guide:'Guía',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos'},features:{explore:['places'],guide:['history'],live:['weather'],datos:['climate']},copy_defaults:{'home.title':'Home','home.description':'Description'},media_upload_enabled:true});
+  if(path==='/site/api/database/tables')return json({tables:[{name:'entities'}]});
+ if(path==='/site/api/database/tables/entities')return json({table:'entities',count:1,columns:[{name:'id',type:'uuid'},{name:'canonical_name',type:'text'}],rows:[{id:key,canonical_name:'Real database row'}]});
+ if(path==='/site/api/options')return json({islands:['tenerife'],sections:{explore:'Explore',guide:'Guía',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos'},features:{explore:['places','beaches'],guide:['history'],live:['weather'],datos:['climate']},copy_defaults:{'home.title':'Home','home.description':'Description'},media_upload_enabled:true});
  if(path==='/site/api/site-manifest')return json(manifest);
  if(path==='/site/api/records')return json(u.searchParams.get('kind')==='settings'?{items:[settings],count:1}:{items:[item],count:1});
  if(path==='/site/api/open-record')return json(item);
@@ -44,19 +47,48 @@ try{
  await page.frameLocator('#visual-frame').locator('#choose').click();await page.locator('[data-key="short_description"]').waitFor();
  assert.equal(await page.locator('[data-key="detailed_description"]').inputValue(),'Existing details.');
  await page.locator('[data-key="short_description"]').fill('A new short description.');await page.locator('[data-key="detailed_description"]').fill('A new detailed description.');
+ await page.getByRole('button',{name:'Zdjęcia i galeria',exact:true}).click();
  await page.locator('.record-photo input[type=file]').setInputFiles({name:'own.png',mimeType:'image/png',buffer:png});
  await page.waitForFunction(()=>document.querySelector('[data-key=image_url]').value==='https://public.example/image.png');
  await page.locator('[data-key=image_alt]').fill('A photograph of the place');
  await page.locator('#record-gallery').getByRole('button',{name:'+ Dodaj zdjęcie z biblioteki',exact:true}).click();await page.locator('dialog').getByRole('button',{name:'Own image'}).click();
  assert.equal(await page.locator('.gallery-row').count(),1);
+ await page.locator('#record-gallery input[type=file]').setInputFiles({name:'gallery.png',mimeType:'image/png',buffer:png});
+ await page.waitForFunction(()=>document.querySelectorAll('.gallery-row').length===2);
+
  await page.locator('#visual-draft').click();await page.frameLocator('#visual-frame').locator('#draft').filter({hasText:'A new short description.'}).waitFor();assert.equal(await page.frameLocator('#visual-frame').locator('#draft').textContent(),'A new short description.');
  await page.locator('#save').click();await page.waitForFunction(()=>document.querySelector('#record-status').textContent.includes('wersja 1'));
  assert.equal(item.published.short_description,'Existing short.','Saving a draft preserves the live copy');
  await page.locator('#publication-review').check();await page.locator('#publish').click();await page.waitForFunction(()=>document.querySelector('#record-status').textContent.includes('wersja 2'));
- assert.equal(item.published.short_description,'A new short description.');assert.equal(item.published.gallery.length,1);
- await page.locator('#open-lugares').click();await page.locator('#manifest-source').filter({hasText:'372 opisy'}).waitFor();assert.match(await page.locator('#manifest-source').textContent(),/372.*8.*403/);
+ assert.equal(item.published.short_description,'A new short description.');assert.equal(item.published.gallery.length,2);
+ await mkdir('test-results/site-editor',{recursive:true});await page.screenshot({path:'test-results/site-editor/compact-photos.png',fullPage:true});
+ await page.getByRole('button',{name:'Treść',exact:true}).click();
+ await page.locator('[data-key=hidden]').uncheck();
+ await page.getByRole('button',{name:'Linki i źródła',exact:true}).click();await page.locator('[data-key=show_links]').uncheck();
+ await page.locator('#save').click();await page.waitForFunction(()=>document.querySelector('#record-status').textContent.includes('wersja 3'));
+ assert.equal(item.draft.hidden,true);assert.equal(item.draft.show_links,false);
+ assert.notEqual(item.published.hidden,true,'visibility is not changed on the public site until publication');
+ await page.locator('#publication-review').check();await page.locator('#publish').click();await page.waitForFunction(()=>document.querySelector('#record-status').textContent.includes('wersja 4'));
+ assert.equal(item.published.hidden,true);assert.equal(item.published.show_links,false);
+ await page.locator('#open-release').click();await page.locator('#manifest-source').filter({hasText:'372 opisy'}).waitFor();assert.match(await page.locator('#manifest-source').textContent(),/372.*8.*403/);
+ await page.getByRole('button',{name:'Treść',exact:true}).click();
  item={...item,blocked_reason:'Identity needs review'};await page.locator('#visual-tree button').filter({hasText:'Existing place'}).click();
  await page.locator('.release-blocked').waitFor();assert.equal(await page.locator('#publish').isDisabled(),true);
+ await page.locator('#open-database').click();await page.getByText('Real database row',{exact:true}).waitFor();
+ assert.equal(await page.locator('#visual-preview').isVisible(),false,'Database view must not show the website preview');
+ assert.equal(await page.locator('#visual-frame').isVisible(),false);
+ await page.goto(EDITOR+'/site/?view=database');await page.getByText('Real database row',{exact:true}).waitFor();
+ assert.equal(await page.locator('#visual-preview').isVisible(),false,'Direct database navigation must stay in the table browser');
+ await page.locator('#open-lugares').click();await page.locator('#site-tree').getByRole('button',{name:'Playas',exact:true}).click();
+ await page.locator('#catalog-new').click();await page.getByRole('heading',{name:'Nowe miejsce',exact:true}).waitFor();
+ assert.equal(await page.locator('#resource').inputValue(),'beaches');assert.equal(await page.locator('#publish').isDisabled(),true,'new points must be saved before publishing');
+ await page.getByRole('button',{name:'Położenie / pinezka',exact:true}).click();
+ assert.equal(await page.locator('[data-key=latitude]').isVisible(),true);assert.equal(await page.locator('[data-key=longitude]').isVisible(),true);
+ assert.equal(await page.locator('.map-location iframe').count(),0,'new points must not show a false marker at zero coordinates');
+ await page.locator('[data-key=latitude]').fill('28.2');await page.locator('[data-key=longitude]').fill('-16.5');await page.getByRole('button',{name:'Odśwież położenie na mapie',exact:true}).click();
+ assert.match(await page.locator('.map-location iframe').getAttribute('src'),/28.2/);
+ await page.getByRole('button',{name:'Treść',exact:true}).click();
+ await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'the editor fits a phone');
  await mkdir('test-results/site-editor',{recursive:true});await page.screenshot({path:'test-results/site-editor/universal-studio.png',fullPage:true});assert.deepEqual(errors,[]);
  console.log('VISUAL STUDIO UI PASS: selection, upload, gallery, draft preview, save, publication and blocked catalogue');
-}catch(e){console.error({errors,status:await page.locator('#status').textContent()});throw e;}finally{await browser.close();}
+}catch(e){await mkdir('test-results/site-editor',{recursive:true});await page.screenshot({path:'test-results/site-editor/failed.png',fullPage:true});console.error({errors,status:await page.locator('#status').textContent()});throw e;}finally{await browser.close();}

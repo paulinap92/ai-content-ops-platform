@@ -75,7 +75,10 @@ export function recordPhotoControls({item, node, field, api, payload, apply, mes
     const saved=await api('/media',{method:'POST',body:JSON.stringify({island:item.identity.island,...prepared,alt:draft.image_alt||'',credit:draft.image_credit||''})});
     apply({...saved,license:draft.image_license||''},JSON.stringify(item.identity));message('Dodano wykadrowaną kopię do szkicu. Oryginał pozostaje w bibliotece.');
   }catch(e){message(e.message,true);}};
-  actions.append(uploadButton, choose, remove, upload,cropSelect,cropX,cropY,crop);
+  actions.append(uploadButton, choose, remove, upload);
+  const cropOptions=node('details',undefined,{class:'photo-crop-options'});cropOptions.append(node('summary','Kadrowanie (opcjonalne)'));
+  for(const [title,input] of [['Proporcje kadru',cropSelect],['Środek kadru w poziomie',cropX],['Środek kadru w pionie',cropY]]){const label=node('label',title);label.append(input);cropOptions.append(label);}
+  cropOptions.append(crop);
   panel.append(actions, node('p', 'Wgranie dodaje publiczny plik do biblioteki strony i przypisuje go do tego szkicu. Wpis zmieni się dopiero po zapisaniu i publikacji.', {class: 'view-help'}));
   const metadata = node('div', undefined, {class: 'photo-metadata'});
   for (const key of ['image_alt', 'image_credit', 'image_license']) metadata.append(field(key, item.draft[key] || ''));
@@ -85,7 +88,7 @@ export function recordPhotoControls({item, node, field, api, payload, apply, mes
   const full = node('button', 'Otwórz pełną bibliotekę zdjęć', {type: 'button'});
   full.onclick = openFullLibrary;
   addresses.append(full);
-  panel.append(metadata, addresses, feedback);
+  panel.append(metadata, cropOptions, addresses, feedback);
   for (const input of panel.querySelectorAll('[data-key]')) input.addEventListener('input', updatePreview);
   upload.onchange = async () => {
     const file = upload.files[0];

@@ -41,12 +41,12 @@ def annotate_record(item):
     return item
 
 
-def safe_url(value):
+def safe_url(value, *, allow_http=False):
     if not isinstance(value, str) or len(value) > 2048 or any(c.isspace() or ord(c)<32 for c in value):
         raise ValueError('Podaj pełny adres HTTPS bez spacji i danych logowania.')
     try:
         u = urlsplit(value)
-        if u.scheme != 'https' or not u.hostname or u.username or u.password:
+        if u.scheme not in ({'https', 'http'} if allow_http else {'https'}) or not u.hostname or u.username or u.password:
             raise ValueError
     except ValueError:
         raise ValueError('Podaj pełny adres HTTPS bez danych logowania.') from None
@@ -71,6 +71,24 @@ def validate_media(payload):
         raise ValueError('Nieprawidłowa widoczność zdjęcia.')
 
 
+def publication_links(value):
+    """Publish only explicitly saved, validated editorial navigation links."""
+    links = []
+    seen = set()
+    for key, title in (('website', 'Página oficial'), ('url', 'Más información'), ('source_url', 'Fuente')):
+        url = value.get(key)
+        if url and url not in seen:
+            links.append({'url': safe_url(url, allow_http=True), 'title': title})
+            seen.add(url)
+    for source in value.get('sources') or []:
+        if isinstance(source, dict) and source.get('url') and source['url'] not in seen:
+            links.append({'url': safe_url(source['url'], allow_http=True), 'title': str(source.get('title') or 'Fuente')[:500]})
+            seen.add(source['url'])
+    value['show_links'] = value.get('show_links') is not False
+    value['cc_studio_links'] = {'visible': value['show_links'], 'links': links[:16]}
+    return value
+
+
 async def prepare_publication(session, identity, current, payload, version, review_confirmed=False):
     from canarias_site.services import studio
     value = deepcopy(payload)
@@ -92,7 +110,7 @@ async def prepare_publication(session, identity, current, payload, version, revi
             value['image_rights_status']='editor-supplied'
             value['image_removed']=False
     if identity['kind']!='explore' or identity['resource'] not in PLACE_RESOURCES:
-        return value
+        return publication_links(value)
     old = current or {}
     if review_confirmed and value.get('category') != old.get('category'):
         value['cc_studio_category']={'canonical_id':key,'type':value.get('category'),'reviewed_by':'authenticated-editor'}
@@ -121,20 +139,20 @@ async def prepare_publication(session, identity, current, payload, version, revi
         value.update(short_description=short, detailed_description=detail, description=short, sources=sources)
         value['cc_studio_copy'] = {
             'canonical_id':key, 'revision':version, 'short_description':short,
-            'detailed_description':detail, 'sources':sources,
+            'detailed_description':detail, 'sources':sources, 'show_links':value.get('show_links') is not False,
             'published_at':datetime.now(timezone.utc).isoformat(),
             'published_by':'authenticated-editor', 'review_method':'editor-confirmed' if review_confirmed else 'existing-evidence',
         }
         # Set the real identity after creating a new canonical object.
         if key.startswith('new:'):value.pop('cc_studio_copy')
-    return value
+    return publication_links(value)
 
 
 async def propagate_place(session, identity, public):
     from canarias_site.services import sql_editor
     # Description and media are shared across catalog memberships; source-specific
     # categories, geometries and original data remain unchanged in other catalogs.
-    changes={k:deepcopy(public[k]) for k in (*COPY_FIELDS,*MEDIA_FIELDS,'description','cc_studio_copy','hidden') if k in public}
+    changes={k:deepcopy(public[k]) for k in (*COPY_FIELDS,*MEDIA_FIELDS,'description','cc_studio_copy','hidden','show_links','website','url','source_url','cc_studio_links') if k in public}
     for resource in PLACE_RESOURCES:
         if resource==identity['resource']:continue
         rows=await sql_editor._explore_features(session,identity['island'],resource)

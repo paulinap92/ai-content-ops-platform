@@ -1,7 +1,7 @@
 import {createVisualStudio} from './visualStudio.js';
 import {createInspector,renderMonth} from "./inspector.js";
 import {renderEditorialText} from "./editorialText.js";
-import {recordPhotoControls, imageKeys} from "./recordPhotos.js";
+import {recordPhotoControls, imageKeys, preparePhoto} from "./recordPhotos.js";
 const $ = (id) => document.getElementById(id);
 const base = location.pathname.replace(/\/$/, "");
 const state = {
@@ -59,7 +59,8 @@ const labels = {
   website: "Strona internetowa",
   featured: "Wyróżnione",
   order: "Kolejność",
-  hidden: "Ukryj wpis na stronie",
+  hidden: "Widoczne na stronie (po publikacji)",
+  show_links: "Pokazuj linki na stronie",
   start_date: "Data początku",
   end_date: "Data końca",
   all_day: "Cały dzień",
@@ -141,6 +142,7 @@ async function task(action) {
     document
       .querySelectorAll(".actions button")
       .forEach((b) => (b.disabled = false));
+    if(state.record)$("publish").disabled=!state.record.id || Boolean(state.record.blocked_reason);
   }
 }
 function params() {
@@ -245,6 +247,7 @@ async function loadRecords() {
   if(!result.items.length && ["guide","explore"].includes(kind)) {
     try {$("record-list").append(await inspection.emptyHint(state.target.section,state.target.resource,island));}catch(_){/* The main empty state remains accurate if optional coverage is unavailable. */}
   }
+  if($("record-chooser"))$("record-chooser").open=!result.items.length;
   state.recordsLoaded = true;
   $("page").textContent =
     `${result.count ? state.offset + 1 : 0}–${state.offset + result.items.length} / ${result.count}`;
@@ -272,7 +275,8 @@ function field(key, value, readonly = false) {
   input.dataset.null = String(value === null);
   if (typeof value === "boolean") {
     input.type = "checkbox";
-    input.checked = value;
+    input.checked = key === "hidden" ? !value : value;
+    if(key === "hidden")input.dataset.invert = "true";
   } else {
     if (input.tagName === "INPUT")
       input.type =
@@ -319,12 +323,13 @@ function renderRecord() {
     "image_source_url",
     "source_url",
     "hidden",
+    "show_links",
     "editor_notes",
   ]);
   for (const key of keys) {
     if (key.startsWith("_") || key.startsWith("cc_") || key === "sources" || key === "gallery" || protectedKeys.has(key) || imageKeys.has(key)) continue;
     if(key==='description'&&item.identity.kind==='explore'&&Object.hasOwn(item.draft,'detailed_description'))continue;
-    const value = Object.hasOwn(item.draft, key) ? item.draft[key] : (key === "hidden" ? false : key === "editor_notes" ? [] : "");
+    const value = Object.hasOwn(item.draft, key) ? item.draft[key] : (key === "hidden" ? false : key === "show_links" ? true : key === "editor_notes" ? [] : "");
     (Object.hasOwn(labels, key) ? fields : advanced).append(
       field(
         key,
@@ -350,7 +355,23 @@ function renderRecord() {
       })});
     fields.append(photoControls.panel);
   }
-  $("record-form").replaceChildren(fields, advanced);
+  const tabs = $('record-tabs'); tabs.replaceChildren(); tabs.hidden = false;
+  const panels = {};
+  for(const [key,label] of [['text','Treść'],['photos','Zdjęcia i galeria'],['location','Położenie / pinezka'],['links','Linki i źródła'],['advanced','Dodatkowe dane']]) {
+    const panel=node('section',undefined,{class:'fields record-panel','data-panel':key});panels[key]=panel;
+    const button=node('button',label,{type:'button','data-record-tab':key});
+    button.onclick=()=>selectRecordTab(key);tabs.append(button);
+  }
+  for(const element of [...fields.children]) {
+    const key=element.querySelector('[data-key]')?.dataset.key;
+    const target=key==='editor_notes'?'advanced':element.classList.contains('record-photo')||element.id==='record-gallery'?'photos':element.classList.contains('map-location')||['latitude','longitude','geometry','location','venue'].includes(key)?'location':element.querySelector('.source-row')||element.textContent.startsWith('Źródła opisu')||['url','website','source_url','show_links'].includes(key)?'links':'text';
+    panels[target].append(element);
+  }
+  if(photoControls)panels.photos.prepend(photoControls.panel);
+  panels.advanced.append(advanced);
+  if(item.identity.kind==='live-point')panels.photos.append(node('p','Punkt pomiarowy nie ma zdjęcia. Edytuj jego nazwę i współrzędne.'));
+  $('record-form').replaceChildren(...panels.text.querySelectorAll('.release-blocked'),...Object.values(panels));
+  selectRecordTab(state.editorTab||'text');
   photoControls?.updatePreview();
   $("edit-actions").hidden = false;
   $("save").textContent=item.identity.kind==="live-point"?"Zapisz i włącz punkt":"Zapisz treść roboczą";
@@ -362,7 +383,7 @@ function renderRecord() {
 function recordPayload() {
   const value = structuredClone(state.record.draft);
   for (const input of $("record-form").querySelectorAll("[data-key]")) {
-    let v = input.type === "checkbox" ? input.checked : input.value;
+    let v = input.type === "checkbox" ? (input.dataset.invert ? !input.checked : input.checked) : input.value;
     if (input.dataset.valueType === "json") {
       try {
         v = JSON.parse(v);
@@ -380,6 +401,11 @@ function recordPayload() {
   const gallery=document.getElementById('record-gallery');
   if(gallery)value.gallery=JSON.parse(gallery.dataset.images||'[]');
   return value;
+}
+function selectRecordTab(key) {
+ state.editorTab=key;
+ document.querySelectorAll('[data-panel]').forEach(panel=>panel.hidden=panel.dataset.panel!==key);
+ document.querySelectorAll('[data-record-tab]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.recordTab===key)));
 }
 async function digest(value) {
   const sorted = (v) =>
@@ -749,6 +775,7 @@ function renderTree(){
 }
 async function navigate(section,resource=null,nextScope=state.scope){
  $("workspace").classList.remove("visual-selection");
+ if(section==='database'||section==='coverage')visual.close();
  document.querySelectorAll("[data-live-back]").forEach(e=>e.remove());
  if(!warnUnsaved()){$("tree-scope").value=state.scope;return;}
  collectSettings();
@@ -764,6 +791,9 @@ async function navigate(section,resource=null,nextScope=state.scope){
  $("context-path").textContent=section==="database"?"Cała baza strony":section==="coverage"?"Wszystkie wyspy":state.scope==="global"?"Cała strona":islandName(state.scope);
  $("context-title").textContent=section==="home"?(state.scope==="global"?"Strona startowa":"Opis wyspy"):section==="media"?"Zdjęcia":section==="database"?"Baza danych":section==="coverage"?"Kompletność danych":[section==="transport"?"Transporte":section==="live-points"?"Punkty pomiarowe Live":state.options.sections[section],resource?resourceLabel(resource):null].filter(Boolean).join(" / ");
  $("context-help").textContent=section==="database"?"Przeglądaj rzeczywistą bazę PostgreSQL: tabele, kolumny i rekordy. Ten widok jest tylko do odczytu.":section==="coverage"?"Zestawienie rzeczywistych danych według katalogu i wyspy; puste źródła są pokazane wprost.":editable?"Po lewej wybierz wpis. Otwieramy pierwszy automatycznie; możesz porównać go z opublikowaną wersją poniżej formularza.":["live","datos"].includes(section)?"Tutaj zmieniasz teksty i widoczność tej części. Pomiary i wykresy są aktualizowane przez joby, a nie ręcznie.":"Edytuj teksty widoczne na stronie. Zapis roboczy zachowuje szkic; publikacja udostępnia zmiany odwiedzającym.";
+ $('catalog-actions').hidden=!editable;
+ $('catalog-new').textContent=section==='guide'?'+ Dodaj artykuł':section==='calendar'?'+ Dodaj wydarzenie':section==='news'?'+ Dodaj aktualność':'+ Dodaj punkt';
+ $('create-island').value=state.scope==='global'?'tenerife':state.scope;
  renderTree();renderSettings();
  $("island").value=state.scope==="global"?"tenerife":state.scope;
  if(section==="database"){view("inspection");await inspection.showDatabase();return;}
@@ -817,6 +847,8 @@ async function init() {
   $("media-island").replaceChildren(new Option("Wszystkie wyspy","global"),...islandOrder.map(v=>new Option(islandName(v),v)));
   $("media-island").onchange=()=>task(loadMedia);
   $("tree-scope").replaceChildren(new Option("Cała strona","global"),...islandOrder.filter(v=>state.options.islands.includes(v)).map(v=>new Option(islandName(v),v)));
+  $('create-island').replaceChildren(...islandOrder.filter(v=>state.options.islands.includes(v)).map(v=>new Option(islandName(v),v)));
+  $('catalog-new').onclick=()=>task(async()=>{const section=state.target.section,resource=state.target.resource;await navigate(section,resource,$('create-island').value);await newRecord();});
   $("tree-scope").onchange=()=>task(()=>navigate(state.target.section,state.target.resource,$("tree-scope").value));
   await loadSettings();
   if(requested.get("view")==="media"){if(parent!==window)parent.postMessage({type:"cc-editor-open-photos"},location.origin);else location.assign("/?library=photos");return;}
@@ -825,9 +857,11 @@ async function init() {
   else if(Object.hasOwn(state.options.sections,requested.get("section")) && (!requested.get("resource") || state.options.features[requested.get("section")]?.includes(requested.get("resource")) || requested.get("section")==="explore" && requested.get("resource")==="featured")) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(requested.has("kind")) {const p=params();await navigate(p.kind,p.resource,p.island);}
   else await navigate("home");
-  await visual.load();
+  await visual.load({preview:requested.get("view")==="preview" || !requested.has("view") && !requested.has("kind") && !requested.has("section")});
   if(requested.get("view")==="lugares")await visual.catalog();
   if(requested.get("new")==="1")await newRecord();
+  const selectedImage=sessionStorage.getItem('cc-editor-selected-image');
+  if(selectedImage && state.record){sessionStorage.removeItem('cc-editor-selected-image');state.editorTab='photos';applyRecordImage(JSON.parse(selectedImage));}
   parent.postMessage({type:"cc-editor-ready"},location.origin);
 }
 for (const key of ["island", "kind", "resource", "month"]) {
@@ -1055,7 +1089,7 @@ async function openVisualRecord(identity) {
  $('context-title').textContent=record.draft.name||record.draft.title;
  $('context-path').textContent=islandName(state.scope)+' / '+resourceLabel(record.identity.resource);
  $('context-help').textContent=record.blocked_reason?'Wstrzymana publikacja. Możesz pracować nad szkicem.':'Edytujesz dane odczytywane przez stronę. Zapisz szkic, sprawdź podgląd i opublikuj.';
- state.record=record;renderSettings();view('content');renderRecord();$('workspace').classList.add('visual-selection');
+ state.record=record;$('catalog-actions').hidden=false;$('create-island').value=state.scope;$('catalog-new').textContent='+ Dodaj punkt';renderSettings();view('content');renderRecord();$('workspace').classList.add('visual-selection');
 }
 const visual=createVisualStudio({api,node,message,onSelect:openVisualRecord,
  onNavigate:async(route,copyKey)=>{
@@ -1072,8 +1106,10 @@ const visual=createVisualStudio({api,node,message,onSelect:openVisualRecord,
   else location.assign('/?view='+tool);
  }});
 $('open-visual').onclick=()=>visual.open();
-$('open-lugares').onclick=()=>task(()=>visual.catalog());
-$('open-events').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool:'events'},location.origin);else location.assign('/?view=events');};
+$('open-lugares').onclick=()=>task(async()=>{visual.close();await navigate('explore','places',state.scope==='global'?'tenerife':state.scope);});
+$('open-release').onclick=()=>task(()=>visual.catalog());
+$('open-database').onclick=()=>task(()=>navigate('database'));
+$('open-events').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool:'events'},location.origin);else if(warnUnsaved())location.assign('/?view=events');};
 $('open-articles').onclick=()=>task(()=>navigate('guide','history',state.scope==='global'?'tenerife':state.scope));
 $('open-media').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-editor-open-photos'},location.origin);else task(()=>navigate('media'));};
 $('open-settings').onclick=()=>task(()=>navigate('home'));
@@ -1093,10 +1129,13 @@ function sourceControls(item){
 function locationControls(item){
  const panel=node('section',undefined,{class:'map-location wide'});panel.append(node('h3','Położenie pinezki'));
  const p=item.draft,lon=Number(p.longitude),lat=Number(p.latitude);
- if(Number.isFinite(lon)&&Number.isFinite(lat)){
+ if(p.longitude!==null && p.latitude!==null && p.longitude!=='' && p.latitude!=='' && Number.isFinite(lon)&&Number.isFinite(lat)){
   const frame=node('iframe',undefined,{loading:'lazy',title:'Mapa położenia pinezki',src:`https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent([lon-.01,lat-.008,lon+.01,lat+.008].join(','))}&layer=mapnik&marker=${lat}%2C${lon}`});
   const link=node('a','Sprawdź punkt na mapie ↗',{href:`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}`,target:'_blank',rel:'noopener'});panel.append(frame,link);
  }
+ const refresh=node('button','Odśwież położenie na mapie',{type:'button'});
+ refresh.onclick=()=>{state.record.draft=recordPayload();renderRecord();state.dirty=true;};
+ panel.append(refresh);
  panel.append(node('p','Współrzędne i kategorię zmieniasz w formularzu. Przed publikacją potwierdź ich kontrolę. Geometria dostawcy pozostaje zachowana.'));return panel;
 }
 function galleryControls(item){
@@ -1105,7 +1144,9 @@ function galleryControls(item){
  const sync=()=>{panel.dataset.images=JSON.stringify(images);state.dirty=true;};
  function draw(){list.replaceChildren();images.forEach((image,index)=>{
   const row=node('div',undefined,{class:'gallery-row'});row.append(node('img',undefined,{src:image.url,alt:image.alt||'',loading:'lazy'}));
-  for(const [key,label]of [['alt','Opis ALT'],['credit','Autor'],['license','Licencja'],['source_url','Źródło zdjęcia']]){const l=node('label',label),input=node('input');input.value=image[key]||'';input.oninput=()=>{image[key]=input.value;sync();};l.append(input);row.append(l);}
+  const metadata=node('details',undefined,{class:'gallery-metadata'});metadata.append(node('summary','Podpis, autor i licencja'));
+  for(const [key,label]of [['alt','Opis ALT'],['credit','Autor'],['license','Licencja'],['source_url','Źródło zdjęcia']]){const l=node('label',label),input=node('input');input.value=image[key]||'';input.oninput=()=>{image[key]=input.value;sync();};l.append(input);metadata.append(l);}
+  row.append(metadata);
   const up=node('button','↑',{type:'button','aria-label':'Przesuń zdjęcie wcześniej'});up.disabled=index===0;up.onclick=()=>{[images[index-1],images[index]]=[images[index],images[index-1]];sync();draw();};
   const remove=node('button','Usuń z galerii',{type:'button'});remove.onclick=()=>{images.splice(index,1);sync();draw();};row.append(up,remove);list.append(row);
  });}
@@ -1115,5 +1156,21 @@ function galleryControls(item){
   for(const image of result.items){const button=node('button',image.filename||'Zdjęcie',{type:'button'});button.append(node('img',undefined,{src:image.url,alt:'',width:'90',loading:'lazy'}));button.onclick=()=>{if(images.length>=20)throw Error('Limit 20 zdjęć.');images.push({url:image.url,alt:image.alt||'',credit:image.credit||'',source_url:image.source_url||'',license:image.license||''});sync();draw();dialog.close();};dialog.append(button);}
   if(!result.items.length)dialog.append(node('p','Najpierw wgraj zdjęcie przyciskiem „Wgraj zdjęcie z komputera” lub w zakładce Zdjęcia.'));
   dialog.onclose=()=>dialog.remove();document.body.append(dialog);dialog.showModal();
- });panel.append(add);draw();return panel;
+ });
+ const upload=node('input',undefined,{type:'file',accept:'image/jpeg,image/png,image/webp',multiple:'',hidden:''});
+ const uploadButton=node('button','Wgraj zdjęcia do galerii',{type:'button'}),feedback=node('p','',{role:'status'});
+ uploadButton.onclick=()=>upload.click();
+ upload.onchange=()=>task(async()=>{
+  const files=[...upload.files];if(!files.length)return;
+  if(files.length+images.length>20)throw Error('Galeria może zawierać najwyżej 20 zdjęć.');
+  uploadButton.disabled=true;
+  try{for(const file of files){
+   feedback.textContent='Wgrywam '+file.name+'…';const prepared=await preparePhoto(file);
+   const image=await api('/media',{method:'POST',body:JSON.stringify({island:item.identity.island,...prepared,alt:'',credit:'Canarias Cerca'})});
+   if(JSON.stringify(state.record?.identity)!==JSON.stringify(item.identity))throw Error('Zmieniono wpis. Plik pozostał w bibliotece zdjęć.');
+   images.push({url:image.url,alt:image.alt||'',credit:image.credit||'',source_url:'',license:''});sync();draw();
+  }feedback.textContent='Dodano zdjęcia do szkicu galerii. Uzupełnij podpisy, zapisz i opublikuj wpis.';
+  }finally{uploadButton.disabled=false;upload.value='';}
+ });
+ panel.append(add,uploadButton,upload,feedback);draw();return panel;
 }

@@ -471,8 +471,7 @@ async function publishToCanarias() {
       }),
     });
     toast(`Zapisano wersję roboczą: ${result.section}/${result.slug}`);
-    $("site-editor-frame").src="/site/?"+new URLSearchParams({kind:"guide",island:result.island,resource:result.section});
-    document.querySelector('[data-view="site"]').click();
+    location.assign("/site/?"+new URLSearchParams({kind:"guide",island:result.island,resource:result.section}));
   } catch (error) {
     toast(error.message, true);
   } finally {
@@ -1210,8 +1209,7 @@ async function saveEventAsSiteDraft(item) {
     const hash = [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))].map(v=>v.toString(16).padStart(2,"0")).join("");
     const nullHash = [...new Uint8Array(await crypto.subtle.digest("SHA-256",new TextEncoder().encode("null")))].map(v=>v.toString(16).padStart(2,"0")).join("");
     await apiFetch("/site/api/draft", {method:"PUT",body:JSON.stringify({identity:{kind:"calendar",island,resource:start.slice(0,7),record_key:"new:"+hash},expected_version:0,base_fingerprint:nullHash,payload:{title:item.title,description:item.description||item.raw_excerpt||"",start_date:start,end_date:String(item.end_date||start).slice(0,10),all_day:!item.start_time,location:item.location||item.venue||"",url:item.source_url||"",source_url:item.source_url||"",price:item.price||"",hidden:false}})});
-    $("site-editor-frame").src="/site/?"+new URLSearchParams({kind:"calendar",island,resource:start.slice(0,7),record_key:"new:"+hash});
-    document.querySelector('[data-view="site"]').click();
+    location.assign("/site/?"+new URLSearchParams({kind:"calendar",island,resource:start.slice(0,7),record_key:"new:"+hash}));
     toast("Wydarzenie zapisano roboczo. Sprawdź je w panelu przed publikacją.");
   } catch (error) { toast(error.message,true); }
 }
@@ -1219,6 +1217,9 @@ async function saveEventAsSiteDraft(item) {
 function initTabs() {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", async () => {
+      if (tab.dataset.view === 'site') {location.assign('/site/');return;}
+      if (tab.dataset.view === 'database') {location.assign('/site/?view=database');return;}
+      if (tab.dataset.view === 'preview') {location.assign('/site/?view=preview');return;}
       document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
       document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
       tab.classList.add("active");
@@ -1296,10 +1297,10 @@ async function uploadLibraryPhoto(file,alt,credit){
 }
 $("photo-upload-file").onchange=async()=>{const file=$("photo-upload-file").files[0];if(!file)return;$("photo-upload-file").disabled=true;$("photo-upload-status").textContent='Przesyłam do biblioteki strony…';try{const image=await uploadLibraryPhoto(file,$("photo-upload-alt").value,$("photo-upload-credit").value);$("photo-upload-status").textContent='Zapisano: '+image.filename+'. Plik jest w trwałej bibliotece strony, nie w Google Drive. Wybierz go, aby przypisać do treści.';state.currentPhotoFolder='';await loadPhotoLibrary();await selectPhoto('site:'+image.media_id);}catch(e){$("photo-upload-status").textContent=e.message;}finally{$("photo-upload-file").disabled=false;$("photo-upload-file").value='';}};
 $("photo-use").onclick=async()=>{const photo=state.selectedPhoto;if(!photo)return;$("photo-use").disabled=true;try{let image=photo.source==='site'?{url:photo.public_url,filename:photo.current_name,alt:photo.alt_texts?.es||'',credit:photo.credit||''}:null;if(!image){const r=await fetch(`${PHOTO_API}/${photo.photo_id}/preview`);if(!r.ok){let d=await r.json().catch(()=>({}));throw new Error(d.details?.join(' · ')||d.detail||'Nie można pobrać oryginału zdjęcia.');}const blob=await r.blob();image=await uploadLibraryPhoto(new File([blob],photo.current_name,{type:blob.type}),photo.alt_texts?.es||'',$('photo-credit').value);}
- if(state.photoSelectionTarget==='social'){window.dispatchEvent(new CustomEvent('cc-social-image-selected',{detail:image}));document.querySelector('[data-view="social"]').click();}else{$('site-editor-frame').contentWindow.postMessage({type:'cc-editor-use-image',image},location.origin);document.querySelector('[data-view="site"]').click();}
+ if(state.photoSelectionTarget==='social'){window.dispatchEvent(new CustomEvent('cc-social-image-selected',{detail:image}));document.querySelector('[data-view="social"]').click();}else{const raw=sessionStorage.getItem('cc-editor-photo-target');if(!raw)throw new Error('Otwórz wpis → Zdjęcia i galeria → Wybierz zdjęcie z biblioteki.');const target=JSON.parse(raw);sessionStorage.setItem('cc-editor-selected-image',JSON.stringify(image));sessionStorage.removeItem('cc-editor-photo-target');location.assign('/site/?'+new URLSearchParams(target));}
  }catch(e){$('photo-use-status').textContent=e.message;}finally{$('photo-use').disabled=false;}};
-$("new-manual-event").onclick=()=>{const raw=$('event-island-filter').value||'Tenerife',island=raw.toLowerCase().replaceAll(' ','-');$('site-editor-frame').src='/site/?'+new URLSearchParams({kind:'calendar',island,resource:new Date().toISOString().slice(0,7),new:'1'});document.querySelector('[data-view="site"]').click();};
-window.addEventListener('DOMContentLoaded',()=>{for(const [slug,name]of [['tenerife','Tenerife'],['gran-canaria','Gran Canaria'],['lanzarote','Lanzarote'],['fuerteventura','Fuerteventura'],['la-palma','La Palma'],['la-gomera','La Gomera'],['el-hierro','El Hierro'],['la-graciosa','La Graciosa']])$('photo-upload-island').append(new Option(name,slug));const target=sessionStorage.getItem('cc-editor-photo-target');if(target){sessionStorage.removeItem('cc-editor-photo-target');const i=JSON.parse(target);$('site-editor-frame').src='/site/?'+new URLSearchParams({...i});$('photo-selection-target').textContent='Wybierz zdjęcie do otwartej treści.';}if(new URLSearchParams(location.search).get('library')==='photos')document.querySelector('[data-view="photos"]').click();});
+$("new-manual-event").onclick=()=>{const raw=$('event-island-filter').value||'Tenerife',island=raw.toLowerCase().replaceAll(' ','-');location.assign('/site/?'+new URLSearchParams({kind:'calendar',island,resource:new Date().toISOString().slice(0,7),new:'1'}));};
+window.addEventListener('DOMContentLoaded',()=>{for(const [slug,name]of [['tenerife','Tenerife'],['gran-canaria','Gran Canaria'],['lanzarote','Lanzarote'],['fuerteventura','Fuerteventura'],['la-palma','La Palma'],['la-gomera','La Gomera'],['el-hierro','El Hierro'],['la-graciosa','La Graciosa']])$('photo-upload-island').append(new Option(name,slug));const target=sessionStorage.getItem('cc-editor-photo-target');if(target){const i=JSON.parse(target);state.photoSelectionTarget='site';$('photo-selection-target').textContent='Wybierz zdjęcie do otwartej treści.';}if(new URLSearchParams(location.search).get('library')==='photos')document.querySelector('[data-view="photos"]').click();});
 
 window.addEventListener('cc-social-open-photos',()=>{state.photoSelectionTarget='social';$('photo-selection-target').textContent='Wybierz zdjęcie do przygotowywanego posta.';$('photo-use').textContent='Użyj w poście';document.querySelector('[data-view="photos"]').click();});
 
@@ -1309,5 +1310,5 @@ window.addEventListener('message',event=>{
 });
 window.addEventListener('DOMContentLoaded',()=>{
  const tool=new URLSearchParams(location.search).get('view');
- if(['events','editor','photos'].includes(tool))document.querySelector(`[data-view="${tool}"]`)?.click();
+ if(['events','editor','photos','social'].includes(tool))document.querySelector(`[data-view="${tool}"]`)?.click();
 });

@@ -30,8 +30,8 @@ export function createVisualStudio({api,node,onSelect,onNavigate,onExternal,mess
    }tree.append(group);
   }
  }
- async function load(){
-  try{manifest=await api('/site-manifest');document.getElementById('manifest-source').textContent='Aktualizowane z '+manifest.generated_from+' · '+manifest.routes.length+' widoków';showRoutes();preview(manifest.routes[0]);}
+ async function load({preview:showPreview=true}={}){
+  try{manifest=await api('/site-manifest');document.getElementById('manifest-source').textContent='Aktualizowane z '+manifest.generated_from+' · '+manifest.routes.length+' widoków';showRoutes();if(showPreview)preview(manifest.routes[0]);}
   catch(e){status.textContent=e.message;}
  }
  async function catalog(){
@@ -62,7 +62,8 @@ export function createVisualStudio({api,node,onSelect,onNavigate,onExternal,mess
  });
  document.getElementById('visual-reload').onclick=()=>frame.contentWindow?.postMessage({type:'cc-studio-refresh'},SITE);
  document.getElementById('visual-draft').onclick=()=>onExternal('draft-preview');
- document.getElementById('visual-close').onclick=()=>{workspace.classList.remove('visual-mode');document.getElementById('visual-preview').hidden=true;};
+ function close(){workspace.classList.remove('visual-mode');document.getElementById('visual-preview').hidden=true;}
+ document.getElementById('visual-close').onclick=close;
  document.getElementById('tree-scope').addEventListener('change',()=>manifest&&showRoutes());
- return {load,catalog,open:()=>{enable();manifest?showRoutes():load();},draft:(identity,payload)=>{frame.contentWindow?.postMessage({type:'cc-studio-draft',identity,payload},SITE);status.textContent='Podgląd szkicu — zmiany nie są jeszcze opublikowane.';},refresh:()=>{if(frame.src)frame.contentWindow?.postMessage({type:'cc-studio-refresh'},SITE);}};
+ return {load,catalog,close,open:()=>{enable();manifest?showRoutes():load();},draft:(identity,payload)=>{frame.contentWindow?.postMessage({type:'cc-studio-draft',identity,payload},SITE);status.textContent='Podgląd szkicu — zmiany nie są jeszcze opublikowane.';},refresh:()=>{if(frame.src)frame.contentWindow?.postMessage({type:'cc-studio-refresh'},SITE);}};
 }
