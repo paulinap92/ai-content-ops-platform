@@ -24,17 +24,8 @@
     </div>
   </header>
 
+  <nav class="studio-navigation tabs" aria-label="Studio CanariasCerca"><button type="button" class="studio-nav-button tab" data-view="preview" data-nav-key="preview">Przegląd strony</button><button type="button" class="studio-nav-button tab" data-view="lugares" data-nav-key="lugares">Miejsca i mapa</button><button type="button" class="studio-nav-button tab" data-view="events" data-nav-key="events">Wydarzenia</button><button type="button" class="studio-nav-button tab" data-view="calendar" data-nav-key="calendar">Kalendarz</button><button type="button" class="studio-nav-button tab" data-view="noticias" data-nav-key="noticias">Noticias</button><button type="button" class="studio-nav-button tab" data-view="guide" data-nav-key="guide">Guía</button><button type="button" class="studio-nav-button tab" data-view="photos" data-nav-key="photos">Zdjęcia</button><button type="button" class="studio-nav-button tab" data-view="templates" data-nav-key="templates">Plantillas</button><button type="button" class="studio-nav-button tab" data-view="database" data-nav-key="database">Baza danych</button><button type="button" class="studio-nav-button tab" data-view="editor" data-nav-key="editor">Asystent AI</button><button type="button" class="studio-nav-button tab" data-view="social" data-nav-key="social">Social Media</button><button type="button" class="studio-nav-button tab" data-view="settings" data-nav-key="settings">Ustawienia</button></nav>
   <main class="shell"><p id="editor-configuration" class="muted"></p>
-    <nav class="tabs" aria-label="Widoki aplikacji">
-      <button class="tab" data-view="editor">AI — teksty</button>
-      <button class="tab active" data-view="site">Treści i mapa</button>
-      <button class="tab" data-view="photos">Zdjęcia</button>
-      <button class="tab" data-view="noticias">Noticias · wiadomości</button>
-      <button class="tab" data-view="events">Wydarzenia · wyszukiwarka</button>
-      <button class="tab" data-view="preview">Podgląd strony</button>
-      <button class="tab" data-view="database">Baza danych</button>
-      <button class="tab" data-view="social">Social Media</button>
-    </nav>
 
     <section id="view-site" class="view active">
       <iframe id="site-editor-frame" title="Content Editor — edycja strony" style="display:block;width:100%;height:calc(100dvh - 160px);min-height:600px;border:0;background:#f4f6f2"></iframe>
@@ -445,7 +436,7 @@
     </section>
     <section id="view-database" class="view"><iframe id="canonical-db-frame" loading="lazy" title="Baza danych strony — PostgreSQL" style="display:block;width:100%;height:calc(100dvh - 160px);min-height:600px;border:0"></iframe></section>
     <section id="view-social" class="view">
-      <div class="social-heading"><div><p class="eyebrow">CANARIAS CERCA</p><h2>Posty i wiadomości</h2><p>Przygotuj treść i zdjęcie, zatwierdź materiał, a potem wybierz kanał.</p></div><button id="social-new" class="primary-button" type="button">Nowy post</button></div>
+      <div class="social-heading"><div><p class="eyebrow">CANARIAS CERCA</p><h2>Posty i wiadomości</h2><p>Przygotuj treść i zdjęcie, zatwierdź materiał, a potem wybierz kanał.</p></div><div><a class="secondary-button" href="/site/?view=templates">Generar gráfica</a> <button id="social-new" class="primary-button" type="button">Nowy post</button></div></div>
       <p class="panel social-delivery-note">Instagram i Facebook publikujesz w <a href="https://app.metricool.com/" target="_blank" rel="noopener noreferrer">Metricool</a>. WhatsApp otworzysz z gotową treścią. Zapisanie lub zatwierdzenie szkicu nie publikuje go.</p>
       <div class="social-layout">
         <aside class="panel social-sidebar"><div class="panel-heading"><h2>Twoje materiały</h2><button id="social-refresh" class="icon-button" aria-label="Odśwież posty" type="button">↻</button></div>

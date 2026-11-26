@@ -38,7 +38,7 @@ const server=createServer(async(req,res)=>{
  if(path==='/' || path.startsWith('/static/')){
   const name=path==='/'?'index.html':path.slice('/static/'.length);
   if(!['index.html','styles.css','app.js','studio-extras.js'].includes(name)){res.writeHead(404);res.end();return;}
-  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);res.end(await readFile(resolve(staticAssets,name)));return;
+  res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg'})[extname(name)]);res.end(await readFile(resolve(staticAssets,name)));return;
  }
  if(path==='/api/v1/events/sources'){res.setHeader('Content-Type','application/json');res.end('[]');return;}
  if(path==='/api/v1/photos/scan'){res.writeHead(scanFailure?503:200,{'Content-Type':'application/json'});res.end(JSON.stringify(scanFailure?{detail:'Drive scan fixture unavailable'}:{source:'drive',found:1,created:1,existing:0}));return;}
@@ -77,8 +77,8 @@ const server=createServer(async(req,res)=>{
   res.writeHead(404);res.end('{}');return;
  }
  const name=path==='/site/'?'index.html':path.startsWith('/site/assets/')?path.slice('/site/assets/'.length):null;
- if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js','charts.js','recordPhotos.js','visualStudio.js'].includes(name)){res.writeHead(404);res.end();return;}
- res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css'})[extname(name)]);
+ if(!name || !['index.html','studio.js','studio.css','editorialText.js','inspector.js','charts.js','recordPhotos.js','visualStudio.js','socialTemplates.js','social-logo.png','social-ai-decor.jpg'].includes(name)){res.writeHead(404);res.end();return;}
+ res.setHeader('Content-Type',({'.html':'text/html','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg'})[extname(name)]);
  res.end(await readFile(resolve(assets,name)));
 });
 await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -106,7 +106,7 @@ try{
  await page.locator('#tree-scope').selectOption('el-hierro');await idle();
  assert.match(await page.locator('[data-copy="island.description"] textarea').inputValue(),/^Hola, soy El Hierro/);
  await page.locator('#tree-scope').selectOption('tenerife');await idle();
- await page.getByRole('button',{name:'Guía',exact:true}).click();await idle();
+ await page.locator('#site-tree').getByRole('button',{name:'Guía',exact:true}).click();await idle();
  await page.locator('[data-copy="nav.guide"] textarea').fill('Guía editada');
  const visibility=page.getByRole('switch');await visibility.click();
  assert.equal(await visibility.getAttribute('aria-checked'),'false');

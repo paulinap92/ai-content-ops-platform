@@ -44,6 +44,7 @@ class Upload(BaseModel):
     data: str = Field(max_length=7_000_000)
     alt: str = Field("",max_length=300)
     credit: str = Field("",max_length=200)
+    social_context: dict | None = None
 
 
 def translate_error(exc):
@@ -63,7 +64,7 @@ async def studio_page():
 
 @router.get("/site/assets/{name}", include_in_schema=False)
 async def studio_asset(name: str):
-    if name not in {"studio.js", "studio.css", "lugares.js", "recordPhotos.js", "visualStudio.js", "editorialText.js", "inspector.js", "charts.js"}:
+    if name not in {"studio.js", "studio.css", "lugares.js", "recordPhotos.js", "visualStudio.js", "editorialText.js", "inspector.js", "charts.js", "socialTemplates.js", "social-logo.png", "social-ai-decor.jpg"}:
         raise HTTPException(404)
     return FileResponse(ASSETS / name, headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"})
 
@@ -154,7 +155,16 @@ async def download_media(session: Session, media_url: str = Query(max_length=204
 @router.post("/site/api/media", include_in_schema=False)
 async def upload(payload: Upload, session: Session):
     try:
-        return await studio_media.upload(session, payload.island, payload.filename, payload.data, payload.alt, payload.credit)
+        context = payload.social_context
+        if context is not None:
+            if set(context) != {"category", "style", "format", "record"} or context["category"] not in ("noticias","eventos","lugares","datos","guia") or context["style"] not in ("oficial","ai") or context["format"] not in ("ig","fb","wa","story"):
+                raise ValueError("Nieprawidłowy szablon społecznościowy.")
+            if context["record"] is not None:
+                identity = context["record"]
+                if not isinstance(identity, dict) or set(identity) != {"kind","island","resource","record_key"} or not all(isinstance(v,str) for v in identity.values()):
+                    raise ValueError("Nieprawidłowe powiązanie grafiki z wpisem.")
+                service.validate_identity(identity)
+        return await studio_media.upload(session, payload.island, payload.filename, payload.data, payload.alt, payload.credit, social_context=context)
     except ValueError as exc:
         translate_error(exc)
 

@@ -26,9 +26,15 @@ def annotate_record(item):
     key = item['identity']['record_key']
     if item['identity']['kind']=='explore' and item['identity']['resource'] in PLACE_RESOURCES:
         p=item['draft']
-        p.setdefault('short_description',p.get('description','')[:220])
-        p.setdefault('detailed_description',p.get('description',''))
-        p.setdefault('sources',[{'url':u,'title':'Fuente'} for u in p.get('cc_lugares_source_urls',[])])
+        description = p.get('description')
+        description = description if isinstance(description, str) else ''
+        if p.get('short_description') is None:
+            p['short_description'] = description[:220]
+        if p.get('detailed_description') is None:
+            p['detailed_description'] = description
+        if p.get('sources') is None:
+            urls = p.get('cc_lugares_source_urls')
+            p['sources'] = [{'url': u, 'title': 'Fuente'} for u in urls if isinstance(u, str)] if isinstance(urls, list) else []
     if key in WITHHELD:
         item['blocked_reason'] = WITHHELD[key]['reason']
         item['release_state'] = 'blocked'

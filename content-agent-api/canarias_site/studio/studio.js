@@ -2,6 +2,7 @@ import {createVisualStudio} from './visualStudio.js';
 import {createInspector,renderMonth} from "./inspector.js";
 import {renderEditorialText} from "./editorialText.js";
 import {recordPhotoControls, imageKeys, preparePhoto} from "./recordPhotos.js";
+import {createSocialTemplates} from "./socialTemplates.js";
 const $ = (id) => document.getElementById(id);
 const base = location.pathname.replace(/\/$/, "");
 const state = {
@@ -131,7 +132,7 @@ async function task(action) {
   if (state.busy) return;
   state.busy = true;
   document
-    .querySelectorAll(".actions button")
+    .querySelectorAll(".actions button:not(#templates-view button)")
     .forEach((b) => (b.disabled = true));
   try {
     await action();
@@ -140,7 +141,7 @@ async function task(action) {
   } finally {
     state.busy = false;
     document
-      .querySelectorAll(".actions button")
+      .querySelectorAll(".actions button:not(#templates-view button)")
       .forEach((b) => (b.disabled = false));
     if(state.record)$("publish").disabled=!state.record.id || Boolean(state.record.blocked_reason);
   }
@@ -153,6 +154,7 @@ function params() {
       $("kind").value === "calendar" ? $("month").value : $("resource").value,
   };
 }
+function activeNav(key){document.querySelectorAll(".studio-nav-button").forEach(b=>{const active=b.dataset.navKey===key;b.classList.toggle("active",active);b.setAttribute("aria-current",active?"page":"false");});}
 function warnUnsaved() {
   return !state.dirty || confirm("Masz niezapisane poprawki. Opuścić wpis?");
 }
@@ -379,6 +381,7 @@ function renderRecord() {
   $("publish").disabled = !item.id || Boolean(item.blocked_reason);
   $("publish").textContent=item.identity.kind==="calendar"?"Opublikuj wydarzenie":item.identity.kind==="live-point"?"Włącz punkt w jobach Live":"Opublikuj treść";
   $("improve-ai").hidden=!["guide","news"].includes(item.identity.kind);
+  $("generate-social-graphic").hidden=!["news","calendar","guide","explore"].includes(item.identity.kind);
 }
 function recordPayload() {
   const value = structuredClone(state.record.draft);
@@ -715,10 +718,11 @@ async function loadMedia() {
 }
 function view(name) {
   inspection.cancel();
+  $("templates-view").hidden = name !== "templates";
   $("inspection-view").hidden = name !== "inspection";
   $("calendar-view").hidden = name !== "content" || params().kind !== "calendar";
   $("content-view").hidden = name !== "content";
-  const noSettings=["media","database","coverage","live-points","transport"].includes(state.target.section);
+  const noSettings=name==="templates"||["media","database","coverage","live-points","transport"].includes(state.target.section);
   $("settings-view").hidden = noSettings;
   $("context-settings").hidden = noSettings;
   $("context-settings").open = name === "settings";
@@ -785,6 +789,8 @@ async function navigate(section,resource=null,nextScope=state.scope){
  if(section==="transport")resource ||= "airports";
  if(section==="live-points")resource ||= "weather";
  state.target={section,resource};
+ activeNav(({explore:"lugares",guide:"guide",calendar:"calendar",news:"noticias",media:"photos",database:"database",home:"settings"})[section]||"settings");
+ $("context-visibility").hidden=false;
  const transport=section==="transport" || section==="explore" && ["airports","ports","ferries","titsa-stops","titsa-routes","tilp-routes"].includes(resource);
  const editable=!transport && ["guide","explore","calendar","news","live-points"].includes(section) && (resource || section==="calendar" || section==="news");
  $("scope").value=state.scope;$("tree-scope").value=state.scope;
@@ -796,6 +802,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  $('create-island').value=state.scope==='global'?'tenerife':state.scope;
  renderTree();renderSettings();
  $("island").value=state.scope==="global"?"tenerife":state.scope;
+ if(section==="guide"&&!resource&&state.scope==="global"){view("inspection");await inspection.showCoverage("guide",null);return;}
  if(section==="database"){view("inspection");await inspection.showDatabase();return;}
  if(section==="coverage"){view("inspection");await inspection.showCoverage();return;}
  if(section==="media"){if(state.scope!=="global")$("media-island").value=state.scope;view("media");await loadMedia();return;}
@@ -852,13 +859,18 @@ async function init() {
   $("tree-scope").onchange=()=>task(()=>navigate(state.target.section,state.target.resource,$("tree-scope").value));
   await loadSettings();
   if(requested.get("view")==="media"){if(parent!==window)parent.postMessage({type:"cc-editor-open-photos"},location.origin);else location.assign("/?library=photos");return;}
-  if(["database","coverage"].includes(requested.get("view"))) await navigate(requested.get("view"));
+  if(requested.get("view")==="guide") await navigate("guide",null,"global");
+  else if(requested.get("view")==="places") await navigate("explore","places",islandOrder.includes(requested.get("island"))?requested.get("island"):"tenerife");
+  else if(requested.get("view")==="calendar") await navigate("calendar",null,"tenerife");
+  else if(["database","coverage"].includes(requested.get("view"))) await navigate(requested.get("view"));
   else if(["transport","live-points"].includes(requested.get("section"))) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(Object.hasOwn(state.options.sections,requested.get("section")) && (!requested.get("resource") || state.options.features[requested.get("section")]?.includes(requested.get("resource")) || requested.get("section")==="explore" && requested.get("resource")==="featured")) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(requested.has("kind")) {const p=params();await navigate(p.kind,p.resource,p.island);}
   else await navigate("home");
   await visual.load({preview:requested.get("view")==="preview" || !requested.has("view") && !requested.has("kind") && !requested.has("section")});
   if(requested.get("view")==="lugares")await visual.catalog();
+  if(requested.get("view")==="preview"||(!requested.has("view")&&!requested.has("kind")&&!requested.has("section")))activeNav("preview");
+  if(requested.get("view")==="templates")openTemplates();
   if(requested.get("new")==="1")await newRecord();
   const selectedImage=sessionStorage.getItem('cc-editor-selected-image');
   if(selectedImage && state.record){sessionStorage.removeItem('cc-editor-selected-image');state.editorTab='photos';applyRecordImage(JSON.parse(selectedImage));}
@@ -1105,14 +1117,39 @@ const visual=createVisualStudio({api,node,message,onSelect:openVisualRecord,
   if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool},location.origin);
   else location.assign('/?view='+tool);
  }});
-$('open-visual').onclick=()=>visual.open();
+const templates=createSocialTemplates($("templates-view"),{api});
+let templateReturn=null;
+function openTemplates(fromRecord=false){
+ if(!$("templates-view").hidden)return;
+ const record=fromRecord&&state.record?{...state.record,draft:recordPayload()}:null;
+ templateReturn={visual:!$("visual-preview").hidden,selected:$("workspace").classList.contains("visual-selection"),nav:document.querySelector(".studio-nav-button.active")?.dataset.navKey||"settings",view:["content","inspection","media"].find(v=>!$(v+"-view").hidden)||"settings",title:$("context-title").textContent,path:$("context-path").textContent,help:$("context-help").textContent,catalog:$("catalog-actions").hidden};
+ visual.close();
+ $("workspace").classList.remove("visual-selection");
+ view("templates");activeNav("templates");$("context-title").textContent="Plantillas";$("context-path").textContent="Canarias Cerca · Social Media";$("context-help").textContent="Twórz grafiki bez zmiany treści na stronie.";
+ $("context-visibility").hidden=true;$("catalog-actions").hidden=true;
+ templates.open(record,state.target.section==="datos"?"datos":"noticias");
+}
+function closeTemplates(){
+ if($("templates-view").hidden||!templateReturn)return;
+ const back=templateReturn;templateReturn=null;view(back.view);activeNav(back.nav);
+ if(back.visual)visual.open();if(back.selected)$("workspace").classList.add("visual-selection");
+ $("context-title").textContent=back.title;$("context-path").textContent=back.path;$("context-help").textContent=back.help;
+ $("catalog-actions").hidden=back.catalog;$("context-visibility").hidden=false;
+}
+$("open-templates").onclick=()=>task(()=>openTemplates());
+$("generate-social-graphic").onclick=()=>task(()=>openTemplates(true));
+$("tpl-back").onclick=closeTemplates;
+$('open-visual').onclick=()=>{closeTemplates();activeNav('preview');visual.open();};
 $('open-lugares').onclick=()=>task(async()=>{visual.close();await navigate('explore','places',state.scope==='global'?'tenerife':state.scope);});
 $('open-release').onclick=()=>task(()=>visual.catalog());
 $('open-database').onclick=()=>task(()=>navigate('database'));
 $('open-events').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool:'events'},location.origin);else if(warnUnsaved())location.assign('/?view=events');};
 $('open-noticias').onclick=()=>{if(warnUnsaved())location.assign('/?view=noticias');};
-$('open-articles').onclick=()=>task(()=>navigate('guide','history',state.scope==='global'?'tenerife':state.scope));
-$('open-media').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-editor-open-photos'},location.origin);else task(()=>navigate('media'));};
+$('open-articles').onclick=()=>task(async()=>{visual.close();await navigate('guide',null,'global');});
+$('open-calendar').onclick=()=>task(async()=>{visual.close();await navigate('calendar',null,state.scope==='global'?'tenerife':state.scope);});
+$('open-ai').onclick=()=>{if(warnUnsaved())location.assign('/?view=editor');};
+$('open-social').onclick=()=>{if(warnUnsaved())location.assign('/?view=social');};
+$('open-media').onclick=()=>{if(warnUnsaved())location.assign('/?view=photos');};
 $('open-settings').onclick=()=>task(()=>navigate('home'));
 
 function sourceControls(item){
