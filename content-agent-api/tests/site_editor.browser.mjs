@@ -106,7 +106,7 @@ try{
  await page.locator('#tree-scope').selectOption('el-hierro');await idle();
  assert.match(await page.locator('[data-copy="island.description"] textarea').inputValue(),/^Hola, soy El Hierro/);
  await page.locator('#tree-scope').selectOption('tenerife');await idle();
- await page.getByRole('button',{name:'Guía',exact:true}).click();await idle();
+ await page.locator('#site-tree').getByRole('button',{name:'Guía',exact:true}).click();await idle();
  await page.locator('[data-copy="nav.guide"] textarea').fill('Guía editada');
  const visibility=page.getByRole('switch');await visibility.click();
  assert.equal(await visibility.getAttribute('aria-checked'),'false');

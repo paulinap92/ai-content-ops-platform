@@ -802,7 +802,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  $('create-island').value=state.scope==='global'?'tenerife':state.scope;
  renderTree();renderSettings();
  $("island").value=state.scope==="global"?"tenerife":state.scope;
- if(section==="guide"&&!resource){view("inspection");await inspection.showCoverage("guide",null);return;}
+ if(section==="guide"&&!resource&&state.scope==="global"){view("inspection");await inspection.showCoverage("guide",null);return;}
  if(section==="database"){view("inspection");await inspection.showDatabase();return;}
  if(section==="coverage"){view("inspection");await inspection.showCoverage();return;}
  if(section==="media"){if(state.scope!=="global")$("media-island").value=state.scope;view("media");await loadMedia();return;}
@@ -1122,7 +1122,7 @@ let templateReturn=null;
 function openTemplates(fromRecord=false){
  if(!$("templates-view").hidden)return;
  const record=fromRecord&&state.record?{...state.record,draft:recordPayload()}:null;
- templateReturn={nav:document.querySelector(".studio-nav-button.active")?.dataset.navKey||"settings",view:["content","inspection","media"].find(v=>!$(v+"-view").hidden)||"settings",title:$("context-title").textContent,path:$("context-path").textContent,help:$("context-help").textContent,catalog:$("catalog-actions").hidden};
+ templateReturn={visual:!$("visual-preview").hidden,selected:$("workspace").classList.contains("visual-selection"),nav:document.querySelector(".studio-nav-button.active")?.dataset.navKey||"settings",view:["content","inspection","media"].find(v=>!$(v+"-view").hidden)||"settings",title:$("context-title").textContent,path:$("context-path").textContent,help:$("context-help").textContent,catalog:$("catalog-actions").hidden};
  visual.close();
  $("workspace").classList.remove("visual-selection");
  view("templates");activeNav("templates");$("context-title").textContent="Plantillas";$("context-path").textContent="Canarias Cerca · Social Media";$("context-help").textContent="Twórz grafiki bez zmiany treści na stronie.";
@@ -1132,6 +1132,7 @@ function openTemplates(fromRecord=false){
 function closeTemplates(){
  if($("templates-view").hidden||!templateReturn)return;
  const back=templateReturn;templateReturn=null;view(back.view);activeNav(back.nav);
+ if(back.visual)visual.open();if(back.selected)$("workspace").classList.add("visual-selection");
  $("context-title").textContent=back.title;$("context-path").textContent=back.path;$("context-help").textContent=back.help;
  $("catalog-actions").hidden=back.catalog;$("context-visibility").hidden=false;
 }

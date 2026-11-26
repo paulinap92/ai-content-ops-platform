@@ -104,7 +104,9 @@ try{
  await page.getByText('Guía · wybierz kategorię i wyspę',{exact:true}).waitFor();
  assert.equal(await page.locator('#open-articles').getAttribute('aria-current'),'page');
  await page.getByRole('button',{name:'Tenerife · 1',exact:true}).click();
- await page.locator('#editor-title').waitFor();
+ await page.locator('#content-view').waitFor();
+ assert.equal(await page.locator('#kind').inputValue(),'guide');
+ assert.equal(await page.locator('#resource').inputValue(),'history');
  await page.goto(EDITOR+'/site/?view=database');await page.getByText('Real database row',{exact:true}).waitFor();
  assert.equal(await page.locator('#visual-preview').isVisible(),false,'Direct database navigation must stay in the table browser');
  await page.locator('#open-lugares').click();await page.locator('#site-tree').getByRole('button',{name:'Playas',exact:true}).click();
