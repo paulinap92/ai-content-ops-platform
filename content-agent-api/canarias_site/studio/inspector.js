@@ -24,6 +24,16 @@ export function createInspector({root,api,label,onIsland,onManagePoints}){
   const id=begin(section?'Dostępność na wyspach':'Kompletność danych','Widok pokazuje rzeczywiste rekordy w bazie. Zero oznacza brak wpisów w danym zakresie, a nie błąd edytora.');
   try{const data=await getCoverage();if(id!==epoch)return;
    const refresh=make('button','Odśwież zestawienie',{type:'button'});refresh.onclick=async()=>{coverageCache=null;await showCoverage(section,resource);};root.append(refresh);
+   if(section==='guide'&&!resource){
+    root.append(make('h3','Guía · wybierz kategorię i wyspę'));
+    const entries=Object.entries(data.guide||{}).filter(([key])=>key!=='explore');
+    if(!entries.length){notice('Brak dostępnych kategorii przewodnika.');return;}
+    for(const [key,entry] of entries){
+      const card=make('section',undefined,{class:'card'});
+      card.append(make('h3',label(key)+' · '+entry.total+' wpisów'),islandButtons(entry,'guide',key));root.append(card);
+    }
+    return;
+   }
    if(section){const key=resource==='featured'?'explore':resource;const entry=section==='explore'&&resource==='featured'?data.guide.explore:section==='guide'?data.guide[key]:section==='explore'?data.explore[key]:null;
     if(entry){root.append(make('h3',`${resource==='featured'?'Destacados':label(resource)} · w bazie ${entry.total}`),islandButtons(entry,section,resource));}
     else if(section==='calendar'){const totals={};for(const r of data.calendar)totals[r.island]=(totals[r.island]||0)+r.count;root.append(islandButtons({islands:totals},section,null),make('h3','Dostępne miesiące'),grid(data.calendar,['island','month','count']));}

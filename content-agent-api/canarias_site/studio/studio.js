@@ -154,6 +154,7 @@ function params() {
       $("kind").value === "calendar" ? $("month").value : $("resource").value,
   };
 }
+function activeNav(key){document.querySelectorAll(".studio-nav-button").forEach(b=>{const active=b.dataset.navKey===key;b.classList.toggle("active",active);b.setAttribute("aria-current",active?"page":"false");});}
 function warnUnsaved() {
   return !state.dirty || confirm("Masz niezapisane poprawki. Opuścić wpis?");
 }
@@ -788,6 +789,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  if(section==="transport")resource ||= "airports";
  if(section==="live-points")resource ||= "weather";
  state.target={section,resource};
+ activeNav(({explore:"lugares",guide:"guide",calendar:"calendar",news:"noticias",media:"photos",database:"database",home:"settings"})[section]||"settings");
  $("context-visibility").hidden=false;
  const transport=section==="transport" || section==="explore" && ["airports","ports","ferries","titsa-stops","titsa-routes","tilp-routes"].includes(resource);
  const editable=!transport && ["guide","explore","calendar","news","live-points"].includes(section) && (resource || section==="calendar" || section==="news");
@@ -800,6 +802,7 @@ async function navigate(section,resource=null,nextScope=state.scope){
  $('create-island').value=state.scope==='global'?'tenerife':state.scope;
  renderTree();renderSettings();
  $("island").value=state.scope==="global"?"tenerife":state.scope;
+ if(section==="guide"&&!resource){view("inspection");await inspection.showCoverage("guide",null);return;}
  if(section==="database"){view("inspection");await inspection.showDatabase();return;}
  if(section==="coverage"){view("inspection");await inspection.showCoverage();return;}
  if(section==="media"){if(state.scope!=="global")$("media-island").value=state.scope;view("media");await loadMedia();return;}
@@ -856,13 +859,17 @@ async function init() {
   $("tree-scope").onchange=()=>task(()=>navigate(state.target.section,state.target.resource,$("tree-scope").value));
   await loadSettings();
   if(requested.get("view")==="media"){if(parent!==window)parent.postMessage({type:"cc-editor-open-photos"},location.origin);else location.assign("/?library=photos");return;}
-  if(["database","coverage"].includes(requested.get("view"))) await navigate(requested.get("view"));
+  if(requested.get("view")==="guide") await navigate("guide",null,"global");
+  else if(requested.get("view")==="places") await navigate("explore","places",islandOrder.includes(requested.get("island"))?requested.get("island"):"tenerife");
+  else if(requested.get("view")==="calendar") await navigate("calendar",null,"tenerife");
+  else if(["database","coverage"].includes(requested.get("view"))) await navigate(requested.get("view"));
   else if(["transport","live-points"].includes(requested.get("section"))) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(Object.hasOwn(state.options.sections,requested.get("section")) && (!requested.get("resource") || state.options.features[requested.get("section")]?.includes(requested.get("resource")) || requested.get("section")==="explore" && requested.get("resource")==="featured")) await navigate(requested.get("section"),requested.get("resource"),islandOrder.includes(requested.get("island"))?requested.get("island"):"global");
   else if(requested.has("kind")) {const p=params();await navigate(p.kind,p.resource,p.island);}
   else await navigate("home");
   await visual.load({preview:requested.get("view")==="preview" || !requested.has("view") && !requested.has("kind") && !requested.has("section")});
   if(requested.get("view")==="lugares")await visual.catalog();
+  if(requested.get("view")==="preview"||(!requested.has("view")&&!requested.has("kind")&&!requested.has("section")))activeNav("preview");
   if(requested.get("view")==="templates")openTemplates();
   if(requested.get("new")==="1")await newRecord();
   const selectedImage=sessionStorage.getItem('cc-editor-selected-image');
@@ -1115,30 +1122,33 @@ let templateReturn=null;
 function openTemplates(fromRecord=false){
  if(!$("templates-view").hidden)return;
  const record=fromRecord&&state.record?{...state.record,draft:recordPayload()}:null;
- templateReturn={view:["content","inspection","media"].find(v=>!$(v+"-view").hidden)||"settings",title:$("context-title").textContent,path:$("context-path").textContent,help:$("context-help").textContent,catalog:$("catalog-actions").hidden};
+ templateReturn={nav:document.querySelector(".studio-nav-button.active")?.dataset.navKey||"settings",view:["content","inspection","media"].find(v=>!$(v+"-view").hidden)||"settings",title:$("context-title").textContent,path:$("context-path").textContent,help:$("context-help").textContent,catalog:$("catalog-actions").hidden};
  visual.close();
  $("workspace").classList.remove("visual-selection");
- view("templates");$("context-title").textContent="Plantillas";$("context-path").textContent="Canarias Cerca · Social Media";$("context-help").textContent="Twórz grafiki bez zmiany treści na stronie.";
+ view("templates");activeNav("templates");$("context-title").textContent="Plantillas";$("context-path").textContent="Canarias Cerca · Social Media";$("context-help").textContent="Twórz grafiki bez zmiany treści na stronie.";
  $("context-visibility").hidden=true;$("catalog-actions").hidden=true;
  templates.open(record,state.target.section==="datos"?"datos":"noticias");
 }
 function closeTemplates(){
  if($("templates-view").hidden||!templateReturn)return;
- const back=templateReturn;templateReturn=null;view(back.view);
+ const back=templateReturn;templateReturn=null;view(back.view);activeNav(back.nav);
  $("context-title").textContent=back.title;$("context-path").textContent=back.path;$("context-help").textContent=back.help;
  $("catalog-actions").hidden=back.catalog;$("context-visibility").hidden=false;
 }
 $("open-templates").onclick=()=>task(()=>openTemplates());
 $("generate-social-graphic").onclick=()=>task(()=>openTemplates(true));
 $("tpl-back").onclick=closeTemplates;
-$('open-visual').onclick=()=>{closeTemplates();visual.open();};
+$('open-visual').onclick=()=>{closeTemplates();activeNav('preview');visual.open();};
 $('open-lugares').onclick=()=>task(async()=>{visual.close();await navigate('explore','places',state.scope==='global'?'tenerife':state.scope);});
 $('open-release').onclick=()=>task(()=>visual.catalog());
 $('open-database').onclick=()=>task(()=>navigate('database'));
 $('open-events').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-studio-open-tool',tool:'events'},location.origin);else if(warnUnsaved())location.assign('/?view=events');};
 $('open-noticias').onclick=()=>{if(warnUnsaved())location.assign('/?view=noticias');};
-$('open-articles').onclick=()=>task(()=>navigate('guide','history',state.scope==='global'?'tenerife':state.scope));
-$('open-media').onclick=()=>{if(parent!==window)parent.postMessage({type:'cc-editor-open-photos'},location.origin);else task(()=>navigate('media'));};
+$('open-articles').onclick=()=>task(async()=>{visual.close();await navigate('guide',null,'global');});
+$('open-calendar').onclick=()=>task(async()=>{visual.close();await navigate('calendar',null,state.scope==='global'?'tenerife':state.scope);});
+$('open-ai').onclick=()=>{if(warnUnsaved())location.assign('/?view=editor');};
+$('open-social').onclick=()=>{if(warnUnsaved())location.assign('/?view=social');};
+$('open-media').onclick=()=>{if(warnUnsaved())location.assign('/?view=photos');};
 $('open-settings').onclick=()=>task(()=>navigate('home'));
 
 function sourceControls(item){

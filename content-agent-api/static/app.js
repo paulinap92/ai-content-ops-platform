@@ -1221,12 +1221,14 @@ function initTabs() {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", async () => {
       if (tab.dataset.view === 'site') {location.assign('/site/');return;}
+      if (['lugares','guide','calendar','settings'].includes(tab.dataset.view)) {location.assign('/site/?view='+(tab.dataset.view==='lugares'?'places':tab.dataset.view));return;}
       if (tab.dataset.view === 'database') {location.assign('/site/?view=database');return;}
       if (tab.dataset.view === 'templates') {location.assign('/site/?view=templates');return;}
       if (tab.dataset.view === 'preview') {location.assign('/site/?view=preview');return;}
       document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
       document.querySelectorAll(".view").forEach((view) => view.classList.remove("active"));
       tab.classList.add("active");
+      document.querySelectorAll(".studio-nav-button").forEach(b=>b.setAttribute("aria-current",b===tab?"page":"false"));
       $(`view-${tab.dataset.view}`).classList.add("active");
       if(tab.dataset.view === "preview" && !$("website-preview-frame").getAttribute("src")) $("website-preview-frame").src="https://www.canariascerca.es/";
       if (tab.dataset.view === "photos") await loadPhotoLibrary();

@@ -33,6 +33,7 @@ await page.route('**/*',async route=>{
   if(path==='/site/api/database/tables')return json({tables:[{name:'entities'}]});
  if(path==='/site/api/database/tables/entities')return json({table:'entities',count:1,columns:[{name:'id',type:'uuid'},{name:'canonical_name',type:'text'}],rows:[{id:key,canonical_name:'Real database row'}]});
  if(path==='/site/api/options')return json({islands:['tenerife'],sections:{explore:'Explore',guide:'Guía',live:'Live',calendar:'Calendario',news:'Noticias',datos:'Datos'},features:{explore:['places','beaches'],guide:['history'],live:['weather'],datos:['climate']},copy_defaults:{'home.title':'Home','home.description':'Description'},media_upload_enabled:true});
+ if(path==='/site/api/coverage')return json({guide:{history:{total:1,islands:{tenerife:1}}},islands:['tenerife'],explore:{},calendar:[],live:[],climate:[],statistics:[],notes:'Fixture'});
  if(path==='/site/api/site-manifest')return json(manifest);
  if(path==='/site/api/records')return json(u.searchParams.get('kind')==='settings'?{items:[settings],count:1}:{items:[item],count:1});
  if(path==='/site/api/open-record')return json(item);
@@ -99,6 +100,11 @@ try{
  await page.locator('#open-database').click();await page.getByText('Real database row',{exact:true}).waitFor();
  assert.equal(await page.locator('#visual-preview').isVisible(),false,'Database view must not show the website preview');
  assert.equal(await page.locator('#visual-frame').isVisible(),false);
+ await page.goto(EDITOR+'/site/?view=guide');
+ await page.getByText('Guía · wybierz kategorię i wyspę',{exact:true}).waitFor();
+ assert.equal(await page.locator('#open-articles').getAttribute('aria-current'),'page');
+ await page.getByRole('button',{name:'Tenerife · 1',exact:true}).click();
+ await page.locator('#editor-title').waitFor();
  await page.goto(EDITOR+'/site/?view=database');await page.getByText('Real database row',{exact:true}).waitFor();
  assert.equal(await page.locator('#visual-preview').isVisible(),false,'Direct database navigation must stay in the table browser');
  await page.locator('#open-lugares').click();await page.locator('#site-tree').getByRole('button',{name:'Playas',exact:true}).click();
