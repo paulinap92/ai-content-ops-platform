@@ -1,10 +1,11 @@
+.git
+.venv
+.cache
 .env
 .env.*
-!.env.example
-.venv
 __pycache__
 *.pyc
-*.bak
+.pytest_cache
+node_modules
 output
 photo_inbox
-.pytest_cache
