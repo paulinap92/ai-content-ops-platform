@@ -1,0 +1,2 @@
+document.querySelector('#open-monitor')?.addEventListener('click',()=>location.assign('/site/monitor'));
+if(location.pathname==='/site/monitor')document.querySelectorAll('[data-nav-key]').forEach(b=>b.addEventListener('click',()=>{const key=b.dataset.navKey;location.assign(['events','noticias','editor','social'].includes(key)?'/?view='+key:'/site/?view='+({preview:'preview',lugares:'places',guide:'guide',calendar:'calendar',photos:'media',templates:'templates',database:'database',settings:'home'}[key]||'home'));}));

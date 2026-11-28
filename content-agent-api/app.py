@@ -135,6 +135,8 @@ def create_app() -> FastAPI:
     app.include_router(photos_router)
     app.include_router(studio_router)
     app.include_router(site_editor_router)
+    from canarias_site.api.data_monitor import router as data_monitor_router
+    app.include_router(data_monitor_router)
     app.include_router(lugares_editor_router)
     app.include_router(inspection_router)
     app.include_router(noticias_router)

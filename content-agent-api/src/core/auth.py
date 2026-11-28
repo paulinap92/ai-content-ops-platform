@@ -18,8 +18,10 @@ router = APIRouter()
 
 
 def configured_token():
-    from src.core.config import settings
-    token = os.getenv("EDITOR_TOKEN", "") or (settings.editor_token.get_secret_value() if settings.editor_token else "")
+    token = os.getenv("EDITOR_TOKEN", "")
+    if not token:
+        from src.core.config import settings
+        token = settings.editor_token.get_secret_value() if settings.editor_token else ""
     if len(token) < 32:
         raise HTTPException(503, "Skonfiguruj prywatny EDITOR_TOKEN (minimum 32 znaki).")
     return token
@@ -77,7 +79,8 @@ class Login(BaseModel):
 
 @router.get("/login", include_in_schema=False)
 async def login_page():
-    return FileResponse("static/login.html", headers={"Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow"})
+    from pathlib import Path
+    return FileResponse(Path(__file__).resolve().parents[2]/"static/login.html", headers={"Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow"})
 
 
 @router.post("/auth/login", include_in_schema=False)

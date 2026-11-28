@@ -37,5 +37,5 @@ def test_primary_menu_has_identical_labels_and_order():
     assert site == tools
     assert [key for key, _ in site] == [
         "preview", "lugares", "events", "calendar", "noticias", "guide",
-        "photos", "templates", "database", "editor", "social", "settings",
+        "photos", "templates", "database", "editor", "social", "settings", "monitor",
     ]

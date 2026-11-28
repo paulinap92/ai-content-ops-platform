@@ -1220,6 +1220,7 @@ async function saveEventAsSiteDraft(item) {
 function initTabs() {
   document.querySelectorAll(".tab").forEach((tab) => {
     tab.addEventListener("click", async () => {
+      if (tab.id === 'open-monitor') {location.assign('/site/monitor');return;}
       if (tab.dataset.view === 'site') {location.assign('/site/');return;}
       if (['lugares','guide','calendar','settings'].includes(tab.dataset.view)) {location.assign('/site/?view='+(tab.dataset.view==='lugares'?'places':tab.dataset.view));return;}
       if (tab.dataset.view === 'database') {location.assign('/site/?view=database');return;}
